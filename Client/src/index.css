@@ -2,8 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-body{
-
+nav{
     font-family: "Nunito Sans", sans-serif;
     font-optical-sizing: auto;
     font-weight: weight;
@@ -12,6 +11,8 @@ body{
       "wdth" 100,
       "YTLC" 500;
 }
+
+
 
 .primaryColor {
   color: #4D4F53;
