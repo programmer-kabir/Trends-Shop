@@ -4,13 +4,13 @@ import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { FaArrowRightToBracket, FaCodeCompare } from "react-icons/fa6";
 import { FiSearch, FiShoppingCart, FiUser } from "react-icons/fi";
 import { BsBagPlus } from "react-icons/bs";
-import logo from "../../assets/LOGO/LOGO.png";
-import DropDown from "../../Components/Design/DropDown";
+import logo from "../../../assets/LOGO/LOGO.png";
+import DropDown from "../../../Components/Design/DropDown";
 import { RxCross2 } from "react-icons/rx";
-import MobileDropDown from "../../Components/Design/MobileDropDown";
+import MobileDropDown from "../../../Components/Design/MobileDropDown";
 import { MdArrowForwardIos, MdDashboard } from "react-icons/md";
 import { LuUser2 } from "react-icons/lu";
-import Content from "../../Components/Content/Content";
+import Content from "../../../Components/Content/Content";
 import { TbCurrencyTaka } from "react-icons/tb";
 const Navbar = () => {
   const user = true;
