@@ -9,7 +9,7 @@ const DropDown = ({ name, items }) => {
     <div className="relative inline-block text-left">
       <div className="w-full primaryColor group hover:text-[#F62977] inline-block">
         <button className="py-2 flex  items-center">
-          <p className="mr-1 text-lg font-medium">{name}</p>
+          <p className="mr-1 text-lg font-light">{name}</p>
           <VscTriangleDown className="font-thin transition-transform duration-300 transform rotate-0 group-hover:rotate-180" />
         </button>
 

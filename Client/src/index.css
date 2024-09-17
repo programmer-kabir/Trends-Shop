@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-nav{
+body{
     font-family: "Nunito Sans", sans-serif;
     font-optical-sizing: auto;
     font-weight: weight;
