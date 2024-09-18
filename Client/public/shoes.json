@@ -7,6 +7,8 @@
     "mainImage": "https://i.ibb.co/Yb5RZ1z/4.jpg",
     "price": "550",
     "star": 1,
+    "Discount": 10,
+    "selling": 7,
     "gender": "MEN'S",
     "Description": {
       "Item_code": 858400008,
@@ -25,6 +27,8 @@
     "mainImage": "https://i.ibb.co/9qn9HsB/3.jpg",
     "price": "550",
     "star": 1,
+    "Discount": 20,
+    "selling": 5,
     "gender": "MEN'S",
     "Description": {
       "Item_code": 858400008,
@@ -46,6 +50,8 @@
     "fourthImage": "https://i.ibb.co/3YcCr3L/1-4.jpg",
     "price": "714",
     "star": 5,
+    "Discount": 35,
+    "selling": 8,
     "gender": "MEN'S",
     "Description": {
       "Item_code": 843700023,
@@ -68,6 +74,8 @@
     "fourthImage": "https://i.ibb.co/JxRvfYd/4-4.jpg",
     "price": "2232",
     "star": 5,
+    "Discount": 12,
+    "selling": 9,
     "gender": "MEN'S",
     "Description": {
       "Item_code": 815401408,
@@ -95,6 +103,8 @@
     "price": "1522",
     "gender": "MEN'S",
     "star": 5,
+    "Discount": 19,
+    "selling": 12,
     "Description": {
       "Item_code": 815404511,
       "Brand": "Walker",
@@ -116,6 +126,8 @@
     "fourthImage": "https://i.ibb.co/KX2LLH2/1-4.jpg",
     "price": "1359",
     "star": 5,
+    "Discount": 15,
+    "selling": 8,
     "gender": "WOMEN'S",
     "Description": {
       "Item_code": 760400002,
@@ -139,6 +151,8 @@
     "fourthImage": "https://i.ibb.co/JqWpCC2/1-4.jpg",
     "price": "1674",
     "star": 5,
+    "Discount": 18,
+    "selling": 6,
     "gender": "MEN'S",
     "Description": {
       "Item_code": 815504511,
@@ -166,6 +180,8 @@
     "price": "2232",
     "gender": "KID'S",
     "star": 5,
+    "Discount": 12,
+    "selling": 9,
     "Description": {
       "Item_code": 815501408,
       "Brand": "Walker",
@@ -196,6 +212,8 @@
     "fourthImage": "https://i.ibb.co/PzGjpbc/3-4.jpg",
     "price": "2232",
     "star": 5,
+    "Discount": 15,
+    "selling": 9,
     "gender": "MEN'S",
     "Description": {
       "Item_code": 815501408,
@@ -219,6 +237,8 @@
     "price": "360",
     "gender": "MEN'S",
     "star": 2,
+    "Discount": 11,
+    "selling": 8,
     "Description": {
       "Item_code": 858400008,
       "Brand": "Walker",
@@ -245,6 +265,8 @@
     "price": "2232",
     "gender": "KID'S",
     "star": 5,
+    "Discount": 19,
+    "selling": 17,
     "Description": {
       "Item_code": 815501408,
       "Brand": "Walker",
@@ -272,6 +294,8 @@
     "mainImage": "https://i.ibb.co/VMD6CGj/2.jpg",
     "price": "550",
     "star": 1,
+    "Discount": 20,
+    "selling": 12,
     "gender": "MEN'S",
     "Description": {
       "Item_code": 858400008,

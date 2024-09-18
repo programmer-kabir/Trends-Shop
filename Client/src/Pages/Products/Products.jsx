@@ -93,7 +93,7 @@ const Products = () => {
   return (
    <Content>
      <section className="flex py-16 gap-5">
-      <div className="h-auto w-[25%] text-center text-[#4D4F53]">
+      <div className="h-auto w-[30%] text-center text-[#4D4F53]">
         <p className="uppercase border-b-2 border-gray-400 font-bold text-center">
           Shop by Filter
         </p>

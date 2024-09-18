@@ -1,28 +1,3 @@
-// import React from "react";
-// import Rating from "react-rating";
-// import { FaRegStar, FaStar } from "react-icons/fa6";
-// const ProductCard = ({ shoes }) => {
-//   console.log(shoes);
-//   return (
-//     <div className="border">
-//       <div>
-//         <img src={shoes.mainImage} alt="" />
-//       </div>
-//       <div>
-//         <p>{shoes.name}</p>
-//         <Rating
-//           placeholderRating={3.2}
-//           emptySymbol={<FaStar size={19} color="#D6D6D6" />}
-//           placeholderSymbol={<FaStar size={19} color="#FF9933" />}
-//           fullSymbol={<FaStar size={19} color="#FF9933" />}
-//         />
-//         <p></p>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ProductCard;
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Card, Space } from "antd";
@@ -31,7 +6,6 @@ import { FaRegEye } from "react-icons/fa6";
 import { FiPlus } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { Tooltip } from "react-tooltip";
-import "./ss.css";
 // import { WishListDataContext } from "../Context/WishlistData";
 const ProductCard = ({ shoes }) => {
   // const {setFavoriteTShirtCount} = useContext(WishListDataContext)
@@ -65,7 +39,7 @@ const ProductCard = ({ shoes }) => {
   //
   const mainPrice = shoes.price;
   let updatePrice;
-  const discount = shoes?.discount;
+  const discount = shoes?.Discount;
 
   if (discount) {
     // Calculate the updated price with the discount
@@ -82,11 +56,11 @@ const ProductCard = ({ shoes }) => {
             <Link to={`../product-details/${shoes._id}`}>
               <div className="relative">
                 <div className="absolute  z-50 overflow-visible">
-                  {shoes?.discount ? (
+                  {shoes?.Discount ? (
                     <>
                       {" "}
                       <Badge.Ribbon placement="start" color="#f50400"
-                        text={`Discount ${shoes.discount}%`}
+                        text={`Discount ${shoes.Discount}%`}
                       ></Badge.Ribbon>
                     </>
                   ) : (
@@ -116,7 +90,7 @@ const ProductCard = ({ shoes }) => {
 
             {/* Additional content */}
             <div className="right-2 cursor-pointer absolute top-10">
-              <div className="translate-x-8 duration-500  space-y-3 transform opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100">
+              <div className="translate-x-4 duration-500  space-y-3 transform opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100">
                 <a
                   data-tooltip-id="favorite"
                   data-tooltip-content="Add To Wishlist"
@@ -186,7 +160,7 @@ const ProductCard = ({ shoes }) => {
         <div className="pt-2 px-2">
           <p className="text-base font-medium">{shoes.name}</p>
           <div className="flex gap-2 pt-2">
-            {shoes?.discount ? (
+            {shoes?.Discount ? (
               <div>
                 <p className="line-through flex text-[#4D4F53] text-xl">
                   {shoes.price}৳
@@ -196,7 +170,7 @@ const ProductCard = ({ shoes }) => {
               <p className="text-[#4D4F53] text-xl">{shoes.price}৳</p>
             )}
             <p></p>
-            {shoes?.discount ? (
+            {shoes?.Discount ? (
               <p className="text-[#f50400] font-semibold text-xl">
                 {updatePrice}৳
               </p>
