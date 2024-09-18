@@ -20,3 +20,15 @@ body{
 .secondaryColor {
   color: #f50400;
 }
+.primaryButton{
+  background-color: #080921;
+  color: white;
+  font-weight: 500;
+  padding: 7px 0px;
+  transition: all 0.3s ease-in-out;
+}
+.primaryButton:hover{
+  background-color: #f50400;
+  color: white;
+
+}

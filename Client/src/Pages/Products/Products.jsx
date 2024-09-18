@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchShoes } from "../Redux/Shoes/shoesSlice";
 import { IoIosArrowDown } from "react-icons/io";
+import { Link } from "react-router-dom";
+import ProductCard from "../../Components/Design/ProductCard";
+import Content from "../../Components/Content/Content";
 
 const Products = () => {
   const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
@@ -9,7 +12,7 @@ const Products = () => {
 
   useEffect(() => {
     dispatch(fetchShoes());
-  }, [dispatch]);
+  }, [ ]);
 
   // State to track open dropdown, active category, selected subcategory
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -75,14 +78,21 @@ const Products = () => {
   };
 
   const filterShoes = Shoes.filter((shoe) => {
-    const isGenderFilter = ["MEN'S", "WOMEN'S", "KID'S"].includes(selectedSubcategory);
-    const matchesGender = isGenderFilter ? shoe.gender === selectedSubcategory : true;
-    const matchesCategory = !isGenderFilter ? shoe.category === selectedSubcategory : true;
+    const isGenderFilter = ["MEN'S", "WOMEN'S", "KID'S"].includes(
+      selectedSubcategory
+    );
+    const matchesGender = isGenderFilter
+      ? shoe.gender === selectedSubcategory
+      : true;
+    const matchesCategory = !isGenderFilter
+      ? shoe.category === selectedSubcategory
+      : true;
     return matchesGender && matchesCategory;
   });
 
   return (
-    <section className="flex py-16 gap-5">
+   <Content>
+     <section className="flex py-16 gap-5">
       <div className="h-auto w-[25%] text-center text-[#4D4F53]">
         <p className="uppercase border-b-2 border-gray-400 font-bold text-center">
           Shop by Filter
@@ -116,16 +126,18 @@ const Products = () => {
               } overflow-hidden`}
             >
               {category.subcategories.map((subcategory, subIndex) => (
-                <div key={subIndex} >
-                  <a
-                    href="#"
+                <div key={subIndex}>
+                  <Link
+                    to={`/products/${subcategory.replace(/ /g, "-")}`}
                     className={`block px-4 text-[15px] py-2  hover:bg-gray-100 ${
-                      activeSubcategory === subcategory ? "bg-slate-100 rounded-md text-blue-500" : ""
+                      activeSubcategory === subcategory
+                        ? "bg-slate-100 rounded-md text-blue-500"
+                        : ""
                     }`}
                     onClick={() => toggleSubcategory(subcategory)}
                   >
                     {subcategory}
-                  </a>
+                  </Link>
                 </div>
               ))}
             </div>
@@ -172,8 +184,13 @@ const Products = () => {
         </div>
       </div>
 
-      <div className="w-full">{filterShoes.length ? filterShoes.length : "No results"}</div>
+      <div className="w-full grid grid-cols-3 gap-7 pt-5">
+        {filterShoes.map((shoes) => (
+          <ProductCard key={shoes._id} shoes={shoes} />
+        ))}
+      </div>
     </section>
+   </Content>
   );
 };
 
