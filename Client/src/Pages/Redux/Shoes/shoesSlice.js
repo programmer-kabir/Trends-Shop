@@ -1,9 +1,19 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-export const fetchShoes = createAsyncThunk("class/fetchShoes", async () => {
-  const res = await axios.get("http://localhost:3000/shoes");
-  return res.data;
+// export const fetchShoes = createAsyncThunk("shoes/fetchShoes", async () => {
+//   const res = await axios.get("http://localhost:3000/shoes");
+//   return res.data;
+// });
+// Example in fetchShoes
+export const fetchShoes = createAsyncThunk('shoes/fetchShoes', async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/shoes');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 });
+
 const shoesSlice = createSlice({
   name: "Shoes",
   initialState: {
@@ -18,7 +28,6 @@ const shoesSlice = createSlice({
     builder.addCase(fetchShoes.fulfilled, (state, action) => {
       state.isLoading = false;
       state.Shoes = action.payload;
-      state.error = null;
     });
     builder.addCase(fetchShoes.rejected, (state, action) => {
       state.isLoading = false;

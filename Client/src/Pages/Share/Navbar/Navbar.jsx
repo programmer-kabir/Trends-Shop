@@ -13,7 +13,7 @@ import { LuUser2 } from "react-icons/lu";
 import Content from "../../../Components/Content/Content";
 import { TbCurrencyTaka } from "react-icons/tb";
 const Navbar = () => {
-  const user = true;
+  const user = false;
   const [letter, setLetter] = useState("");
   const [nav, setNav] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -51,16 +51,28 @@ const Navbar = () => {
     }
   }, [user]);
 
-  const MensItems = ["BOOT", "LOAFER", "SANDALS", "CASUAL", "FORMAL", "SPORTS"];
-  const WomensItems = [
-    "BOOT",
-    "LOAFER",
-    "SANDALS",
-    "CASUAL",
-    "FORMAL",
-    "SPORTS",
+  const MensItems = [
+    { name: "BOOT", link: "products/boot" },
+    { name: "LOAFER", link: "products/loafer" },
+    { name: "SANDALS", link: "products/sandals" },
+    { name: "CASUAL", link: "products/MAN'S-CASUAL" },
+    { name: "FORMAL", link: "products/MAN'S-FORMAL" },
+    { name: "SPORTS", link: "products/MAN'S-SPORT" },
   ];
-  const KidsItems = ["SANDALS", "CASUAL", "FORMAL", "SPORTS"];
+  const WomensItems = [
+    { name: "BOOT", link: "products/boot" },
+    { name: "LOAFER", link: "products/loafer" },
+    { name: "SANDALS", link: "products/sandals" },
+    { name: "CASUAL", link: "products/MAN'S-CASUAL" },
+    { name: "SPORTS", link: "products/sports" },
+  ];
+  const KidsItems = [
+    { name: "FORMAL", link: "products/FORMAL" },
+    { name: "SANDALS", link: "products/sandals" },
+    { name: "CASUAL", link: "products/MAN'S-CASUAL" },
+    { name: "SPORTS", link: "products/sports" },
+  ];
+
   return (
     <div className="bg-white">
       <nav
@@ -99,7 +111,6 @@ const Navbar = () => {
                 </div>
                 {/* User */}
                 <div className="flex items-center justify-center gap-3">
-                
                   {user ? (
                     <>
                       {user.role === "admin" ? (
@@ -111,39 +122,43 @@ const Navbar = () => {
                       ) : (
                         <Link to="/dashboard/my_profile">
                           <div className="secondaryColor">
-                            <MdDashboard size={22}/>
+                            <MdDashboard size={22} />
                           </div>
                         </Link>
                       )}
                       <button className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
-                    <BsBagPlus size={18} />
-                    <div className="flex g">
-                      <TbCurrencyTaka size={17} />
-                      <p className="font-bold uppercase text-[15px]">0</p>
-                    </div>
-                  </button>
-                       <button className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
+                        <BsBagPlus size={18} />
+                        <div className="flex g">
+                          <TbCurrencyTaka size={17} />
+                          <p className="font-bold uppercase text-[15px]">0</p>
+                        </div>
+                      </button>
+                      <button className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
                         <LuUser2 size={18} />
-                        <p className="font-bold uppercase text-[15px]">Logout</p>
+                        <p className="font-bold uppercase text-[15px]">
+                          Logout
+                        </p>
                       </button>
                     </>
                   ) : (
                     <>
-                    <Link to={"/login"}>
+                      <Link to={"/login"}>
+                        <button className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
+                          <LuUser2 size={18} />
+                          <p className="font-bold uppercase text-[15px]">
+                            Login
+                          </p>
+                        </button>
+                      </Link>
                       <button className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
-                        <LuUser2 size={18} />
-                        <p className="font-bold uppercase text-[15px]">Login</p>
+                        <BsBagPlus size={18} />
+                        <div className="flex g">
+                          <TbCurrencyTaka size={17} />
+                          <p className="font-bold uppercase text-[15px]">0</p>
+                        </div>
                       </button>
-                    </Link>
-                      <button className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
-                    <BsBagPlus size={18} />
-                    <div className="flex g">
-                      <TbCurrencyTaka size={17} />
-                      <p className="font-bold uppercase text-[15px]">0</p>
-                    </div>
-                  </button></>
+                    </>
                   )}
-                
                 </div>
               </div>
 

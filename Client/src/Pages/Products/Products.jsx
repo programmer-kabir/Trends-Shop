@@ -5,36 +5,34 @@ import { IoIosArrowDown } from "react-icons/io";
 import { Link } from "react-router-dom";
 import ProductCard from "../../Components/Design/ProductCard";
 import Content from "../../Components/Content/Content";
+import LoadingSpinner from "../../Components/Design/LoadingSpinner/LoadingSpinner"; // Import the spinner
 
 const Products = () => {
-  const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
   const dispatch = useDispatch();
+  const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
 
   useEffect(() => {
     dispatch(fetchShoes());
-  }, [ ]);
+  }, [dispatch]);
 
-  // State to track open dropdown, active category, selected subcategory
   const [openDropdown, setOpenDropdown] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeSubcategory, setActiveSubcategory] = useState("");
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
 
-  // Toggle main category dropdown
   const toggleDropdown = (index) => {
     if (openDropdown === index) {
       setOpenDropdown(null);
-      setActiveCategory(null); // Reset active category when dropdown is closed
+      setActiveCategory(null);
     } else {
       setOpenDropdown(index);
-      setActiveCategory(index); // Set active category
+      setActiveCategory(index);
     }
   };
 
-  // Toggle subcategory and set its value
   const toggleSubcategory = (subcategory) => {
     setSelectedSubcategory(subcategory);
-    setActiveSubcategory(subcategory); // Set active subcategory
+    setActiveSubcategory(subcategory);
   };
 
   const categories = [
@@ -64,7 +62,6 @@ const Products = () => {
     },
   ];
 
-  // Price dropdown
   const [selectedOption, setSelectedOption] = useState("Sort By Price");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -91,13 +88,13 @@ const Products = () => {
   });
 
   return (
-   <Content>
-     <section className="flex py-16 gap-5">
+    <Content>
+     {
+      isLoading ? <LoadingSpinner />:<> <section className="flex py-16 gap-5">
       <div className="h-auto w-[30%] text-center text-[#4D4F53]">
         <p className="uppercase border-b-2 border-gray-400 font-bold text-center">
           Shop by Filter
         </p>
-        {/* Category */}
         {categories.map((category, index) => (
           <div
             key={index}
@@ -116,12 +113,10 @@ const Products = () => {
                 }`}
               />
             </button>
-
-            {/* Dropdown Menu */}
             <div
               className={`w-full space-y-1 transition-all duration-300 ${
                 openDropdown === index
-                  ? "opacity-100 max-h-40 "
+                  ? "opacity-100 max-h-40"
                   : "opacity-0 max-h-0 py-0 pointer-events-none"
               } overflow-hidden`}
             >
@@ -143,7 +138,6 @@ const Products = () => {
             </div>
           </div>
         ))}
-        {/* Sort By Price */}
         <div className="pt-5">
           <p className="uppercase border-b-2 border-gray-400 font-bold text-center">
             Sort By Price
@@ -160,8 +154,6 @@ const Products = () => {
                 }`}
               />
             </button>
-
-            {/* Dropdown Menu */}
             {isDropdownOpen && (
               <div className="absolute w-full text-sm rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300">
                 <a
@@ -185,12 +177,19 @@ const Products = () => {
       </div>
 
       <div className="w-full grid grid-cols-3 gap-7 pt-5">
-        {filterShoes.map((shoes) => (
-          <ProductCard key={shoes._id} shoes={shoes} />
-        ))}
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : error ? (
+          <p className="text-red-500 text-center">Error loading data!</p>
+        ) : (
+          filterShoes.map((shoes) => (
+            <ProductCard key={shoes._id} shoes={shoes} />
+          ))
+        )}
       </div>
-    </section>
-   </Content>
+    </section></>
+     }
+    </Content>
   );
 };
 
