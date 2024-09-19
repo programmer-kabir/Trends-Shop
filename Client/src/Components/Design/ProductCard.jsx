@@ -68,7 +68,7 @@ const ProductCard = ({ shoes }) => {
                   )}{" "}
                 </div>
                 {/* Fixed height for the image container */}
-                <div className="overflow-hidden rounded-md hover:rounded-md">
+                <div className="overflow-hidden rounded-md hover:rounded">
                   <img
                     src={shoes.mainImage}
                     alt=""
