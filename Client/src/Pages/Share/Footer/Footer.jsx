@@ -2,7 +2,7 @@ import React from 'react'
 import SocialIcons from './SocialIcons'
 import { Link } from 'react-router-dom'
 import SubscribeInput from './SubscripeInput'
-
+import toast from 'react-hot-toast'
 const Footer = () => {
   return (
     <div>
@@ -69,7 +69,7 @@ const Footer = () => {
      
       <div className="bg-gray-700 text-white text-sm">
         <p className="text-center text-balance pt-2 pb-2">
-          Copyright © 2024 | Trendy Lifestyle
+          Copyright © 2024 | Trends Shop Lifestyle
         </p>
       </div>
     </div>
