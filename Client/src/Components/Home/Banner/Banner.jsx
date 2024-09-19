@@ -1,6 +1,7 @@
 import React from "react";
 import BannerImage from "../../../assets/Banner/banner.png";
 import "./Banner.css";
+import Collection from "../Collection/Collection";
 const Banner = () => {
   return (
     <section className="relative">
@@ -27,6 +28,9 @@ const Banner = () => {
           </button>
         </div>
       </div>
+    <div className="pt-5">
+    <Collection />
+    </div>
     </section>
   );
 };
