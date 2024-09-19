@@ -1,7 +1,9 @@
 import { Badge, Button, Modal } from "antd";
 import React, { useState } from "react";
-import './styles.css'
+import { TbCurrencyTaka } from "react-icons/tb";
 const HoverCard = ({ shoe }) => {
+
+
   const [open, setOpen] = useState(false);
   const showModal = () => {
     setOpen(true);
@@ -9,7 +11,6 @@ const HoverCard = ({ shoe }) => {
   const handleCancel = () => {
     setOpen(false);
   };
-
 
   const mainPrice = shoe.price;
   let updatePrice;
@@ -55,21 +56,28 @@ const HoverCard = ({ shoe }) => {
         {/* Buttons */}
         <div className="absolute inset-0 flex flex-col items-center justify-between cursor-pointer p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {/* First button in the middle */}
-          <div className="flex-grow flex items-center justify-center">
-            <button onClick={showModal} className="px-2 py-2 text-xs bg-[#080921] hover:bg-[#4D4F53] transition-all duration-500 ease-in-out text-white font-semibold rounded-md">
+          <div className="flex-grow flex items-center  justify-center">
+            <button
+              onClick={showModal}
+              className="px-2 py-2 text-xs bg-[#080921] hover:bg-[#4D4F53] transition-all duration-500 ease-in-out text-white font-semibold rounded-md"
+            >
               Clicked To View
             </button>
           </div>
-          <Modal
-            title="Title"
-            open={open}
-            onCancel={handleCancel}
-          >
-            <p>sfhs</p>
+          {/* Modal */}
+          <Modal title="Product Details" open={open} onCancel={handleCancel}>
+            <div className="h-[300px]">
+              <img className="w-full h-full" src={shoe.mainImage} alt="" />
+            </div>
+             <p className="text-red-700 font-semibold">{shoe.name}</p>
+             <p className="text-[#4D4F53] ">{shoe.shortDescription}</p>
+             <p className="font-bold text-red-700  flex items-center gap-0">Price: {updatePrice}<span className="-ml-1"><TbCurrencyTaka size={18}/></span></p>
+
+            
           </Modal>
           {/* Last button at the bottom */}
-          <div className="mb-4">
-            <Button type="default">Last Button</Button>
+          <div className="mb-0 flex flex-col w-full">
+            <button className="w-full bg-[#f50400] hover:bg-[#4D4F53] py-2 rounded-md font-semibold text-white transition-all duration-700 ease-in-out">Buy Now</button>
           </div>
         </div>
         {/* Content */}

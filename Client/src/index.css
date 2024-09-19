@@ -32,3 +32,6 @@ body{
   color: white;
 
 }
+.ant-modal-footer{
+  display: none;
+}

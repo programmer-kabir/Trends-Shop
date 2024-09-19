@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import Content from "../../Content/Content";
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -22,6 +22,14 @@ const BestSelling = () => {
   useEffect(() => {
     dispatch(fetchShoes());
   }, []);
+  // Sort products based on 'selling' in descending order
+  const sortedProducts = useMemo(() => {
+    return [...Shoes].sort((a, b) => b.selling - a.selling);
+  }, [Shoes]);
+
+  // Select the top 6 products
+  const top10Products = sortedProducts.slice(0, 10);
+
 
   return (
     <Content>
@@ -37,13 +45,11 @@ const BestSelling = () => {
         <Swiper
           slidesPerView={4}
           spaceBetween={10}
-          pagination={{
-            clickable: true,
-          }}
+          
           modules={[Pagination]}
           className="mySwiper"
         >
-          {Shoes.map((shoe) => (
+          {top10Products.map((shoe) => (
             <SwiperSlide key={shoe._id}>
               <HoverCard shoe={shoe} />
             </SwiperSlide>
