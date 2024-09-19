@@ -69,7 +69,7 @@ const HoverCard = ({ shoe }) => {
             <div className="h-[300px]">
               <img className="w-full h-full" src={shoe.mainImage} alt="" />
             </div>
-             <p className="text-red-700 font-semibold">{shoe.name}</p>
+             <p className="text-red-700 pt-2 font-semibold">{shoe.name}</p>
              <p className="text-[#4D4F53] ">{shoe.shortDescription}</p>
              <p className="font-bold text-red-700  flex items-center gap-0">Price: {updatePrice}<span className="-ml-1"><TbCurrencyTaka size={18}/></span></p>
 
