@@ -35,3 +35,7 @@ body{
 .ant-modal-footer{
   display: none;
 }
+
+.ant-divider{
+  color: rgb(0, 0, 0);
+}

@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 
 const Register = () => {
   const onFinish = (values) => {
-    event.preventDefault();
     console.log("Form Values:", values); // Logs the form data to the console
   };
 
