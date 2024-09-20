@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { Button, Divider, Form, Input, Modal } from "antd";
 import { GiCheckMark } from "react-icons/gi";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../../assets/LOGO/LOGO.png";
 import { IoMdCopy } from "react-icons/io";
 import toast from 'react-hot-toast'
+import useAuth from "../../../Components/Hooks/useAuth";
 const Login = () => {
+  const {SingInUser,setLoading} = useAuth()
+
   const [open, setOpen] = useState(false);
   const showModal = () => {
     setOpen(true);
@@ -13,6 +16,20 @@ const Login = () => {
   const handleCancel = () => {
     setOpen(false);
   };
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from?.pathname || "/";
+
+  const onFinish = (values) =>{
+    SingInUser(values.email, values.password)
+    .then((result) => {
+      const loggedUser = result.user;
+      setLoading(false);
+      toast.success('login successful')
+      navigate(from , {replace:true})
+    });
+  };
+  
   // Email
   const email1 = "admin@gmail.com";
   const email2 = "user@gmail.com";
@@ -39,6 +56,7 @@ const Login = () => {
         console.error("Failed to copy: ", err);
       });
   };
+
 
     return (
     <section className="mt-12 md:lg:mt-20 px-20">
@@ -94,7 +112,7 @@ const Login = () => {
               labelCol={{ span: 5 }}
               wrapperCol={{ span: 35 }}
               className="space-y-4 px-5"
-              // onFinish={onFinish}
+              onFinish={onFinish}
             >
               <Form.Item
                 label="Email"
@@ -121,10 +139,10 @@ const Login = () => {
                 ]}
               >
                 <Input.Password placeholder="Enter your password" />
+              </Form.Item>
                 <Link to="/forget-password">
                   <p className="text-end underline py-1">Forget Password?</p>
                 </Link>
-              </Form.Item>
 
               <Form.Item>
                 <Button

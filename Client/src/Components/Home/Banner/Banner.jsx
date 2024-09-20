@@ -28,9 +28,7 @@ const Banner = () => {
           </button>
         </div>
       </div>
-    <div className="pt-5">
-    <Collection />
-    </div>
+
     </section>
   );
 };

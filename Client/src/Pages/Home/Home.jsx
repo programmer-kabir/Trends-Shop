@@ -10,6 +10,7 @@ const Home = () => {
   return (
     <div className="space-y-20">
       <Banner />
+      <Collection />
       <BestSelling />
       <MensCollection />
       <WomensCollection />

@@ -6,13 +6,19 @@ import useAuth from "../../../Components/Hooks/useAuth";
 import toast from "react-hot-toast";
 
 const Register = () => {
-  const {RegisterUser} = useAuth()
+  const {RegisterUser,updateUserProfile} = useAuth()
   const navigate = useNavigate();
   const onFinish = (values) => {
     RegisterUser(values.email, values.password)
     .then(result =>{
       const user = result.user
-      console.log(user);
+      updateUserProfile(values.name)
+      .then((data) => {
+        
+        // console.log(user);
+      });
+      toast.success("Registration successful! You can now log in.");
+      navigate('/')
     })
     .catch((error) => {
         toast.error(error.message);
