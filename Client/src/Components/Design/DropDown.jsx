@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaMinus } from "react-icons/fa6";
 import { VscTriangleDown } from "react-icons/vsc";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const DropDown = ({ name, items }) => {
   const [hoveredItem, setHoveredItem] = useState(null);
@@ -21,7 +21,7 @@ const DropDown = ({ name, items }) => {
               onMouseEnter={() => setHoveredItem(index)}
               onMouseLeave={() => setHoveredItem(null)}
             >
-              <Link
+              <NavLink
                 to={item.link}
                 className={`flex items-center hover:text-[#F62977] gap-1 px-4 py-1 text-base text-[#525258] transition-transform duration-300 ${
                   hoveredItem === index ? "hover:transform translate-x-2" : ""
@@ -31,7 +31,7 @@ const DropDown = ({ name, items }) => {
                 <span className={hoveredItem === index ? "ml-0" : ""}>
                   {item.name}
                 </span>
-              </Link>
+              </NavLink>
             </li>
           ))}
         </ul>

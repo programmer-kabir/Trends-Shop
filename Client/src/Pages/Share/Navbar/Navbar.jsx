@@ -128,7 +128,7 @@ if (loading) {
                           </div>
                         </Link>
                       ) : (
-                        <Link to="/dashboard/my_profile">
+                        <Link to="user/dashboard">
                           <div className="secondaryColor">
                             <MdDashboard size={22} />
                           </div>
