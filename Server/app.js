@@ -26,7 +26,9 @@ async function run() {
     await client.connect();
     const shoesCollection = client.db("TrendsShop").collection("shoes");
     const usersCollection = client.db("TrendsShop").collection("users");
-
+    const divisionCollection = client.db("TrendsShop").collection("divisions");
+    const districtCollection = client.db("TrendsShop").collection("districts");
+    const upZillahCollection = client.db("TrendsShop").collection("upZillahs");
     // shoes get
     app.get("/shoes", async (req, res) => {
       const result = await shoesCollection.find().toArray();
@@ -45,11 +47,43 @@ async function run() {
       const result = await usersCollection.insertOne(user);
       res.send(result);
     });
+
+    // Update User Data
+    app.put("/users", async (req, res) => {
+      const updatedUserData = req.body;
+      console.log(updatedUserData);
+      const query = { email: updatedUserData.email };
+      const existingUser = await usersCollection.findOne(query);
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const result = await usersCollection.updateOne(query, {
+        $set: updatedUserData,
+      });
+      res.send(result);
+    });
     // Get all user
     app.get("/users", async (req, res) => {
       const user = await usersCollection.find().toArray();
       res.send(user);
     });
+
+    // Address
+    app.get("/districts", async (req, res) => {
+      const district = await districtCollection.find().toArray();
+      res.send(district);
+    });
+    // division
+    app.get("/divisions", async (req, res) => {
+      const divisions = await divisionCollection.find().toArray();
+      res.send(divisions);
+    });
+    // upzillah
+    app.get("/upZillahs", async (req, res) => {
+      const upZillahs = await upZillahCollection.find().toArray();
+      res.send(upZillahs);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("You successfully connected to MongoDB!");

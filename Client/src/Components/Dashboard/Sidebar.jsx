@@ -169,7 +169,9 @@ const Sidebar = () => {
             
           </div>
         
-        <div></div>
+        <div className="w-full">
+          <Outlet />
+        </div>
       </div>
     </section>
   );
