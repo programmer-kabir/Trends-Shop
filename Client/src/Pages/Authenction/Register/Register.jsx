@@ -1,11 +1,22 @@
 import React from "react";
 import logo from "../../../assets/LOGO/LOGO.png";
 import { Button, Form, Input } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import useAuth from "../../../Components/Hooks/useAuth";
+import toast from "react-hot-toast";
 
 const Register = () => {
+  const {RegisterUser} = useAuth()
+  const navigate = useNavigate();
   const onFinish = (values) => {
-    console.log("Form Values:", values); // Logs the form data to the console
+    RegisterUser(values.email, values.password)
+    .then(result =>{
+      const user = result.user
+      console.log(user);
+    })
+    .catch((error) => {
+        toast.error(error.message);
+    });
   };
 
   return (
