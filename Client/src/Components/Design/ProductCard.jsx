@@ -6,10 +6,13 @@ import { FaRegEye } from "react-icons/fa6";
 import { FiPlus } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { Tooltip } from "react-tooltip";
+import useAuth from "../Hooks/useAuth";
 // import { WishListDataContext } from "../Context/WishlistData";
 const ProductCard = ({ shoes }) => {
-  // const {setFavoriteTShirtCount} = useContext(WishListDataContext)
+  const {user} = useAuth()
   const [isFavorite, setIsFavorite] = useState(false);
+  const [activeSize, setActiveSize] = useState(null);
+
   useEffect(() => {
     // Check if the current product is in favorites when component mounts
     const storedIdsString = localStorage.getItem("favoriteTShirt");
@@ -47,7 +50,19 @@ const ProductCard = ({ shoes }) => {
   } else {
     updatePrice = mainPrice;
   }
-  console.log(updatePrice);
+  const handleSizeClick = (size) => {
+    setActiveSize(size);
+  };
+  // Add to Cart
+  const handleAddToCart = (id) => {
+    if(!activeSize){
+toast.error('Please Select Your size')
+    }
+    const email = user.email
+    const data = {productId:id, size:activeSize,email : user.email}
+    
+  };
+
   return (
     <div>
       <div className="bg-gray-100 pb-1 rounded-md">
@@ -134,7 +149,8 @@ const ProductCard = ({ shoes }) => {
                   <Tooltip id="favorite" />
                   <FaRegEye size={20} color={isHoveredEye ? "white" : "#000"} />
                 </div>
-                <div
+                <button
+                onClick={()=>handleAddToCart(shoes._id)}
                   data-tooltip-id="favorite"
                   data-tooltip-content="Add To Cart"
                   data-tooltip-place="left"
@@ -152,7 +168,7 @@ const ProductCard = ({ shoes }) => {
                     size={20}
                     color={isHoveredCompare ? "white" : "#000 "}
                   />
-                </div>
+                </button>
               </div>
             </div>
           </div>
@@ -178,7 +194,23 @@ const ProductCard = ({ shoes }) => {
               <></>
             )}
           </div>
-          
+          {/* / */}
+          <div className="py-3">
+            <h2 className="font-medium pb-1">Select Your Size:</h2>
+                        {shoes?.size.map((size, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleSizeClick(size)}
+                            className={`mx-2 py-1 px-2 border-2 font-medium ${
+                              activeSize === size
+                                ? "border-[#f50400] bg-[#f50400] text-white"
+                                : "border-gray-300 text-gray-700"
+                            }`}
+                          >
+                            {size}
+                          </button>
+                        ))}
+                      </div>
         </div>
       </div>
     </div>

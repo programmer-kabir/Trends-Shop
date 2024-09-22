@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { GrFormEdit } from "react-icons/gr";
+import CircularJSON from 'circular-json';
+
 import District from "../../../Components/Apis/Distric";
 import Division from "../../../Components/Apis/Division";
 import upZillah from "../../../Components/Apis/upZillah";
@@ -21,6 +22,8 @@ const MyProfile = () => {
   const matchingUsers = Users.filter(
     (userData) => userData.email === user?.email
   );
+  
+
   // const matchingUsers = ''
   const {
     handleSubmit,
@@ -50,8 +53,7 @@ const MyProfile = () => {
   useEffect(() => {
     // console.log("Divisions:", division);
   }, [division]);
-  let firstName;
-  let lastName;
+
   const addedPhoneNumber = async () => {
     const email = user?.email;
     // Get the input element by its ID
@@ -75,19 +77,44 @@ const MyProfile = () => {
         }
       });
   };
+  const addedPostCode = async () => {
+    const email = user?.email;
+    // Get the input element by its ID
+    const postCodeInput = document.getElementById("postCode");
+    const postCode = postCodeInput.value
+    // Log the input value to the console
+    
+    const data = {email, postCode};
+    console.log(data);
+    const response = await axios
+      .put(
+        `${import.meta.env.VITE_LOCALHOST_KEY}/users`,
+        data
+      )
+      .then((data) => {
+        // console.log(data.data);
+        if (data.data.modifiedCount > 0) {
+          // dispatch(updateUser(data));
+          postCodeInput.value = '';
+          toast.success("Successfully Your Post Code is added");
+        }
+      });
+  };
   const [isEditMode, setEditMode] = useState(false);
   
   const onSubmit = async (data) => {
-    // console.log(data);
-    const name = data.firstName + " " + lastName;
+    const jsonData = CircularJSON.stringify(data); 
+    console.log(data);
+    const name = data.name;
     console.log(name);
 
     const districtId = data.district;
     const districts = district.find((dis) => dis.id === districtId);
     const districtName = districts.name;
     // console.log(data.date);
-    name;
+    
     data.district = districtName;
+    // data.postCode=postCode
     const response = await axios
       .put(`${import.meta.env.VITE_LOCALHOST_KEY}/users`, data)
       .then((data) => {
@@ -100,7 +127,7 @@ const MyProfile = () => {
   };
   return (
     <div>
-      <div className="px-5 pt-7 ">
+      <div className="px-5 pt-5 ">
         <div className="">
           <h2 className="text-xl font-semibold">ACCOUNT INFORMATION</h2>
           <p className="text-gray-700 text-sm">
@@ -108,9 +135,9 @@ const MyProfile = () => {
           </p>
 
           {/* Profile */}
-          <div className="pt-10 ">
+          <div className="pt-10 flex gap-4">
             <div
-              className="py-5 bg-white w-2/3"
+              className="py-5 bg-white w-2/3 h-fit"
               style={{
                 boxShadow:
                   "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px",
@@ -135,24 +162,24 @@ const MyProfile = () => {
                   onSubmit={handleSubmit(onSubmit)}
                   className="px-5 space-y-4"
                 >
-                  {/* First Name */}
+                  {/*  Name */}
                   <label
-                    htmlFor="firstName"
+                    htmlFor="name"
                     className={`relative block overflow-hidden rounded border ${
-                      errors.firstName ? "border-red-500" : "border-gray-600"
+                      errors.name ? "border-red-500" : "border-gray-600"
                     } px-3 pt-3 shadow-sm outline-none`}
                   >
                     <input
                       type="text"
-                      id="firstName"
-                      defaultValue={firstName}
-                      {...register("firstName")}
+                      id="name"
+                      Value={matchingUsers[0]?.name}
+                      {...register("name")}
                       placeholder="First Name"
                       className="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent  focus:outline-none focus:ring-0 sm:text-sm"
                     />
 
                     <span className="absolute start-3 top-3 -translate-y-1/2 text-xs text-gray-700 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:top-3 peer-focus:text-xs">
-                      First Name*
+                     Name
                     </span>
                   </label>
                  
@@ -190,7 +217,7 @@ const MyProfile = () => {
                       name="gender"
                       id="gender"
                       {...register("gender", { required: true })}
-                      defaultValue={matchingUsers?.gender}
+                      defaultValue={matchingUsers[0]?.gender}
                       className={`border ${
                         errors.date
                           ? "border-red-500 outline-none"
@@ -220,15 +247,15 @@ const MyProfile = () => {
                           id="division"
                           {...register("divison", { required: true })}
                           defaultValue={matchingUsers[0]?.divison}
-                          value={selectedDivision}
+                          Value={matchingUsers[0]?.divison}
                           onChange={(e) => setSelectedDivision(e.target.value)}
                           className=" rounded-xl h-8 w-full border-none bg-transparent p-0 placeholder-transparent text-lg outline-none"
                         >
-                          <option value="" disabled>
+                          <option Value="" disabled>
                             Select Division
                           </option>
                           {division.map((divisions) => (
-                            <option key={divisions.id} value={divisions.name}>
+                            <option key={divisions.id} Value={divisions.name}>
                               {divisions.name}
                             </option>
                           ))}
@@ -325,6 +352,8 @@ const MyProfile = () => {
                     </div>
                   </div>
 
+                  
+
                   <button className="bg-black px-3 py-3 rounded-md text-white">
                     Save Changes
                   </button>
@@ -359,11 +388,12 @@ const MyProfile = () => {
                     </div>
                     
                     {/*  */}
+                    
                     <div>
-                      <p className="text-gray-800">Village Name</p>
+                      <p className="text-gray-800">Post Code</p>
                       <p className="font-semibold">
-                        {matchingUsers[0]?.village
-                          ? matchingUsers[0]?.village
+                        {matchingUsers[0]?.postCode
+                          ? matchingUsers[0]?.postCode
                           : "N/A"}
                       </p>
                     </div>
@@ -378,14 +408,7 @@ const MyProfile = () => {
                           : "N/A"}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-gray-800">Others Phone Number</p>
-                      <p className="font-semibold">
-                        {matchingUsers[0]?.otherNumber
-                          ? matchingUsers[0]?.otherNumber
-                          : "N/A"}
-                      </p>
-                    </div>
+                    
                    
                     <div>
                       <p className="text-gray-800">District Name</p>
@@ -403,15 +426,21 @@ const MyProfile = () => {
                           : "N/A"}
                       </p>
                     </div>
-                    
+                    <div>
+                      <p className="text-gray-800">Village Name</p>
+                      <p className="font-semibold">
+                        {matchingUsers[0]?.village
+                          ? matchingUsers[0]?.village
+                          : "N/A"}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
-          </div>
-          {/* Add a Phone Number */}
+            <div className="w-[33%]">
           {!isEditMode && (
-            <div className="my-7 w-2/3">
+            <div className="">
               <div
                 className="py-5 "
                 style={{
@@ -449,6 +478,50 @@ const MyProfile = () => {
               </div>
             </div>
           )}
+          {/* Added Post Code */}
+          {!isEditMode && (
+            <div className="my-7">
+              <div
+                className="py-5 "
+                style={{
+                  boxShadow:
+                    "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px",
+                }}
+              >
+                <p className="text-xl px-6 font-semibold">Add Phone Number</p>
+                <hr className="my-5" />
+                <div className="px-5 space-y-3">
+                  {/* input Number */}
+                  <label
+                    htmlFor="postCode"
+                    className="relative block overflow-hidden rounded border border-gray-600 px-3 pt-3 shadow-sm outline-none"
+                  >
+                    <input
+                      type="number"
+                      id="postCode"
+                      placeholder=" Post Code"
+                      defaultValue={matchingUsers[0]?.postCode}
+                      className="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0 sm:text-sm"
+                    />
+
+                    <span className="absolute start-3 top-3 -translate-y-1/2 text-xs text-gray-700 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:top-3 peer-focus:text-xs">
+                      Post Code*
+                    </span>
+                  </label>
+                  <button
+                    onClick={addedPostCode}
+                    className="w-full bg-black text-white py-3 rounded-md text-center"
+                  >
+                    Proceed
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          </div>
+          </div>
+          {/* Add a Phone Number */}
+         
         </div>
       </div>
     </div>

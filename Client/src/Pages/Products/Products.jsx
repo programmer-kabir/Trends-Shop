@@ -87,108 +87,114 @@ const Products = () => {
     return matchesGender && matchesCategory;
   });
 
+
   return (
     <Content>
-     {
-      isLoading ? <LoadingSpinner />:<> <section className="flex py-16 gap-5">
-      <div className="h-auto w-[30%] text-center text-[#4D4F53]">
-        <p className="uppercase border-b-2 border-gray-400 font-bold text-center">
-          Shop by Filter
-        </p>
-        {categories.map((category, index) => (
-          <div
-            key={index}
-            className="relative border-r flex flex-col w-full text-center px-5"
-          >
-            <button
-              onClick={() => toggleDropdown(index)}
-              className={`flex justify-center items-center text-center px-2 py-[14px] text-sm hover:bg-gray-100 text-black rounded-md focus:outline-none w-full ${
-                activeCategory === index ? "text-blue-500" : ""
-              }`}
-            >
-              <span>{category.name}</span>
-              <IoIosArrowDown
-                className={`w-5 h-5 ml-auto transform transition-transform duration-500 ${
-                  openDropdown === index ? "rotate-180" : "rotate-0"
-                }`}
-              />
-            </button>
-            <div
-              className={`w-full space-y-1 transition-all duration-300 ${
-                openDropdown === index
-                  ? "opacity-100 max-h-40"
-                  : "opacity-0 max-h-0 py-0 pointer-events-none"
-              } overflow-hidden`}
-            >
-              {category.subcategories.map((subcategory, subIndex) => (
-                <div key={subIndex}>
-                  <Link
-                    to={`/products/${subcategory.replace(/ /g, "-")}`}
-                    className={`block px-4 text-[15px] py-2  hover:bg-gray-100 ${
-                      activeSubcategory === subcategory
-                        ? "bg-slate-100 rounded-md text-blue-500"
-                        : ""
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          {" "}
+          <section className="flex py-16 gap-5">
+            <div className="h-auto w-[30%] text-center text-[#4D4F53]">
+              <p className="uppercase border-b-2 border-gray-400 font-bold text-center">
+                Shop by Filter
+              </p>
+              {categories.map((category, index) => (
+                <div
+                  key={index}
+                  className="relative border-r flex flex-col w-full text-center px-5"
+                >
+                  <button
+                    onClick={() => toggleDropdown(index)}
+                    className={`flex justify-center items-center text-center px-2 py-[14px] text-sm hover:bg-gray-100 text-black rounded-md focus:outline-none w-full ${
+                      activeCategory === index ? "text-blue-500" : ""
                     }`}
-                    onClick={() => toggleSubcategory(subcategory)}
                   >
-                    {subcategory}
-                  </Link>
+                    <span>{category.name}</span>
+                    <IoIosArrowDown
+                      className={`w-5 h-5 ml-auto transform transition-transform duration-500 ${
+                        openDropdown === index ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </button>
+                  <div
+                    className={`w-full space-y-1 transition-all duration-300 ${
+                      openDropdown === index
+                        ? "opacity-100 max-h-40"
+                        : "opacity-0 max-h-0 py-0 pointer-events-none"
+                    } overflow-hidden`}
+                  >
+                    {category.subcategories.map((subcategory, subIndex) => (
+                      <div key={subIndex}>
+                        <Link
+                          to={`/products/${subcategory.replace(/ /g, "-")}`}
+                          className={`block px-4 text-[15px] py-2  hover:bg-gray-100 ${
+                            activeSubcategory === subcategory
+                              ? "bg-slate-100 rounded-md text-blue-500"
+                              : ""
+                          }`}
+                          onClick={() => toggleSubcategory(subcategory)}
+                        >
+                          {subcategory}
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
-            </div>
-          </div>
-        ))}
-        <div className="pt-5">
-          <p className="uppercase border-b-2 border-gray-400 font-bold text-center">
-            Sort By Price
-          </p>
-          <div className="relative inline-block px-2 pt-2 font-light text-left w-full">
-            <button
-              onClick={togglePriceDropdown}
-              className="flex items-center text-sm px-4 py-2 text-black border rounded-md focus:outline-none w-full"
-            >
-              <span>{selectedOption}</span>
-              <IoIosArrowDown
-                className={`w-5 h-5 ml-auto transform transition-transform duration-500 ${
-                  isDropdownOpen ? "rotate-180" : "rotate-0"
-                }`}
-              />
-            </button>
-            {isDropdownOpen && (
-              <div className="absolute w-full text-sm rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300">
-                <a
-                  href="#"
-                  onClick={() => handleOptionClick("Low to High")}
-                  className="block px-4 py-2  hover:bg-gray-100"
-                >
-                  Low to High
-                </a>
-                <a
-                  href="#"
-                  onClick={() => handleOptionClick("High to Low")}
-                  className="block px-4 py-2  hover:bg-gray-100"
-                >
-                  High to Low
-                </a>
+              <div className="pt-5">
+                <p className="uppercase border-b-2 border-gray-400 font-bold text-center">
+                  Sort By Price
+                </p>
+                <div className="relative inline-block px-2 pt-2 font-light text-left w-full">
+                  <button
+                    onClick={togglePriceDropdown}
+                    className="flex items-center text-sm px-4 py-2 text-black border rounded-md focus:outline-none w-full"
+                  >
+                    <span>{selectedOption}</span>
+                    <IoIosArrowDown
+                      className={`w-5 h-5 ml-auto transform transition-transform duration-500 ${
+                        isDropdownOpen ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </button>
+                  {isDropdownOpen && (
+                    <div className="absolute w-full text-sm rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300">
+                      <a
+                        href="#"
+                        onClick={() => handleOptionClick("Low to High")}
+                        className="block px-4 py-2  hover:bg-gray-100"
+                      >
+                        Low to High
+                      </a>
+                      <a
+                        href="#"
+                        onClick={() => handleOptionClick("High to Low")}
+                        className="block px-4 py-2  hover:bg-gray-100"
+                      >
+                        High to Low
+                      </a>
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
+            </div>
 
-      <div className="w-full grid grid-cols-3 gap-7 pt-5">
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : error ? (
-          <p className="text-red-500 text-center">Error loading data!</p>
-        ) : (
-          filterShoes.map((shoes) => (
-            <ProductCard key={shoes._id} shoes={shoes} />
-          ))
-        )}
-      </div>
-    </section></>
-     }
+            <div className="w-full grid grid-cols-3 gap-7 pt-5">
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : error ? (
+                <p className="text-red-500 text-center">Error loading data!</p>
+              ) : (
+                filterShoes.map((shoes) => (
+                  <ProductCard key={shoes._id} shoes={shoes} />
+                ))
+              )}
+            </div>
+          </section>
+        </>
+      )}
     </Content>
   );
 };
