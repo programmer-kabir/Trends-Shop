@@ -29,6 +29,8 @@ async function run() {
     const divisionCollection = client.db("TrendsShop").collection("divisions");
     const districtCollection = client.db("TrendsShop").collection("districts");
     const upZillahCollection = client.db("TrendsShop").collection("upZillahs");
+    const bookedCollection = client.db("TrendsShop").collection("booked");
+
     // shoes get
     app.get("/shoes", async (req, res) => {
       const result = await shoesCollection.find().toArray();
@@ -66,6 +68,90 @@ async function run() {
     app.get("/users", async (req, res) => {
       const user = await usersCollection.find().toArray();
       res.send(user);
+    });
+
+
+    // User Booked Data
+    // app.post('/booked',async(req, res) =>{
+    //   const body = req.body
+    //   // console.log(body);
+    //   const id = body.productId;
+    //   const email = body.email;
+    //   const filter = { productId: id, email };
+    //   const incomingQuantity = body.quantity || 1;
+    //   const incomingSize = body.size;
+
+    //   console.log(incomingQuantity);
+    //   try{
+
+    //     const existingData  = await bookedCollection.findOne(filter);
+    //     if (existingData ) {
+    //       const updateResult = await bookedCollection.updateOne(
+    //         filter,
+    //         { $inc: { quantity: incomingQuantity } } // Increment the quantity field by the incoming quantity
+    //       );
+    //       res.send({ message: "Quantity updated successfully", updateResult });
+    //     } else {
+    //       const result = await bookedCollection.insertOne(body);
+    //       res.send(result);
+    //     }
+    //   }
+    //   catch(error){
+    //     res.status(500).send({ message: "Server error" });
+    //   }
+    // })
+
+    app.post('/booked', async (req, res) => {
+      const body = req.body;
+      const id = body.productId;
+      const email = body.email;
+      const incomingSize = body.size;
+      const incomingQuantity = body.quantity || 1;
+    
+      const filter = { productId: id, email };
+    
+      try {
+        // Find if the item already exists in the bookedCollection
+        const existingData = await bookedCollection.findOne(filter);
+    
+        if (existingData) {
+          // Check if the sizes field is already an array
+          if (Array.isArray(existingData.size)) {
+            // If size is already an array, add the incoming size if it doesn't exist
+            const updateResult = await bookedCollection.updateOne(
+              filter,
+              {
+                $inc: { quantity: incomingQuantity }, // Increment the quantity field
+                $addToSet: { size: incomingSize } // Add size to the size array if it doesn't already exist
+              }
+            );
+            res.send({ message: "Quantity updated and size added successfully", updateResult });
+          } else {
+            // If size is not an array, convert it to an array and add the new size
+            const updatedSizes = [existingData.size, incomingSize];
+            const updateResult = await bookedCollection.updateOne(
+              filter,
+              {
+                $inc: { quantity: incomingQuantity }, // Increment the quantity field
+                $set: { size: updatedSizes } // Convert the size to an array with the existing and incoming sizes
+              }
+            );
+            res.send({ message: "Quantity updated and size array created", updateResult });
+          }
+        } else {
+          // If item does not exist, insert a new entry with the size as a single value
+          const result = await bookedCollection.insertOne(body);
+          res.send(result);
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Server error" });
+      }
+    });
+    
+    app.get("/booked", async (req, res) => {
+      const result = await bookedCollection.find().toArray();
+      res.send(result);
     });
 
     // Address

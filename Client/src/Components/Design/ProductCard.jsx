@@ -7,12 +7,15 @@ import { FiPlus } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { Tooltip } from "react-tooltip";
 import useAuth from "../Hooks/useAuth";
+import axios from "axios";
+import { WishListDataContext } from "../Context/WishlistData";
 // import { WishListDataContext } from "../Context/WishlistData";
 const ProductCard = ({ shoes }) => {
-  const {user} = useAuth()
+  const { user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeSize, setActiveSize] = useState(null);
-
+  const { favoriteTShirtCount, setFavoriteTShirtCount } =
+    useContext(WishListDataContext);
   useEffect(() => {
     // Check if the current product is in favorites when component mounts
     const storedIdsString = localStorage.getItem("favoriteTShirt");
@@ -25,6 +28,7 @@ const ProductCard = ({ shoes }) => {
     const storedIdsString = localStorage.getItem("favoriteTShirt");
     const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
     setId(storedIds);
+    const newFavorite = { id, size:activeSize };
 
     if (!storedIds.includes(id)) {
       storedIds.push(id);
@@ -55,12 +59,29 @@ const ProductCard = ({ shoes }) => {
   };
   // Add to Cart
   const handleAddToCart = (id) => {
-    if(!activeSize){
-toast.error('Please Select Your size')
+    if (!activeSize) {
+      toast.error("Please Select Your size");
     }
-    const email = user.email
-    const data = {productId:id, size:activeSize,email : user.email}
-    
+    else{
+      const data = {
+        productId: id,
+        size: activeSize,
+        quantity: 1,
+        email: user.email,
+      };
+      axios
+      .post(`${import.meta.env.VITE_LOCALHOST_KEY}/booked`, data)
+      .then((data) => {
+        console.log(data.data);
+        if (data.data?.updateResult?.acknowledged) {
+          toast.success(`${shoes.name} quantity updated in the cart`);
+        } else if (data.data?.insertedId) {
+          toast.success(`${shoes.name} added to the cart`);
+        } else {
+          toast.error('Failed to add to cart');
+        }
+      });
+    }
   };
 
   return (
@@ -74,7 +95,9 @@ toast.error('Please Select Your size')
                   {shoes?.Discount ? (
                     <>
                       {" "}
-                      <Badge.Ribbon placement="start" color="#f50400"
+                      <Badge.Ribbon
+                        placement="start"
+                        color="#f50400"
                         text={`Discount ${shoes.Discount}%`}
                       ></Badge.Ribbon>
                     </>
@@ -114,7 +137,7 @@ toast.error('Please Select Your size')
                   <Tooltip id="favorite" />
 
                   <div
-                    onClick={() => handleAddToFavorite(TShirt._id)}
+                    onClick={() => handleAddToFavorite(shoes._id)}
                     className={` hover:bg-[#f50400] p-2 ${
                       isFavorite ? "bg-[#f50400] text-white" : "bg-white"
                     }`}
@@ -133,7 +156,7 @@ toast.error('Please Select Your size')
                   </div>
                 </a>
 
-                <div
+                {/* <div
                   data-tooltip-id="favorite"
                   data-tooltip-content="Quick View"
                   data-tooltip-place="left"
@@ -148,9 +171,9 @@ toast.error('Please Select Your size')
                 >
                   <Tooltip id="favorite" />
                   <FaRegEye size={20} color={isHoveredEye ? "white" : "#000"} />
-                </div>
+                </div> */}
                 <button
-                onClick={()=>handleAddToCart(shoes._id)}
+                  onClick={() => handleAddToCart(shoes._id)}
                   data-tooltip-id="favorite"
                   data-tooltip-content="Add To Cart"
                   data-tooltip-place="left"
@@ -197,20 +220,20 @@ toast.error('Please Select Your size')
           {/* / */}
           <div className="py-3">
             <h2 className="font-medium pb-1">Select Your Size:</h2>
-                        {shoes?.size.map((size, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleSizeClick(size)}
-                            className={`mx-2 py-1 px-2 border-2 font-medium ${
-                              activeSize === size
-                                ? "border-[#f50400] bg-[#f50400] text-white"
-                                : "border-gray-300 text-gray-700"
-                            }`}
-                          >
-                            {size}
-                          </button>
-                        ))}
-                      </div>
+            {shoes?.size.map((size, index) => (
+              <button
+                key={index}
+                onClick={() => handleSizeClick(size)}
+                className={`mx-2 py-1 px-2 border-2 font-medium ${
+                  activeSize === size
+                    ? "border-[#f50400] bg-[#f50400] text-white"
+                    : "border-gray-300 text-gray-700"
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

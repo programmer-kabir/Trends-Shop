@@ -8,6 +8,7 @@ import store from "./Pages/Redux/store";
 import { Provider } from "react-redux";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "./Provider/AuthProvider";
+import WishlistData from "./Components/Context/WishlistData";
 
 const queryClient = new QueryClient();
 
@@ -16,9 +17,11 @@ createRoot(document.getElementById("root")).render(
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <Toaster />
+        <WishlistData>
         <Provider store={store}>
           <RouterProvider router={router} />
         </Provider>
+        </WishlistData>
       </QueryClientProvider>
     </AuthProvider>
   </StrictMode>

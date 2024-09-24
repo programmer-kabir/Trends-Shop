@@ -14,6 +14,7 @@ import Content from "../../../Components/Content/Content";
 import { TbCurrencyTaka } from "react-icons/tb";
 import useAuth from "../../../Components/Hooks/useAuth";
 import LoadingSpinner from "../../../Components/Design/LoadingSpinner/LoadingSpinner";
+import { FaRegHeart } from "react-icons/fa";
 const Navbar = () => {
   const { user, logOut, loading } = useAuth();
   const [letter, setLetter] = useState("");
@@ -119,6 +120,11 @@ if (loading) {
                 </div>
                 {/* User */}
                 <div className="flex items-center justify-center gap-3">
+                <button className="text-[#f50400] hover:text-[#398EFA] py-1 transition-all duration-300 ease-in-out">
+                        <FaRegHeart  size={20} />
+                       
+                        
+                      </button>
                   {user ? (
                     <>
                       {user.role === "admin" ? (
@@ -160,7 +166,7 @@ if (loading) {
                       </Link>
                       <button className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
                         <BsBagPlus size={18} />
-                        <div className="flex g">
+                        <div className="flex ">
                           <TbCurrencyTaka size={17} />
                           <p className="font-bold uppercase text-[15px]">0</p>
                         </div>

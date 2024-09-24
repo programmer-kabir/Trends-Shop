@@ -7,6 +7,7 @@ import Register from "../Pages/Authenction/Register/Register";
 import Dashboard from "../Layouts/Dashboard";
 import MyProfile from "../Pages/Dashboard/User/MyProfile";
 import MyOrders from "../Pages/Dashboard/User/MyOrders";
+import ProductDetails from "../Pages/Products/ProductDetails";
 
 const router = createBrowserRouter([
   {
@@ -30,23 +31,26 @@ const router = createBrowserRouter([
         path: "/login",
         element: <Login />,
       },
+      {
+        path: "/product-details/:id",
+        element: <ProductDetails />,
+      },
     ],
   },
   {
-    path:"user",
-    element:<Dashboard />,
-    children:[
+    path: "user",
+    element: <Dashboard />,
+    children: [
       {
-        path:"dashboard",
-        element:<MyProfile />
+        path: "dashboard",
+        element: <MyProfile />,
       },
       {
-        path:"my_orders",
-        element:<MyOrders />
-      }
-    ]
-  }
-
+        path: "my_orders",
+        element: <MyOrders />,
+      },
+    ],
+  },
 ]);
 
 export default router;
