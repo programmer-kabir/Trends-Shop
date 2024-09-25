@@ -67,7 +67,7 @@ const Sidebar = () => {
       {/*  */}
       <div className="flex">
         
-          <div className="pt-5 px-5 overflow-hidden space-y-1 w-[25%] h-screen" style={{boxShadow: "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.08) 0px 0px 0px 1px"}}>
+          <div className="pt-5 hidden lg:block px-5 overflow-hidden space-y-1 w-[25%] h-screen" style={{boxShadow: "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.08) 0px 0px 0px 1px"}}>
             {isAdmin && (
               <div className="space-y-1  ">
                 <NavLink

@@ -28,7 +28,7 @@ const ProductCard = ({ shoes }) => {
     const storedIdsString = localStorage.getItem("favoriteTShirt");
     const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
     setId(storedIds);
-    const newFavorite = { id, size:activeSize };
+    const newFavorite = { id, size: activeSize };
 
     if (!storedIds.includes(id)) {
       storedIds.push(id);
@@ -61,26 +61,28 @@ const ProductCard = ({ shoes }) => {
   const handleAddToCart = (id) => {
     if (!activeSize) {
       toast.error("Please Select Your size");
-    }
-    else{
+    } else {
       const data = {
         productId: id,
         size: activeSize,
+        productName: shoes.name,
+        price: updatePrice,
+        discount: discount,
         quantity: 1,
         email: user.email,
       };
       axios
-      .post(`${import.meta.env.VITE_LOCALHOST_KEY}/booked`, data)
-      .then((data) => {
-        console.log(data.data);
-        if (data.data?.updateResult?.acknowledged) {
-          toast.success(`${shoes.name} quantity updated in the cart`);
-        } else if (data.data?.insertedId) {
-          toast.success(`${shoes.name} added to the cart`);
-        } else {
-          toast.error('Failed to add to cart');
-        }
-      });
+        .post(`${import.meta.env.VITE_LOCALHOST_KEY}/booked`, data)
+        .then((data) => {
+          console.log(data.data);
+          if (data.data?.updateResult?.acknowledged) {
+            toast.success(`${shoes.name} quantity updated in the cart`);
+          } else if (data.data?.insertedId) {
+            toast.success(`${shoes.name} added to the cart`);
+          } else {
+            toast.error("Failed to add to cart");
+          }
+        });
     }
   };
 

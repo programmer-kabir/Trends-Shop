@@ -11,6 +11,7 @@ import { WishListDataContext } from '../../Components/Context/WishlistData';
 import toast from 'react-hot-toast';
 import useAuth from '../../Components/Hooks/useAuth';
 import axios from 'axios';
+import DeliveryOption from '../../Components/Design/DeliveryOption';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -35,8 +36,8 @@ const ProductDetails = () => {
     // Check if the current product is in favorites when component mounts
     const storedIdsString = localStorage.getItem("favoriteTShirt");
     const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
-    setIsFavorite(storedIds.includes(currentShoe._id));
-  }, [currentShoe._id]);
+    setIsFavorite(storedIds.includes(currentShoe?._id));
+  }, [currentShoe?._id]);
 
   const [storedIds, setId] = useState("");
   const handleAddToFavorite = (id) => {
@@ -98,6 +99,9 @@ const ProductDetails = () => {
       const data = {
         productId: id,
         size: activeSize,
+        productName:currentShoe.name,
+        price:updatePrice,
+        discount:discount,
         quantity: 1,
         email: user.email,
       };
@@ -252,7 +256,7 @@ const ProductDetails = () => {
                   </div>
                 </div>
               </div>
-              <div className="w-1/4">{/* Delivery Option */}</div>
+              <div className="w-1/4"><DeliveryOption /></div>
             </div>
           </section>
         </Content>

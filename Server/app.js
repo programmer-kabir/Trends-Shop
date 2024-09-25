@@ -111,6 +111,9 @@ async function run() {
       const filter = { productId: id, email };
     
       try {
+
+        // Genarate Invoice Number
+
         // Find if the item already exists in the bookedCollection
         const existingData = await bookedCollection.findOne(filter);
     
@@ -150,8 +153,18 @@ async function run() {
     });
     
     app.get("/booked", async (req, res) => {
-      const result = await bookedCollection.find().toArray();
-      res.send(result);
+      const email = req.query.email;
+      // console.log(email);
+      if (!email) {
+        res.send([]);
+      }
+      const query = { email: email };
+      const data = await bookedCollection.find(query).toArray();
+      res.send(data);
+    });
+    app.get("/userBookedData", async (req, res) => {
+      const data = await bookedCollection.find().toArray();
+      res.send(data);
     });
 
     // Address
