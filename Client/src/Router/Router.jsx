@@ -8,6 +8,7 @@ import Dashboard from "../Layouts/Dashboard";
 import MyProfile from "../Pages/Dashboard/User/MyProfile";
 import MyOrders from "../Pages/Dashboard/User/MyOrders";
 import ProductDetails from "../Pages/Products/ProductDetails";
+import CheckOut from "../Pages/Dashboard/User/CheckOut";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,11 @@ const router = createBrowserRouter([
         path: "/product-details/:id",
         element: <ProductDetails />,
       },
+      {
+        path:'/CheckOut',
+        element:<CheckOut />
+            
+      }
     ],
   },
   {
