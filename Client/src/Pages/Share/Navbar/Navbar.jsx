@@ -15,6 +15,9 @@ import { TbCurrencyTaka } from "react-icons/tb";
 import useAuth from "../../../Components/Hooks/useAuth";
 import LoadingSpinner from "../../../Components/Design/LoadingSpinner/LoadingSpinner";
 import { FaRegHeart } from "react-icons/fa";
+import useAdmin from "../../../Components/Hooks/useAdmin";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUser } from "../../Redux/Users/userSlice";
 const Navbar = () => {
   const { user, logOut, loading } = useAuth();
   const [letter, setLetter] = useState("");
@@ -22,6 +25,19 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { isLoading, Users, error } = useSelector((state) => state.Users);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchUser());
+  }, []);
+  const currentUser = !isLoading && Users && user 
+    ? Users.filter((users) => users.email === user.email) 
+    : [];
+  console.log(currentUser[0]?.role);
+  // const [isAdmin,isAdminLoading] = useAdmin();
+  // if(isAdminLoading || loading){
+  //   <LoadingSpinner />
+  // }
   const handleNav = () => {
     setNav(!nav);
   };
@@ -78,9 +94,7 @@ const Navbar = () => {
 const handleSignOut = () =>{
   logOut()
 }
-if (loading) {
-  <LoadingSpinner />;
-}
+
   return (
 
    <div className="bg-white">
@@ -127,10 +141,10 @@ if (loading) {
                       </button>
                   {user ? (
                     <>
-                      {user.role === "admin" ? (
-                        <Link to="/dashboard/admin_board">
-                          <div className="rounded-full flex justify-center items-center w-8 h-8 text-center p-1 font-semibold border-black border primaryColor">
-                            <p>{letter}</p>
+                      {currentUser[0]?.role === "admin" ? (
+                        <Link to="admin/dashboard">
+                          <div className="secondaryColor">
+                            <MdDashboard size={22} />
                           </div>
                         </Link>
                       ) : (

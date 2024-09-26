@@ -3,12 +3,31 @@ const app = express();
 const port = 3000;
 const cors = require("cors");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 //Middleware
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+// .Middleware use verify
+const verifyJWT = (req, res, next) => {
+  const authorization = req.headers.authorization;
+  if (!authorization) {
+    return res.status(401).send({ error: true, message: "unauthorized token" });
+  }
+
+  const token = authorization.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
+    if (err) {
+      return res
+        .status(401)
+        .send({ error: true, message: "unauthorized token" });
+    }
+    req.decoded = decoded;
+    next();
+  });
+};
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.0i3pjbq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -30,6 +49,17 @@ async function run() {
     const districtCollection = client.db("TrendsShop").collection("districts");
     const upZillahCollection = client.db("TrendsShop").collection("upZillahs");
     const bookedCollection = client.db("TrendsShop").collection("booked");
+
+        // JWT
+        app.post("/jwt", (req, res) => {
+          const user = req.body;
+          const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
+            expiresIn: "1h",
+          });
+          res.send({ token });
+        });
+    
+
 
     // shoes get
     app.get("/shoes", async (req, res) => {
@@ -70,6 +100,44 @@ async function run() {
       res.send(user);
     });
 
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      if (user?.role !== "admin") {
+        return res
+          .status(403)
+          .send({ error: true, message: "forbidden access" });
+      }
+      next();
+    };
+    // Update user to admin
+    app.patch("/users/admin/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      console.log(filter);
+      const updatedDoc = {
+        $set: {
+          role: "admin",
+        },
+      };
+      const result = await usersCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    });
+
+    // Get admin
+    app.get("/users/admin/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+
+      if (req.decoded.email !== email) {
+        res.send({ admin: false });
+      }
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      const result = { admin: user?.role === "admin" };
+      res.send(result);
+    });
+
 
     // User Booked Data
     // app.post('/booked',async(req, res) =>{
@@ -101,45 +169,44 @@ async function run() {
     //   }
     // })
 
-    app.post('/booked', async (req, res) => {
+    app.post("/booked", async (req, res) => {
       const body = req.body;
       const id = body.productId;
       const email = body.email;
       const incomingSize = body.size;
       const incomingQuantity = body.quantity || 1;
-    
-      const filter = { productId: id, email };
-    
-      try {
 
+      const filter = { productId: id, email };
+
+      try {
         // Genarate Invoice Number
 
         // Find if the item already exists in the bookedCollection
         const existingData = await bookedCollection.findOne(filter);
-    
+
         if (existingData) {
           // Check if the sizes field is already an array
           if (Array.isArray(existingData.size)) {
             // If size is already an array, add the incoming size if it doesn't exist
-            const updateResult = await bookedCollection.updateOne(
-              filter,
-              {
-                $inc: { quantity: incomingQuantity }, // Increment the quantity field
-                $addToSet: { size: incomingSize } // Add size to the size array if it doesn't already exist
-              }
-            );
-            res.send({ message: "Quantity updated and size added successfully", updateResult });
+            const updateResult = await bookedCollection.updateOne(filter, {
+              $inc: { quantity: incomingQuantity }, // Increment the quantity field
+              $addToSet: { size: incomingSize }, // Add size to the size array if it doesn't already exist
+            });
+            res.send({
+              message: "Quantity updated and size added successfully",
+              updateResult,
+            });
           } else {
             // If size is not an array, convert it to an array and add the new size
             const updatedSizes = [existingData.size, incomingSize];
-            const updateResult = await bookedCollection.updateOne(
-              filter,
-              {
-                $inc: { quantity: incomingQuantity }, // Increment the quantity field
-                $set: { size: updatedSizes } // Convert the size to an array with the existing and incoming sizes
-              }
-            );
-            res.send({ message: "Quantity updated and size array created", updateResult });
+            const updateResult = await bookedCollection.updateOne(filter, {
+              $inc: { quantity: incomingQuantity }, // Increment the quantity field
+              $set: { size: updatedSizes }, // Convert the size to an array with the existing and incoming sizes
+            });
+            res.send({
+              message: "Quantity updated and size array created",
+              updateResult,
+            });
           }
         } else {
           // If item does not exist, insert a new entry with the size as a single value
@@ -151,7 +218,7 @@ async function run() {
         res.status(500).send({ message: "Server error" });
       }
     });
-    
+
     app.get("/booked", async (req, res) => {
       const email = req.query.email;
       // console.log(email);

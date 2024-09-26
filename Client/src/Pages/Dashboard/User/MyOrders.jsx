@@ -188,7 +188,7 @@ const MyOrder = () => {
                   
                   <td className="p-4 py-5">
                     <p className="text-sm text-gray-900 font-medium">
-                      {data?.discount}%
+                      {data?.discount ? <>{data?.discount }</>:<>0</>}%
                     </p>{" "}
                     {/* Replace with actual data field */}
                   </td>

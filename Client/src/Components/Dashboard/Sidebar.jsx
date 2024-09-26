@@ -10,15 +10,19 @@ import Heading from "./Heading";
 import { LuUser2 } from "react-icons/lu";
 import Content from "../Content/Content";
 import Thanks from "./Thanks";
+import useAdmin from "../Hooks/useAdmin";
+import LoadingSpinner from "../Design/LoadingSpinner/LoadingSpinner";
 const Sidebar = () => {
   const { user, logOut } = useAuth();
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
   const handleNavLinkClick = () => {
     setIsSubMenuOpen(!isSubMenuOpen);
   };
-  const isAdmin = true;
+  const [isAdmin,isAdminLoading] = useAdmin();
 
-  // console.log(isAdmin);
+if(isAdminLoading){
+  <LoadingSpinner />
+}
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => {

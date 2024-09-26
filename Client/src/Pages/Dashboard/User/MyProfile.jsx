@@ -137,7 +137,6 @@ const MyProfile = () => {
     }
     return progress;
   };
-  console.log(matchingUsers.name);
 
   return (
     <div>

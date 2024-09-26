@@ -1,10 +1,14 @@
-// components/LoadingSpinner.js
 import React from "react";
+import RingLoader from "react-spinners/RingLoader";
 
-const LoadingSpinner = () => (
-  <div className="flex justify-center items-center h-full">
-    <div className="w-16 h-16 border-4 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
-  </div>
-);
+// Default values shown
 
-export default LoadingSpinner;
+const Loader = () => {
+  return (
+    <div className="flex items-center justify-center h-[100vh] bg-gray-700">
+      <RingLoader  color="#36d7b7" />
+    </div>
+  );
+};
+
+export default Loader;
