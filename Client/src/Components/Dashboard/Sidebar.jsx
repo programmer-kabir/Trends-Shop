@@ -97,6 +97,17 @@ if(isAdminLoading){
                   {/* <FaUser className="w-5 h-5" /> */}
                   <span>Users</span>
                 </NavLink>
+                <NavLink
+                  to="coupon"
+                  className={({ isActive }) =>
+                    `font-medium transition-all py-3 text-base   w-full flex items-center gap-4 px-5 capitalize ${
+                      isActive ? "bg-[#e6f4ff]  text-[#1677ff] rounded" : ""
+                    }`
+                  }
+                >
+                  {/* <FaUser className="w-5 h-5" /> */}
+                  <span>Coupon</span>
+                </NavLink>
                
               
               </div>
