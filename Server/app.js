@@ -49,6 +49,7 @@ async function run() {
     const districtCollection = client.db("TrendsShop").collection("districts");
     const upZillahCollection = client.db("TrendsShop").collection("upZillahs");
     const bookedCollection = client.db("TrendsShop").collection("booked");
+    const couponCollection = client.db("TrendsShop").collection("coupon");
 
         // JWT
         app.post("/jwt", (req, res) => {
@@ -231,6 +232,12 @@ async function run() {
     });
     app.get("/userBookedData", async (req, res) => {
       const data = await bookedCollection.find().toArray();
+      res.send(data);
+    });
+
+    // Coupon 
+    app.get("/couponCode", async (req, res) => {
+      const data = await couponCollection.find().toArray();
       res.send(data);
     });
 
