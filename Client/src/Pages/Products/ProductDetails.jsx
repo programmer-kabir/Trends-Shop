@@ -25,7 +25,6 @@ const ProductDetails = () => {
 
   // Ensure `Shoes` is loaded before trying to find `currentShoe`
   const currentShoe = Shoes?.find((shoe) => shoe._id === id);
-
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState('mainImage');
   const [activeSize, setActiveSize] = useState(null);

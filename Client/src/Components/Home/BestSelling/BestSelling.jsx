@@ -14,6 +14,7 @@ import { FreeMode, Pagination } from "swiper/modules";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchShoes } from "../../../Pages/Redux/Shoes/shoesSlice";
 import HoverCard from "../../Design/HoverCard";
+import Title from "../../Design/Title";
 
 const BestSelling = () => {
   const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
@@ -33,13 +34,14 @@ const BestSelling = () => {
 
   return (
     <Content>
-      <span className="flex items-center">
+      {/* <span className="flex items-center">
         <span className="h-[2px] flex-1 bg-black"></span>
         <span className="shrink-0 px-6 text-black font-bold">
           BEST SELLING'S PRODUCTS
         </span>
         <span className="h-[2px] flex-1 bg-black"></span>
-      </span>
+      </span> */}
+      <Title title={"BEST SELLING'S PRODUCTS"}/>
 
       <div>
         <Swiper
@@ -47,7 +49,7 @@ const BestSelling = () => {
           spaceBetween={10}
           
           modules={[Pagination]}
-          className="mySwiper"
+          className="mySwiper mt-5"
         >
           {top10Products.map((shoe) => (
             <SwiperSlide key={shoe._id}>

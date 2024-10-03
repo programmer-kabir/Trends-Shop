@@ -5,6 +5,7 @@ import BestSelling from "../../Components/Home/BestSelling/BestSelling";
 import MensCollection from "../../Components/Home/MensCollection/MensCollection";
 import WomensCollection from "../../Components/Home/WomensCollection/WomensCollection";
 import KidsCollection from "../../Components/Home/KidsCollection/KidsCollection";
+import CouponCode from "../../Components/Home/CouponCode/CouponCode";
 
 const Home = () => {
   return (
@@ -15,6 +16,7 @@ const Home = () => {
       <MensCollection />
       <WomensCollection />
       <KidsCollection />
+      <CouponCode />
     </div>
   );
 };

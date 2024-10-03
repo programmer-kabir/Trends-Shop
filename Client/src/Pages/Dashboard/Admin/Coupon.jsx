@@ -2,14 +2,9 @@ import React, { useEffect } from "react";
 import { FiSearch } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCoupons } from "../../Redux/Coupons/couponsSlice";
-
+import { MdDeleteForever, MdEdit } from "react-icons/md";
 const Coupon = () => {
-  const { isLoading, Coupons, error } = useSelector((state) => state.Coupons);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchCoupons());
-  }, []);
-  console.log(Coupons);
+  v
   return (
     <section
       className="mx-5 px-5 py-7 my-2 bg-white "
@@ -69,40 +64,61 @@ const Coupon = () => {
           </thead>
 
           <tbody className="divide-y divide-gray-200">
-            {/* {user?.map((User) => (
-            <tr>
-              <td className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
-                {User.name}
-              </td>
-              <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                {User?.email}
-              </td>
-              <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                {User?.role ? User?.role : "User"}
-              </td>
-
-              <td className="whitespace-nowrap px-4 py-2">
-                <div className="flex gap-2">
-                  <span
-                    onClick={() => handleMakeAdmin(User)}
-                    className="inline-flex items-center gap-1 rounded-full bg-cyan-200 hover:bg-cyan-400 hover:text-gray-600 transition-colors duration-500 px-2 py-1 text-xs font-semibold  text-cyan-600"
-                  >
-                    {User.role === "admin" ? "admin" : <>Make Admin</>}
-                  </span>
-                  {User.role === "admin" ? (
-                    <span
-                      onClick={() => handleMakeAdmin(User)}
-                      className="inline-flex items-center gap-1 rounded-full bg-cyan-200 hover:bg-cyan-400 hover:text-gray-600 transition-colors duration-500 px-2 py-1 text-xs font-semibold  text-cyan-600"
-                    >
-                      {User.role === "admin" ? <>Make User</> : ""}
-                    </span>
+            {Coupons?.map((coupon) => (
+              <tr>
+                <td className="whitespace-nowrap flex items-center gap-2  px-4 py-2 text-gray-700 font-bold">
+                  <img
+                    className="w-[60px] h-[60px] rounded-md"
+                    src={coupon.image}
+                    alt=""
+                  />
+                  {coupon?.name}
+                </td>
+                <td className="whitespace-nowrap0 px-4 py-2 text-gray-700">
+                  <button className="bg-gray-200 px-2 py-1 rounded-md">
+                    {" "}
+                    {coupon?.code}
+                  </button>
+                </td>
+                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                  {coupon?.amount}%
+                </td>
+                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                  {coupon?.status == "Active" ? (
+                    <button className=" bg-[#50cd901a] px-2  rounded-md  text-sm  font-semibold py-1 text-[#50cd89]">
+                      {coupon?.status}
+                    </button>
                   ) : (
-                    ""
+                    <button className=" bg-[#f1cd901a] px-2  rounded-md  text-sm  font-semibold py-1 text-[#f1416c]">
+                      {coupon?.status}
+                    </button>
                   )}
-                </div>
-              </td>
-            </tr>
-          ))} */}
+                </td>
+                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                  {coupon?.star}
+                </td>
+                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                  {coupon?.end}
+                </td>
+
+                <td className="whitespace-nowrap px-4 py-2">
+                  <div className="flex gap-2">
+                    <span
+                      onClick={() => handleMakeAdmin(coupon)}
+                      className="bg-[#50cd89]  px-3 py-2 rounded-md"
+                    >
+                      <MdEdit color="white" size={20}/>
+                    </span>
+                    <span
+                      onClick={() => handleMakeAdmin(coupon)}
+                      className="border rounded-md border-[#50cd89]  px-3 py-2 "
+                    >
+                      <MdDeleteForever size={20}/>
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

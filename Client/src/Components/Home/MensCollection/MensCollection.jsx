@@ -14,6 +14,7 @@ import { FreeMode, Pagination } from "swiper/modules";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchShoes } from "../../../Pages/Redux/Shoes/shoesSlice";
 import HoverCard from "../../Design/HoverCard";
+import Title from "../../Design/Title";
 
 
 const MensCollection = () => {
@@ -30,13 +31,14 @@ const MensCollection = () => {
 
   return (
     <Content className="">
-    <span className="flex items-center">
+    {/* <span className="flex items-center">
       <span className="h-[2px] flex-1 bg-black"></span>
       <span className="shrink-0 px-6 text-[#f50400] font-bold">
       MEN'S COLLECTION
       </span>
       <span className="h-[2px] flex-1 bg-black"></span>
-    </span>
+    </span> */}
+    <Title title={"MEN'S COLLECTION"}/>
 
     <div>
       <Swiper
@@ -44,7 +46,7 @@ const MensCollection = () => {
         spaceBetween={10}
         
         modules={[Pagination]}
-        className="mySwiper"
+        className="mySwiper mt-5"
       >
         {mensShoes.map((shoe) => (
           <SwiperSlide key={shoe._id}>

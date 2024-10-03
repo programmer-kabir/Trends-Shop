@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import useBooked from "../../../Components/Hooks/useBooked";
 import LoadingSpinner from "../../../Components/Design/LoadingSpinner/LoadingSpinner";
 import Content from "../../../Components/Content/Content";
-import { FaPlus } from "react-icons/fa6";
-import { Form, Input, Radio } from "antd";
+import { FaMinus, FaPlus } from "react-icons/fa6";
+import { Radio } from "antd";
 import { TbCurrencyTaka } from "react-icons/tb";
 import { GoFileDirectoryFill } from "react-icons/go";
 import { IoPlaySkipBackSharp } from "react-icons/io5";
@@ -11,26 +11,49 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUser } from "../../Redux/Users/userSlice";
 import useAuth from "../../../Components/Hooks/useAuth";
 import { useForm } from "react-hook-form";
+import { fetchCoupons } from "../../Redux/Coupons/couponsSlice";
+import { toast } from "react-hot-toast";
 const CheckOut = () => {
   const [booked, loading] = useBooked();
   const [shippingCost, setShippingCost] = useState(0);
   const [showCoupon, setShowCoupon] = useState(false);
   const { user } = useAuth();
   const { isLoading, Users, error } = useSelector((state) => state.Users);
+  const {
+    isLoading: isCouponLoading,
+    Coupons,
+    error: isCouponError,
+  } = useSelector((state) => state.Coupons);
+  const [name, setName] = useState();
+  const [number, setNumber] = useState();
+  const [address, setAddress] = useState();
+  const isFormValid = name && number && address && shippingCost > 0;
+  const [discount, setDiscount] = useState(0);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchUser());
+    dispatch(fetchCoupons());
   }, []);
   const matchingUsers = Users.filter(
     (userData) => userData.email === user?.email
   );
-  console.log(matchingUsers[0]?.number);
-
+  useEffect(() => {
+    if (matchingUsers.length > 0) {
+      setName(matchingUsers[0]?.name || "");
+      setNumber(matchingUsers[0]?.number || "");
+      setAddress(
+        matchingUsers[0]?.village
+          ? `${matchingUsers[0]?.village}, ${matchingUsers[0]?.upZillah}, ${matchingUsers[0]?.district}, ${matchingUsers[0]?.divison} ${matchingUsers[0]?.postCode}`
+          : ""
+      );
+    }
+  }, [matchingUsers]);
   const subTotal = booked.reduce(
     (total, data) => total + data.price * data.quantity,
     0
   );
-  const totalCost = subTotal + shippingCost;
+  const totalCostBeforeDiscount = subTotal + shippingCost;
+
   const {
     handleSubmit,
     control,
@@ -38,22 +61,37 @@ const CheckOut = () => {
     setValue,
     formState: { errors },
   } = useForm();
-  const onFinish = (data) => {
-    console.log(data);
+  const [couponCode, setCouponCode] = useState("");
+
+  const handleCouponCode = () => {
+    const foundCoupon = Coupons.find((coupon) => coupon.code === couponCode);
+    if (foundCoupon) {
+      setDiscount(foundCoupon.amount);
+      toast.success(`Coupon applied! You got ${foundCoupon.amount}% off.`);
+    } else {
+      toast.error("Invalid coupon code. Please try again.");
+    }
   };
+  const totalCostAfterDiscount =
+    totalCostBeforeDiscount - totalCostBeforeDiscount * (discount / 100);
+
+    // Tran
+    const [isOpen, setIsOpen] = useState(false);
+    const toggleInput = () => {
+      setIsOpen(!isOpen);
+    };
   return (
     <Content>
       <div className="pt-5 px-3">
         {loading ? (
           <section>
-            <div className="flex gap-5 items-center justify-between">
+            <form onSubmit={handleSubmit(onsubmit)} className="flex gap-5 items-center justify-between">
               <div className="w-1/2">
                 <h1 className="text-[#f50400] text-xl font-bold text-center">
                   Billing Details
                 </h1>
 
-                <form  className="space-y-5">
-                  
+                <div className="space-y-5">
                   <div className="space-y-2">
                     <p className="flex items-center gap-2">
                       <span className="text-red-600">* </span>Name
@@ -63,7 +101,7 @@ const CheckOut = () => {
                       type="text"
                       name="name"
                       value={matchingUsers[0]?.name}
-                      className="border border-[#d9d9d9] outline-none focus:border-[#3b82f6] w-full text-xl px-3 py-2 rounded-md "
+                      className="border border-[#d9d9d9] outline-none focus:border-[#3b82f6] w-full px-3 py-2 rounded-md "
                       placeholder="Enter Your Name"
                       id=""
                     />
@@ -76,8 +114,13 @@ const CheckOut = () => {
                     <input
                       type="number"
                       name="number"
-                      value={matchingUsers[0]?.number}
-                      className="border border-[#d9d9d9] outline-none focus:border-[#3b82f6] w-full text-xl px-3 py-2 rounded-md "
+                      onChange={(e) => setNumber(e.target.value)}
+                      value={
+                        matchingUsers[0]?.number !== undefined
+                          ? matchingUsers[0].number
+                          : undefined
+                      }
+                      className="border border-[#d9d9d9] outline-none focus:border-[#3b82f6] w-full  px-3 py-2 rounded-md "
                       placeholder="Enter Your Number"
                       id=""
                     />
@@ -90,33 +133,43 @@ const CheckOut = () => {
                     <input
                       type="text"
                       name="address"
-                      value={`${matchingUsers[0]?.village}, ${matchingUsers[0]?.upZillah}, ${matchingUsers[0]?.district}, ${matchingUsers[0]?.divison} ${matchingUsers[0]?.postCode}`}
-                      className="border border-[#d9d9d9] outline-none focus:border-[#3b82f6] w-full text-xl px-3 py-2 rounded-md "
+                      value={
+                        matchingUsers[0]?.village !== undefined
+                          ? `${matchingUsers[0]?.village}, ${matchingUsers[0]?.upZillah}, ${matchingUsers[0]?.district}, ${matchingUsers[0]?.divison} ${matchingUsers[0]?.postCode}`
+                          : undefined
+                      }
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="border border-[#d9d9d9] outline-none focus:border-[#3b82f6] w-full  px-3 py-2 rounded-md "
                       placeholder="Enter Your Address (divison, district, up-zella, Village name, post code )"
                       id=""
                     />
                   </div>
                   <div className="space-y-2">
-                    <p className="flex items-center gap-2">
-                      AdditionalData
-                    </p>
+                    <p className="flex items-center gap-2">AdditionalData</p>
 
                     <textarea
-                    rows={7}
-                    cols={7}
+                      rows={7}
+                      cols={7}
                       type="text"
                       name="additionalData"
-                      className="border border-[#d9d9d9] outline-none focus:border-[#3b82f6] w-full text-xl px-3 py-2 rounded-md "
+                      className="border border-[#d9d9d9] outline-none focus:border-[#3b82f6] w-full px-3 py-2 rounded-md "
                       placeholder="Enter Your additional Data"
                       id=""
                     />
                   </div>
 
-                  <button className="bg-[#f50963] hover:bg-[#080921] px-6 w-full text-white transition-all duration-500 ease-in-out py-3 flex items-center justify-center gap-1 rounded-sm text-xl">
+                  <button
+                    className={`${
+                      isFormValid
+                        ? "bg-[#f50963] hover:bg-[#080921]"
+                        : "bg-gray-300 cursor-not-allowed"
+                    } px-6 w-full text-white transition-all duration-500 ease-in-out py-3 flex items-center justify-center gap-1 rounded-sm text-xl`}
+                    disabled={!isFormValid}
+                  >
                     {" "}
                     <IoPlaySkipBackSharp size={18} /> Place order
                   </button>
-                </form>
+                </div>
               </div>
               {/* right Sdie */}
               <div className="border-2 rounded-md p-5 border-[#f50400] w-1/2">
@@ -143,11 +196,21 @@ const CheckOut = () => {
                     <input
                       type="text"
                       name="coupon"
-                      className="text-xl w-full px-3 py-4 rounded-sm outline-none bg-[#f5f5f8]"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      className=" w-full px-3 py-4 rounded-sm outline-none bg-[#f5f5f8]"
                       placeholder="Coupon Code"
                     />
                     <div className="flex justify-end">
-                      <button className="bg-[#f50963] hover:bg-[#080921] px-6 text-white transition-all duration-500 ease-in-out py-4 rounded-sm text-xl">
+                      <button
+                        onClick={handleCouponCode}
+                        className={`${
+                          isFormValid
+                            ? "bg-[#f50963] hover:bg-[#080921]"
+                            : "bg-gray-300 cursor-not-allowed"
+                        } px-6 text-white transition-all duration-500 ease-in-out py-3 rounded-sm text-xl`}
+                        disabled={!isFormValid}
+                      >
                         Apply Coupon
                       </button>
                     </div>
@@ -175,6 +238,7 @@ const CheckOut = () => {
                     </div>
                   </div>
                 ))}
+
                 <div className="flex items-center pt-2 justify-between">
                   <h5 className="text-[17px] uppercase font-bold">sub Total</h5>
                   <h5 className="text-[17px] uppercase font-bold">
@@ -225,12 +289,39 @@ const CheckOut = () => {
                     </Radio>
                   </div>
                   <div className="bg-neutral-200 mt-2 p-2 px-2 flex justify-between items-start font-bold uppercase text-[16px]">
+                    <h2>Discount</h2>
+                    <h2>{discount}৳</h2>
+                  </div>
+                  <div className="bg-neutral-200 mt-2 p-2 px-2 flex justify-between items-start font-bold uppercase text-[16px]">
                     <h2>Total</h2>
-                    <h2>{totalCost}৳</h2>
+                    <h2>{totalCostAfterDiscount}৳</h2>
                   </div>
                 </div>
+                {/* transition id */}
+                <div className="pt-5">
+      <div className="flex pb-5 items-center justify-between px-7">
+        <h2 className="font-medium text-[17px] list-item">Transaction Id</h2>
+        <button onClick={toggleInput} color="#f50400">
+          {isOpen ? <FaMinus color="#f50400"/> : <FaPlus color="#f50400"/>}
+        </button>
+      </div>
+
+      {/* Smooth transition container */}
+      <div
+        className={`transition-all duration-700 ease-in overflow-hidden ${isOpen ? 'max-h-40' : 'max-h-0'}`}
+      >
+        {isOpen && (
+          <input
+            type="text"
+            name="address"
+            className="bg-gray-200 outline-none w-full px-3 py-2"
+            placeholder="Enter Transaction ID"
+          />
+        )}
+      </div>
+    </div>
               </div>
-            </div>
+            </form>
           </section>
         ) : (
           <>

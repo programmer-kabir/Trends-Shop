@@ -117,7 +117,7 @@ if(isAdminLoading){
                 <NavLink
                   to="dashboard"
                   className={({ isActive }) =>
-                    `font-medium transition-all py-3 text-base   w-full flex items-center gap-4 px-5 capitalize ${
+                    `transition-all py-3 text-base   w-full flex items-center gap-4 px-5 capitalize ${
                       isActive ? "bg-[#e6f4ff]  text-[#1677ff] rounded" : ""
                     }`
                   }
@@ -128,7 +128,7 @@ if(isAdminLoading){
                 <NavLink
                   to="my_orders"
                   className={({ isActive }) =>
-                    `font-medium transition-all py-3 text-base  w-full flex items-center gap-4 px-5 capitalize ${
+                    `transition-all py-3 text-base  w-full flex items-center gap-4 px-5 capitalize ${
                        isActive ? "bg-[#e6f4ff]  text-[#1677ff] rounded" : ""
                     }`
                   }
