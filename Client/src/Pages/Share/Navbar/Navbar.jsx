@@ -33,7 +33,7 @@ const Navbar = () => {
   const currentUser = !isLoading && Users && user 
     ? Users.filter((users) => users.email === user.email) 
     : [];
-  console.log(currentUser[0]?.role);
+  // console.log(currentUser[0]?.role);
   // const [isAdmin,isAdminLoading] = useAdmin();
   // if(isAdminLoading || loading){
   //   <LoadingSpinner />

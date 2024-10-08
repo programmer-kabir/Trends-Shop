@@ -17,22 +17,25 @@ import { fetchBooked } from "../../Redux/Booked/bookedSlice";
 const CheckOut = () => {
   // const [booked, loading] = useBooked();
   const {  Booked } = useSelector((state) => state.Booked);
-  const dispatch = useDispatch();
-const {user} = useAuth()
-  const { isLoading, Users, error } = useSelector((state) => state.Users);
-  const { isLoading: isCouponLoading, Coupons, error: isCouponError } = useSelector((state) => state.Coupons);
   useEffect(() => {
-    dispatch(fetchUser());
-    dispatch(fetchCoupons());
-    dispatch(fetchBooked(user.email));
-  }, [dispatch,user]);
-
+    dispatch(fetchBooked());
+  }, []);
   const [shippingCost, setShippingCost] = useState(0);
   const [showCoupon, setShowCoupon] = useState(false);
+  const { user } = useAuth();
+  const { isLoading, Users, error } = useSelector((state) => state.Users);
+  const { isLoading: isCouponLoading, Coupons, error: isCouponError } = useSelector((state) => state.Coupons);
   const [name, setName] = useState();
   const [number, setNumber] = useState(0);
   const [address, setAddress] = useState();
   const [discount, setDiscount] = useState(0);
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    dispatch(fetchUser());
+    dispatch(fetchCoupons());
+  }, [dispatch]);
+
   const matchingUsers = Users.filter((userData) => userData.email === user?.email);
 
   useEffect(() => {
@@ -47,7 +50,7 @@ const {user} = useAuth()
     }
   }, [matchingUsers]);
 
-  const subTotal = Booked.reduce((total, data) => total + data.price * data.quantity, 0);
+  // const subTotal = booked.reduce((total, data) => total + data.price * data.quantity, 0);
   const totalCostBeforeDiscount = subTotal + shippingCost;
 
   const {
@@ -112,12 +115,10 @@ const {user} = useAuth()
     console.log(mainData);
   };
 
-  
-
   return (
     <Content>
       <div className="pt-5 px-3">
-       
+        {loading ? (
           <section>
             <form
               onSubmit={handleSubmit(onSubmit)}
@@ -285,7 +286,7 @@ const {user} = useAuth()
                   <h5 className="text-[18px] uppercase font-bold">Product</h5>
                   <h5 className="text-[18px] uppercase font-bold">Sub Total</h5>
                 </div>
-                {Booked.map((data) => (
+                {booked.map((data) => (
                   <div key={data._id}>
                     <div className="flex items-center pt-5 justify-between border-b-2 border-gray-200">
                       <h5 className="text-gray-900 flex items-center gap-1">
@@ -396,7 +397,11 @@ const {user} = useAuth()
               </div>
             </form>
           </section>
-      
+        ) : (
+          <>
+            <LoadingSpinner />
+          </>
+        )}
       </div>
     </Content>
   );
