@@ -45,7 +45,7 @@ if(isAdminLoading){
             />
           
           </div>
-          <div className="flex gap-5 items-center ">
+          <div className="flex  gap-5 items-center ">
           <div className="flex px-2 py-1 rounded-md  bg-[#F3F3F9] gap-2 items-center ">
           <AiOutlineSearch className="w-7 h-7" color="#64748b" />
           <input
@@ -71,13 +71,13 @@ if(isAdminLoading){
       {/*  */}
       <div className="flex">
         
-          <div className="pt-5 hidden lg:block px-5 overflow-hidden space-y-1 w-[25%] h-screen" style={{boxShadow: "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.08) 0px 0px 0px 1px"}}>
+          <div className="pt-5 hidden lg:block px-5 overflow-hidden space-y-1 w-[20%] h-screen" style={{boxShadow: "rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.08) 0px 0px 0px 1px"}}>
             {isAdmin && (
               <div className="space-y-1  ">
                 <NavLink
                   to="dashboard"
                   className={({ isActive }) =>
-                    `font-medium transition-all py-3 text-base   w-full flex items-center gap-4 px-5 capitalize ${
+                    `font-normal transition-all py-3 text-base   w-full flex items-center gap-4 px-5 capitalize ${
                       isActive ? "bg-[#e6f4ff]  text-[#1677ff] rounded" : ""
                     }`
                   }
@@ -89,7 +89,7 @@ if(isAdminLoading){
                 <NavLink
                   to="manage_users"
                   className={({ isActive }) =>
-                    `font-medium transition-all py-3 text-base   w-full flex items-center gap-4 px-5 capitalize ${
+                    `font-normal transition-all py-3 text-base   w-full flex items-center gap-4 px-5 capitalize ${
                       isActive ? "bg-[#e6f4ff]  text-[#1677ff] rounded" : ""
                     }`
                   }
@@ -100,13 +100,24 @@ if(isAdminLoading){
                 <NavLink
                   to="coupon"
                   className={({ isActive }) =>
-                    `font-medium transition-all py-3 text-base   w-full flex items-center gap-4 px-5 capitalize ${
+                    `font-normal transition-all py-3 text-base   w-full flex items-center gap-4 px-5 capitalize ${
                       isActive ? "bg-[#e6f4ff]  text-[#1677ff] rounded" : ""
                     }`
                   }
                 >
                   {/* <FaUser className="w-5 h-5" /> */}
                   <span>Coupon</span>
+                </NavLink>
+                <NavLink
+                  to="request_Payment"
+                  className={({ isActive }) =>
+                    `font-normal transition-all py-3 text-base   w-full flex items-center gap-4 px-5 capitalize ${
+                      isActive ? "bg-[#e6f4ff]  text-[#1677ff] rounded" : ""
+                    }`
+                  }
+                >
+                  {/* <FaUser className="w-5 h-5" /> */}
+                  <span>Request Payment</span>
                 </NavLink>
                
               
@@ -142,7 +153,7 @@ if(isAdminLoading){
             
           </div>
         
-        <div className="w-full">
+        <div className="md:w-[80%] ">
           <Outlet />
         </div>
       </div>

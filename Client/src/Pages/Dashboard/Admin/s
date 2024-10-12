@@ -1,0 +1,56 @@
+  <tbody className="divide-y divide-gray-200">
+          {RequestPayment?.map((payment) => (
+            <tr>
+              <td className="whitespace-nowrap flex items-center gap-2  px-4 py-2 text-gray-700 font-bold">
+               
+                {payment?.name}
+              </td>
+              <td className="whitespace-nowrap0 px-4 py-2 text-gray-700">
+                <button className="bg-gray-200 px-2 py-1 rounded-md">
+                  {" "}
+                  {payment?.email}
+                </button>
+              </td>
+              <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                {payment?.shippingCost}
+              </td>
+              <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                {payment?.transactionID}
+              </td>
+              {/* <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                {payment?.status == "Active" ? (
+                  <button className=" bg-[#50cd901a] px-2  rounded-md  text-sm  font-semibold py-1 text-[#50cd89]">
+                    {payment?.status}
+                  </button>
+                ) : (
+                  <button className=" bg-[#f1cd901a] px-2  rounded-md  text-sm  font-semibold py-1 text-[#f1416c]">
+                    {payment?.status}
+                  </button>
+                )}
+              </td> */}
+              <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                {filteredData.map(data => <p>{data.name}</p>)}
+              </td>
+              <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                {payment?.end}
+              </td>
+
+              <td className="whitespace-nowrap px-4 py-2">
+                <div className="flex gap-2">
+                  <span
+                    onClick={() => handleMakeAdmin(payment)}
+                    className="bg-[#50cd89]  px-3 py-2 rounded-md"
+                  >
+                    {/* <MdEdit color="white" size={20}/> */}
+                  </span>
+                  <span
+                    onClick={() => handleMakeAdmin(payment)}
+                    className="border rounded-md border-[#50cd89]  px-3 py-2 "
+                  >
+                    {/* <MdDeleteForever size={20}/> */}
+                  </span>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>

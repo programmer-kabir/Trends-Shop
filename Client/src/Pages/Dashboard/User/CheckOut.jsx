@@ -14,9 +14,14 @@ import { useForm } from "react-hook-form";
 import { fetchCoupons } from "../../Redux/Coupons/couponsSlice";
 import { toast } from "react-hot-toast";
 import { fetchBooked } from "../../Redux/Booked/bookedSlice";
+import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
 const CheckOut = () => {
   // const [booked, loading] = useBooked();
+  const {id} = useParams()
+  // console.log(id);
   const {  Booked } = useSelector((state) => state.Booked);
+ 
   const dispatch = useDispatch();
 const {user} = useAuth()
   const { isLoading, Users, error } = useSelector((state) => state.Users);
@@ -26,7 +31,9 @@ const {user} = useAuth()
     dispatch(fetchCoupons());
     dispatch(fetchBooked(user.email));
   }, [dispatch,user]);
-
+  const CurrentProduct = Booked.find((data) => data.productId === id); 
+  // console.log(CurrentProduct.size);
+    // console.log(CurrentProduct);
   const [shippingCost, setShippingCost] = useState(0);
   const [showCoupon, setShowCoupon] = useState(false);
   const [name, setName] = useState();
@@ -47,8 +54,7 @@ const {user} = useAuth()
     }
   }, [matchingUsers]);
 
-  const subTotal = Booked.reduce((total, data) => total + data.price * data.quantity, 0);
-  const totalCostBeforeDiscount = subTotal + shippingCost;
+  const totalCostBeforeDiscount = (CurrentProduct?.price * CurrentProduct?.quantity) + shippingCost;
 
   const {
     handleSubmit,
@@ -71,7 +77,7 @@ const {user} = useAuth()
   };
 
   const totalCostAfterDiscount = totalCostBeforeDiscount - totalCostBeforeDiscount * (discount / 100);
-
+const navigate = useNavigate()
   // Transaction ID toggle
   const [isOpen, setIsOpen] = useState(false);
   const toggleInput = () => setIsOpen(!isOpen);
@@ -87,8 +93,12 @@ const {user} = useAuth()
 
     let mainData = {
       ...data,
+      bookedId:CurrentProduct._id,
+      products: CurrentProduct.productId,
       shippingCost,
       name: matchingUsers[0]?.name,
+      email:user.email,
+      status:"Awaiting Check Payment",
     };
 
     if (matchingUsers[0]?.village) {
@@ -109,7 +119,16 @@ const {user} = useAuth()
         couponCode,
       };
     }
-    console.log(mainData);
+    // console.log(mainData);
+     axios.post(`${import.meta.env.VITE_LOCALHOST_KEY}/requestPayment`,mainData)
+    .then(data =>{
+      console.log(data.data.bookedUpdateResult);
+      if(data.data.bookedUpdateResult.acknowledged){
+        toast.success('Please Waiting Your Payment Confirmation')
+        navigate('/user/my_orders')
+      }
+    })
+      
   };
 
   
@@ -285,31 +304,26 @@ const {user} = useAuth()
                   <h5 className="text-[18px] uppercase font-bold">Product</h5>
                   <h5 className="text-[18px] uppercase font-bold">Sub Total</h5>
                 </div>
-                {Booked.map((data) => (
-                  <div key={data._id}>
-                    <div className="flex items-center pt-5 justify-between border-b-2 border-gray-200">
+                
+                  
+                    <div className="flex items-center pt-5 justify-between">
                       <h5 className="text-gray-900 flex items-center gap-1">
-                        {data?.productName}{" "}
+                        {CurrentProduct?.productName}{" "}
                         <FaPlus
                           size={12}
                           className="rotate-45"
                           color="#111827"
                         />{" "}
-                        {data.quantity}
+                        {CurrentProduct?.quantity}
                       </h5>
                       <h5 className="uppercase font-bold">
-                        {data?.price * data.quantity}৳
+                        {CurrentProduct?.price * CurrentProduct?.quantity}৳
                       </h5>
                     </div>
-                  </div>
-                ))}
+                  
+                
 
-                <div className="flex items-center pt-2 justify-between">
-                  <h5 className="text-[17px] uppercase font-bold">sub Total</h5>
-                  <h5 className="text-[17px] uppercase font-bold">
-                    {subTotal}৳
-                  </h5>
-                </div>
+                
                 {/* Shipping */}
                 <div className="pt-4 w-full">
                   <span className="flex items-center">

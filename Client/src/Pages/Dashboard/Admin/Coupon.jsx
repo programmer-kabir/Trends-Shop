@@ -3,8 +3,16 @@ import { FiSearch } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCoupons } from "../../Redux/Coupons/couponsSlice";
 import { MdDeleteForever, MdEdit } from "react-icons/md";
+import Loader from "../../../Components/Design/LoadingSpinner/LoadingSpinner";
 const Coupon = () => {
-  v
+  const { isLoading, Coupons, error } = useSelector((state) => state.Coupons);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchCoupons());
+  }, []);
+  if(isLoading){
+    <Loader />
+  }
   return (
     <section
       className="mx-5 px-5 py-7 my-2 bg-white "

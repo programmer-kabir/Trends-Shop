@@ -50,6 +50,7 @@ async function run() {
     const upZillahCollection = client.db("TrendsShop").collection("upZillahs");
     const bookedCollection = client.db("TrendsShop").collection("booked");
     const couponCollection = client.db("TrendsShop").collection("coupon");
+    const requestPaymentCollection = client.db("TrendsShop").collection("requestPayment");
 
         // JWT
         app.post("/jwt", (req, res) => {
@@ -140,36 +141,6 @@ async function run() {
     });
 
 
-    // User Booked Data
-    // app.post('/booked',async(req, res) =>{
-    //   const body = req.body
-    //   // console.log(body);
-    //   const id = body.productId;
-    //   const email = body.email;
-    //   const filter = { productId: id, email };
-    //   const incomingQuantity = body.quantity || 1;
-    //   const incomingSize = body.size;
-
-    //   console.log(incomingQuantity);
-    //   try{
-
-    //     const existingData  = await bookedCollection.findOne(filter);
-    //     if (existingData ) {
-    //       const updateResult = await bookedCollection.updateOne(
-    //         filter,
-    //         { $inc: { quantity: incomingQuantity } } // Increment the quantity field by the incoming quantity
-    //       );
-    //       res.send({ message: "Quantity updated successfully", updateResult });
-    //     } else {
-    //       const result = await bookedCollection.insertOne(body);
-    //       res.send(result);
-    //     }
-    //   }
-    //   catch(error){
-    //     res.status(500).send({ message: "Server error" });
-    //   }
-    // })
-
     app.post("/booked", async (req, res) => {
       const body = req.body;
       const id = body.productId;
@@ -256,6 +227,57 @@ async function run() {
       const upZillahs = await upZillahCollection.find().toArray();
       res.send(upZillahs);
     });
+
+    // Payment
+    app.post('/requestPayment', async (req, res) => {
+      const data = req.body;
+    
+      try {
+        // Step 1: Insert payment data into requestPaymentCollection
+        const paymentResult = await requestPaymentCollection.insertOne(data);
+    
+        if (paymentResult.insertedId) {
+          // Step 2: Extract productId and email from payment data
+          const { bookedId, email } = data;
+          // Step 3: Find the matching booking record in bookedCollection where productId matches the id
+          const filter = { _id: new ObjectId(bookedId), email }; // Convert 'products' to an ObjectId
+          // Step 4: Update the status only if the booking exists
+          const update = { $set: { status: "Awaiting Check Payment" } }; // Set the status to 'Awaiting Check Payment'
+    
+          // Check if a matching booking exists in bookedCollection
+          const existingBooking = await bookedCollection.findOne(filter);
+          console.log(existingBooking);
+          if (existingBooking) {
+            // Proceed to update status in the booked collection
+            const bookedUpdateResult = await bookedCollection.updateMany(filter, update);
+    
+            if (bookedUpdateResult.matchedCount > 0) {
+              res.send({
+                message: "Payment recorded and booking status updated successfully",
+                paymentResult,
+                bookedUpdateResult,
+              });
+            } else {
+              res.status(404).send({ message: "No matching booking found to update status" });
+            }
+          } else {
+            // If no matching booking exists, do not proceed with updating status
+            res.status(404).send({ message: "No matching booking found with the given productId and email" });
+          }
+        } else {
+          res.status(500).send({ message: "Failed to insert payment data" });
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Server error" });
+      }
+    });
+    app.get('/requestPayment', async(req, res) =>{
+      const result  = await requestPaymentCollection.find().toArray()
+      res.send(result)
+    })
+    
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
