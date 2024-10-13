@@ -273,77 +273,136 @@ async function run() {
       }
     });
 
-    // Payment Update Admin
-    // app.patch('/requestPayment', async(req, res) =>{
-    //   const data = req.body
-    //   console.log(data);
-    //   const filter = { _id: new ObjectId(data.paymentId) };
-    //   const existingPayment = await requestPaymentCollection.findOne(filter);
-    //   if (existingPayment.status && data?.newStatus) {
-    //     const update = { $set: { status: data.newStatus } };
-    //     await requestPaymentCollection.updateOne(filter, update);
-  
-    //     // Fetch the updated payment to return it in the response
-    //     const updatedPayment = await requestPaymentCollection.findOne(filter);
-  
-    //     return res.status(200).json({
-    //       message: data.newStatus,
-    //       payment: updatedPayment
-    //     });
-    //   } else {
-    //     return res.status(400).json({ message: 'New status not provided or existing payment has no status' });
-    //   }
 
-    // })
-    // Payment Update Admin
-app.patch('/requestPayment', async (req, res) => {
-  const { paymentId, newStatus, bookedId } = req.body;
-
-  try {
-    // Step 1: Find the existing payment by paymentId
-    const paymentFilter = { _id: new ObjectId(paymentId) };
-    const existingPayment = await requestPaymentCollection.findOne(paymentFilter);
-
-    if (!existingPayment) {
-      return res.status(404).json({ message: "Payment not found" });
-    }
-
-    if (!newStatus) {
-      return res.status(400).json({ message: "New status not provided" });
-    }
-
-    // Step 2: Update the payment status in requestPaymentCollection
-    const paymentUpdate = { $set: { status: newStatus } };
-    await requestPaymentCollection.updateOne(paymentFilter, paymentUpdate);
-
-    // Step 3: Check if the bookedId matches any document in bookedCollection
-    const bookingFilter = { _id: new ObjectId(bookedId) };
-    const existingBooking = await bookedCollection.findOne(bookingFilter);
-
-    if (!existingBooking) {
-      return res.status(404).json({ message: "No matching booking found for the provided bookedId" });
-    }
-
-    // Step 4: Update the booking status in bookedCollection
-    const bookingUpdate = { $set: { status: newStatus } };
-    await bookedCollection.updateOne(bookingFilter, bookingUpdate);
-
-    // Step 5: Fetch the updated payment and booking for the response
-    const updatedPayment = await requestPaymentCollection.findOne(paymentFilter);
-    const updatedBooking = await bookedCollection.findOne(bookingFilter);
-
-    // Step 6: Return the success response
-    return res.status(200).json({
-      message: `Payment and booking status updated to ${newStatus}`,
-      payment: updatedPayment,
-      booking: updatedBooking,
+    app.patch('/requestPayment', async (req, res) => {
+      const { paymentId, newStatus, bookedId } = req.body;
+    
+      try {
+        // Step 1: Find the existing payment by paymentId
+        const paymentFilter = { _id: new ObjectId(paymentId) };
+        const existingPayment = await requestPaymentCollection.findOne(paymentFilter);
+    
+        if (!existingPayment) {
+          return res.status(404).json({ message: "Payment not found" });
+        }
+    
+        if (!newStatus) {
+          return res.status(400).json({ message: "New status not provided" });
+        }
+    
+        // Step 2: Check if the payment already has an invoiceId
+        let newInvoiceId = existingPayment.invoiceId;
+        
+        if (!existingPayment.invoiceId) {
+          // Step 3: Generate a new unique invoice ID (e.g., tr00001, tr00002, etc.)
+          const lastPayment = await requestPaymentCollection
+            .find({})
+            .sort({ invoiceId: -1 })
+            .limit(1)
+            .toArray();
+    
+          if (lastPayment.length === 0 || !lastPayment[0].invoiceId) {
+            newInvoiceId = "tr00001"; // Start with tr00001 if no payments exist
+          } else {
+            // Increment the numeric part of the last invoice ID
+            const lastInvoiceId = lastPayment[0].invoiceId;
+            const invoiceNumber = parseInt(lastInvoiceId.slice(2)) + 1; // Extract the numeric part and increment it
+            newInvoiceId = "tr" + invoiceNumber.toString().padStart(5, "0"); // Create new invoice ID with padded zeros
+          }
+        }
+    
+        // Step 4: Update the payment status and set the new invoiceId in requestPaymentCollection, but only if the invoiceId was newly generated
+        const paymentUpdate = {
+          $set: {
+            status: newStatus,
+            ...(existingPayment.invoiceId ? {} : { invoiceId: newInvoiceId }), // Only set invoiceId if it doesn't already exist
+          },
+        };
+        await requestPaymentCollection.updateOne(paymentFilter, paymentUpdate);
+    
+        // Step 5: Check if the bookedId matches any document in bookedCollection
+        const bookingFilter = { _id: new ObjectId(bookedId) };
+        const existingBooking = await bookedCollection.findOne(bookingFilter);
+    
+        if (!existingBooking) {
+          return res.status(404).json({ message: "No matching booking found for the provided bookedId" });
+        }
+    
+        // Step 6: Update the booking status and set the new invoiceId in bookedCollection, but only if the invoiceId was newly generated
+        const bookingUpdate = {
+          $set: {
+            status: newStatus,
+            ...(existingBooking.invoiceId ? {} : { invoiceId: newInvoiceId }), // Only set invoiceId if it doesn't already exist
+          },
+        };
+        await bookedCollection.updateOne(bookingFilter, bookingUpdate);
+    
+        // Step 7: Fetch the updated payment and booking for the response
+        const updatedPayment = await requestPaymentCollection.findOne(paymentFilter);
+        const updatedBooking = await bookedCollection.findOne(bookingFilter);
+    
+        // Step 8: Return the success response
+        return res.status(200).json({
+          message: `Payment and booking status updated to ${newStatus}, Invoice ID: ${newInvoiceId}`,
+          payment: updatedPayment,
+          booking: updatedBooking,
+        });
+    
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server error" });
+      }
     });
+    
+    // Payment Update Admin
+// app.patch('/requestPayment', async (req, res) => {
+//   const { paymentId, newStatus, bookedId } = req.body;
 
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
+//   try {
+//     // Step 1: Find the existing payment by paymentId
+//     const paymentFilter = { _id: new ObjectId(paymentId) };
+//     const existingPayment = await requestPaymentCollection.findOne(paymentFilter);
+
+//     if (!existingPayment) {
+//       return res.status(404).json({ message: "Payment not found" });
+//     }
+
+//     if (!newStatus) {
+//       return res.status(400).json({ message: "New status not provided" });
+//     }
+
+//     // Step 2: Update the payment status in requestPaymentCollection
+//     const paymentUpdate = { $set: { status: newStatus } };
+//     await requestPaymentCollection.updateOne(paymentFilter, paymentUpdate);
+
+//     // Step 3: Check if the bookedId matches any document in bookedCollection
+//     const bookingFilter = { _id: new ObjectId(bookedId) };
+//     const existingBooking = await bookedCollection.findOne(bookingFilter);
+
+//     if (!existingBooking) {
+//       return res.status(404).json({ message: "No matching booking found for the provided bookedId" });
+//     }
+
+//     // Step 4: Update the booking status in bookedCollection
+//     const bookingUpdate = { $set: { status: newStatus } };
+//     await bookedCollection.updateOne(bookingFilter, bookingUpdate);
+
+//     // Step 5: Fetch the updated payment and booking for the response
+//     const updatedPayment = await requestPaymentCollection.findOne(paymentFilter);
+//     const updatedBooking = await bookedCollection.findOne(bookingFilter);
+
+//     // Step 6: Return the success response
+//     return res.status(200).json({
+//       message: `Payment and booking status updated to ${newStatus}`,
+//       payment: updatedPayment,
+//       booking: updatedBooking,
+//     });
+
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ message: "Server error" });
+//   }
+// });
 
     app.get('/requestPayment', async(req, res) =>{
       const result  = await requestPaymentCollection.find().toArray()
