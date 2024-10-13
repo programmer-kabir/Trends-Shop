@@ -66,14 +66,14 @@ const RequestPayment = () => {
 
   return (
     <section
-      className="mx-5 pb-32 py-7 my-2 bg-white overflow-x-scroll"
+      className="mx-5 pb-32  rounded-md py-7 my-2 bg-white overflow-x-scroll"
       style={{
         boxShadow:
           "rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset",
       }}
     >
       <div className="pt-10 ">
-        <div className="w-full flex justify-between items-center px-10 mb-3 mt-1 ">
+        <div className="w-full flex justify-between items-center px-5 mb-3 mt-1 ">
           <div>
             <h3 className="text-lg font-semibold text-slate-800">
               Trends Shop with Invoices
@@ -120,7 +120,7 @@ const RequestPayment = () => {
         {filteredPayments.length > 0 ? (
           <table className="divide-y-2 divide-gray-200 bg-white text-sm">
             <thead className="text-left">
-              <tr>
+              <tr className="px-5">
                 <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
                   Invoice Id
                 </th>
