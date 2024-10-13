@@ -1,20 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchRequestPayment } from '../../Redux/RequestPayment/requestPaymentSlice';
-import { fetchShoes } from '../../Redux/Shoes/shoesSlice';
-import { Link } from 'react-router-dom';
-import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchRequestPayment } from "../../Redux/RequestPayment/requestPaymentSlice";
+import { fetchShoes } from "../../Redux/Shoes/shoesSlice";
+import { Link } from "react-router-dom";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import axios from "axios";
+import toast from "react-hot-toast";
+import useAuth from "../../../Components/Hooks/useAuth";
+import { fetchBooked } from "../../Redux/Booked/bookedSlice";
+import useBooked from "../../../Components/Hooks/useBooked";
 const RequestPayment = () => {
-  const { isLoading, RequestPayment, error } = useSelector((state) => state.RequestPayment);
-  const { isLoading:isShoeLoading, Shoes, error:isShoeError } = useSelector((state) => state.Shoes);
+  const { user } = useAuth();
+  const { isLoading, RequestPayment, error } = useSelector(
+    (state) => state.RequestPayment
+  );
+  const {
+    isLoading: isShoeLoading,
+    Shoes,
+    error: isShoeError,
+  } = useSelector((state) => state.Shoes);
+
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     dispatch(fetchRequestPayment());
     dispatch(fetchShoes());
   }, [dispatch]);
-
   const [openDropdowns, setOpenDropdowns] = useState({});
   const [paymentStatus, setPaymentStatus] = useState({});
 
@@ -25,21 +36,31 @@ const RequestPayment = () => {
       [paymentId]: !prevState[paymentId],
     }));
   };
-  const handleStatusChange = (paymentId, newStatus) => {
+
+  const handleStatusChange = (paymentId, newStatus, bookedId) => {
     setPaymentStatus((prevState) => ({
       ...prevState,
       [paymentId]: newStatus,
     }));
-    
-    // Optionally, you can dispatch an action or API call here to persist the status change
+
     setOpenDropdowns((prevState) => ({
       ...prevState,
-      [paymentId]: false, // Close the dropdown after selecting
+      [paymentId]: false,
     }));
+    // const bookProductId = RequestPayment.filter(data => data.bookedId ===)
+    const data = { newStatus, paymentId, bookedId };
+    console.log(data);
+    axios
+      .patch(`${import.meta.env.VITE_LOCALHOST_KEY}/requestPayment`, data)
+      .then((data) => {
+        console.log(data.data);
+        toast.success(`${user?.displayName} ${data?.data?.message}`);
+      });
   };
+
   return (
     <section
-      className="mx-5 pb-32 px-5 py-7 my-2  bg-white overflow-x-auto"
+      className="mx-5 pb-32 px-5 py-7 my-2  bg-white overflow-x-scroll"
       style={{
         boxShadow:
           "rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset",
@@ -56,13 +77,27 @@ const RequestPayment = () => {
         <table className="min-w-full divide-y-2  divide-gray-200 bg-white text-sm ">
           <thead className="text-left ">
             <tr className="">
-              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">Name</th>
-              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">Email</th>
-              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">Shipping Cost</th>
-              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">Transaction ID</th>
-              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">Products</th>
-              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">Number</th>
-              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">Status</th>
+              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
+                Name
+              </th>
+              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
+                Email
+              </th>
+              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
+                Shipping Cost
+              </th>
+              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
+                Transaction ID
+              </th>
+              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
+                Products
+              </th>
+              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
+                Number
+              </th>
+              <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
+                Status
+              </th>
             </tr>
           </thead>
 
@@ -70,7 +105,9 @@ const RequestPayment = () => {
             {RequestPayment?.map((payment) => {
               if (!payment) return null;
 
-              const matchingShoe = Shoes.find((shoe) => shoe._id === payment.products);
+              const matchingShoe = Shoes.find(
+                (shoe) => shoe._id === payment.products
+              );
 
               return (
                 <tr key={payment._id}>
@@ -99,13 +136,21 @@ const RequestPayment = () => {
                   <td className="whitespace-nowrap px-4 py-2">
                     <div className="relative">
                       <span
-                        onClick={() => toggleDropdown(payment._id)}
+                        onClick={() => {
+                          toggleDropdown(payment._id); // Call the second function
+                        }}
+                        // onClick={()=>handleStatusChange()}
+                        // onClick={() => toggleDropdown(payment._id)}
                         className="bg-[#50cd89] px-3 py-2 rounded-md flex items-center justify-between cursor-pointer"
                       >
                         {/* Show the updated status */}
                         {paymentStatus[payment._id] || payment?.status}
                         <span className="ml-2">
-                          {openDropdowns[payment._id] ? <FaChevronUp /> : <FaChevronDown />}
+                          {openDropdowns[payment._id] ? (
+                            <FaChevronUp />
+                          ) : (
+                            <FaChevronDown />
+                          )}
                         </span>
                       </span>
 
@@ -114,19 +159,33 @@ const RequestPayment = () => {
                           <ul>
                             <li
                               className="px-3 py-2 hover:bg-gray-200 cursor-pointer"
-                              onClick={() => handleStatusChange(payment._id, 'Receive Payment')}
+                              onClick={() =>
+                                handleStatusChange(
+                                  payment._id,
+                                  "Receive Payment",
+                                  payment?.bookedId
+                                )
+                              }
                             >
                               Receive Payment
                             </li>
                             <li
                               className="px-3 py-2 hover:bg-gray-200 cursor-pointer"
-                              onClick={() => handleStatusChange(payment._id, 'Transition ID Error')}
+                              onClick={() =>
+                                handleStatusChange(
+                                  payment._id,
+                                  "Transition ID Error",
+                                  payment?.bookedId
+                                )
+                              }
                             >
                               Transition Id Error
                             </li>
                             <li
                               className="px-3 py-2 hover:bg-gray-200 cursor-pointer"
-                              onClick={() => handleStatusChange(payment._id, 'Delivery')}
+                              onClick={() =>
+                                handleStatusChange(payment._id, "Delivery",payment?.bookedId)
+                              }
                             >
                               Delivery
                             </li>

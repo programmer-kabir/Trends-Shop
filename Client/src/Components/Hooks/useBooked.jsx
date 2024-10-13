@@ -12,7 +12,7 @@ const useBooked = () => {
     queryKey: ["booked"],
     queryFn: async () => {
       const res = await fetch(
-        `${import.meta.env.VITE_LOCALHOST_KEY}/booked?email=${user.email}`
+        `${import.meta.env.VITE_LOCALHOST_KEY}/userBookedData`
       );
       return res.json();
     },

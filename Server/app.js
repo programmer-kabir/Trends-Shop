@@ -85,7 +85,7 @@ async function run() {
     // Update User Data
     app.put("/users", async (req, res) => {
       const updatedUserData = req.body;
-      console.log(updatedUserData);
+      // console.log(updatedUserData);
       const query = { email: updatedUserData.email };
       const existingUser = await usersCollection.findOne(query);
       if (!existingUser) {
@@ -117,7 +117,7 @@ async function run() {
     app.patch("/users/admin/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
-      console.log(filter);
+      // console.log(filter);
       const updatedDoc = {
         $set: {
           role: "admin",
@@ -186,7 +186,7 @@ async function run() {
           res.send(result);
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
         res.status(500).send({ message: "Server error" });
       }
     });
@@ -246,7 +246,7 @@ async function run() {
     
           // Check if a matching booking exists in bookedCollection
           const existingBooking = await bookedCollection.findOne(filter);
-          console.log(existingBooking);
+          // console.log(existingBooking);
           if (existingBooking) {
             // Proceed to update status in the booked collection
             const bookedUpdateResult = await bookedCollection.updateMany(filter, update);
@@ -272,6 +272,79 @@ async function run() {
         res.status(500).send({ message: "Server error" });
       }
     });
+
+    // Payment Update Admin
+    // app.patch('/requestPayment', async(req, res) =>{
+    //   const data = req.body
+    //   console.log(data);
+    //   const filter = { _id: new ObjectId(data.paymentId) };
+    //   const existingPayment = await requestPaymentCollection.findOne(filter);
+    //   if (existingPayment.status && data?.newStatus) {
+    //     const update = { $set: { status: data.newStatus } };
+    //     await requestPaymentCollection.updateOne(filter, update);
+  
+    //     // Fetch the updated payment to return it in the response
+    //     const updatedPayment = await requestPaymentCollection.findOne(filter);
+  
+    //     return res.status(200).json({
+    //       message: data.newStatus,
+    //       payment: updatedPayment
+    //     });
+    //   } else {
+    //     return res.status(400).json({ message: 'New status not provided or existing payment has no status' });
+    //   }
+
+    // })
+    // Payment Update Admin
+app.patch('/requestPayment', async (req, res) => {
+  const { paymentId, newStatus, bookedId } = req.body;
+
+  try {
+    // Step 1: Find the existing payment by paymentId
+    const paymentFilter = { _id: new ObjectId(paymentId) };
+    const existingPayment = await requestPaymentCollection.findOne(paymentFilter);
+
+    if (!existingPayment) {
+      return res.status(404).json({ message: "Payment not found" });
+    }
+
+    if (!newStatus) {
+      return res.status(400).json({ message: "New status not provided" });
+    }
+
+    // Step 2: Update the payment status in requestPaymentCollection
+    const paymentUpdate = { $set: { status: newStatus } };
+    await requestPaymentCollection.updateOne(paymentFilter, paymentUpdate);
+
+    // Step 3: Check if the bookedId matches any document in bookedCollection
+    const bookingFilter = { _id: new ObjectId(bookedId) };
+    const existingBooking = await bookedCollection.findOne(bookingFilter);
+
+    if (!existingBooking) {
+      return res.status(404).json({ message: "No matching booking found for the provided bookedId" });
+    }
+
+    // Step 4: Update the booking status in bookedCollection
+    const bookingUpdate = { $set: { status: newStatus } };
+    await bookedCollection.updateOne(bookingFilter, bookingUpdate);
+
+    // Step 5: Fetch the updated payment and booking for the response
+    const updatedPayment = await requestPaymentCollection.findOne(paymentFilter);
+    const updatedBooking = await bookedCollection.findOne(bookingFilter);
+
+    // Step 6: Return the success response
+    return res.status(200).json({
+      message: `Payment and booking status updated to ${newStatus}`,
+      payment: updatedPayment,
+      booking: updatedBooking,
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
     app.get('/requestPayment', async(req, res) =>{
       const result  = await requestPaymentCollection.find().toArray()
       res.send(result)

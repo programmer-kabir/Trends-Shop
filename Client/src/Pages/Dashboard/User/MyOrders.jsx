@@ -11,19 +11,31 @@ import { fetchShoes } from "../../Redux/Shoes/shoesSlice";
 import useBooked from "../../../Components/Hooks/useBooked";
 import { Link } from "react-router-dom";
 import LoadingSpinner from "../../../Components/Design/LoadingSpinner/LoadingSpinner";
+import { fetchRequestPayment } from "../../Redux/RequestPayment/requestPaymentSlice";
+import { fetchBooked } from "../../Redux/Booked/bookedSlice";
+import useAuth from "../../../Components/Hooks/useAuth";
 // import usePayment from "../../../Components/Hooks/usePayment";
 const MyOrder = () => {
-  const { isLoading, Shoes, review } = useSelector((state) => state.Shoes);
+  const {user} = useAuth()
+  const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
+  const { isLoading:isPaymentLoading, RequestPayment, error:isPaymentError } = useSelector(
+    (state) => state.RequestPayment
+  );
+  const {  Booked } = useSelector((state) => state.Booked);
+
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchShoes());
+    dispatch(fetchRequestPayment())
+    dispatch(fetchBooked(user?.email))
   }, []);
-  const [booked, refetch, loading] = useBooked();
 
-  useEffect(() => {
-    booked;
-  }, [refetch]);
-  const matchedItems = booked
+// Matching data where Booked._id and RequestPayment.bookId match
+const matchingData = Booked?.filter((bookedItem) =>
+  RequestPayment.some((paymentItem) => paymentItem.bookedId === bookedItem._id)
+);
+console.log(matchingData);
+  const matchedItems = Booked
     .map((bookedItem) => {
       const matchingShoe = Shoes.find(
         (shoe) => shoe._id === bookedItem.productId
@@ -43,7 +55,7 @@ const MyOrder = () => {
       return null;
     })
     .filter((item) => item !== null);
-  console.log(matchedItems);
+  // console.log(matchedItems);
 
   const [activeTab, setActiveTab] = useState("Completed");
   const tabs = ["Completed", "Incomplete"];
@@ -199,25 +211,34 @@ const MyOrder = () => {
                         {/* Replace with actual data field */}
                       </td>
                       <td className="p-4 py-5">
-                        <p className="text-sm text-gray-900 font-medium">
-                          {data?.status === "Awaiting Check Payment" ? (
-                            <button className=" cursor-not-allowed flex disable items-center gap-2 bg-[#439DDF] text-white rounded font-semibold px-3 py-1">
-                              Waiting For success Payment
-                            </button>
-                          ) : (
-                            <div className="flex gap-2 items-center">
-                             <Link to={`/CheckOut/${data.productId}`}>
-                             <button className="uppercase  flex items-center gap-2 bg-[#439DDF] hover:bg-[#B63155] text-white rounded font-semibold px-3 py-1">
-                                Payment
-                              </button></Link>
-                              <button className="uppercase  flex items-center gap-2 bg-[#B63155] text-white rounded font-semibold px-3 py-1">
-                                Cancel
-                              </button>
-                            </div>
-                          )}
-                        </p>{" "}
-                        {/* Replace with actual data field */}
-                      </td>
+  <p className="text-sm text-gray-900 font-medium">
+    {data?.status === "Awaiting Check Payment" ? (
+      <button className="cursor-not-allowed flex disable items-center gap-2 bg-[#439DDF] text-white rounded font-semibold px-3 py-1">
+        Waiting For Successful Payment
+      </button>
+    ) : data?.status === "Receive Payment" ? (
+      <button className="cursor-not-allowed flex disable items-center gap-2 bg-[#439DDF] text-white rounded font-semibold px-3 py-1">
+        Payment Received
+      </button>
+    ) : data?.status === "Error" ? (
+      <button className="cursor-not-allowed flex disable items-center gap-2 bg-[#439DDF] text-white rounded font-semibold px-3 py-1">
+        Payment Error
+      </button>
+    ) : (
+      <div className="flex gap-2 items-center">
+        <Link to={`/CheckOut/${data.productId}`}>
+          <button className="uppercase flex items-center gap-2 bg-[#439DDF] hover:bg-[#B63155] text-white rounded font-semibold px-3 py-1">
+            Payment
+          </button>
+        </Link>
+        <button className="uppercase flex items-center gap-2 bg-[#B63155] text-white rounded font-semibold px-3 py-1">
+          Cancel
+        </button>
+      </div>
+    )}
+  </p>
+</td>
+
                     </tr>
                   ))}
                 </tbody>

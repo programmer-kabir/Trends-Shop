@@ -9,7 +9,7 @@ import useAuth from "../Hooks/useAuth";
 import Heading from "./Heading";
 import { LuUser2 } from "react-icons/lu";
 import Content from "../Content/Content";
-import Thanks from "./Thanks";
+import { HiMiniBars3BottomLeft } from "react-icons/hi2";
 import useAdmin from "../Hooks/useAdmin";
 import LoadingSpinner from "../Design/LoadingSpinner/LoadingSpinner";
 const Sidebar = () => {
@@ -36,17 +36,21 @@ if(isAdminLoading){
     <section className="">
         <nav className=" shadow  border-b ">
 
-         <div className="flex items-center   w-[96%] mx-auto   justify-between py-2 ">
-         <div className="">
+         <div className="flex px-1 md:px-0 items-center w-full  md:w-[96%] mx-auto   justify-between py-2 ">
+          
+          <button className="md:hidden">
+          <HiMiniBars3BottomLeft size={25}/>
+          </button>
+         <div className="flex items-center">
             <img
-              className="w-1/4 object-fill mr-4 rounded"
+              className="md:w-1/4 w-[90px] object-fill mr-4 rounded"
               src={logo}
               alt=""
             />
           
           </div>
           <div className="flex  gap-5 items-center ">
-          <div className="flex px-2 py-1 rounded-md  bg-[#F3F3F9] gap-2 items-center ">
+          <div className="md:flex hidden px-2 py-1 rounded-md  bg-[#F3F3F9] gap-2 items-center ">
           <AiOutlineSearch className="w-7 h-7" color="#64748b" />
           <input
             type="search"
