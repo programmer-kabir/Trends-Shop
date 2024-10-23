@@ -11,9 +11,9 @@ import ProductDetails from "../Pages/Products/ProductDetails";
 import CheckOut from "../Pages/Dashboard/User/CheckOut";
 import PrivateRoute from "./PrivetRouter";
 import AdminBoard from "../Pages/Dashboard/Admin/AdminBoard";
-import Coupon from "../Pages/Dashboard/Admin/Coupon";
 import ManagerUsers from "../Pages/Dashboard/Admin/ManagerUsers";
 import RequestPayment from "../Pages/Dashboard/Admin/RequestPayment";
+import AddCoupon from "../Pages/Dashboard/Admin/AddCoupon";
 
 const router = createBrowserRouter([
   {
@@ -80,7 +80,7 @@ const router = createBrowserRouter([
       },
       {
         path: "coupon",
-        element: <Coupon />,
+        element: <AddCoupon />,
       },
       {
         path: "manage_users",
