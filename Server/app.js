@@ -211,6 +211,20 @@ async function run() {
       const data = await couponCollection.find().toArray();
       res.send(data);
     });
+    app.post('/couponCode', async(req, res) =>{
+      const body = req.body;
+      const {name} = req.body;
+      const existingCoupon = await couponCollection.findOne({ name });
+   
+        // If name already exists, send an error response
+        if (existingCoupon) {
+          return res.status(400).json({ message: 'Coupon name already exists.' });
+        }
+        
+     
+      const data = await couponCollection.insertOne(body)
+      res.send(data)
+    })
 
     // Address
     app.get("/districts", async (req, res) => {

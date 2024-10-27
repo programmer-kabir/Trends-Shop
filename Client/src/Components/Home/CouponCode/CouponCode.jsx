@@ -69,6 +69,10 @@ const CouponCode = () => {
     }
 ;
   };
+  const getCouponStatus = (endDate) => {
+    return new Date(endDate) > new Date() ? "Active" : "Expired";
+  };
+
   return (
     <Content>
       <section>
@@ -113,9 +117,9 @@ const CouponCode = () => {
               </div>
               <div className="space-y-2">
                 <h2 className="font-light">
-                  Coupon{" "}
+                  
                   <span className="text-green-600 font-medium">
-                    {coupon.status}
+                  {getCouponStatus(coupon.end)}
                   </span>
                 </h2>
                 <button onClick={()=>copyToClipboard(coupon?.code)} className="border-2 border-dashed bg-[#0080801a] border-[#00808066] text-center text-[#008080] font-semibold text-xl px-3 py-1">
