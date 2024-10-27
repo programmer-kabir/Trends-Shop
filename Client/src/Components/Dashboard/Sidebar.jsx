@@ -13,14 +13,14 @@ import { HiMiniBars3BottomLeft } from "react-icons/hi2";
 import useAdmin from "../Hooks/useAdmin";
 import LoadingSpinner from "../Design/LoadingSpinner/LoadingSpinner";
 const Sidebar = () => {
-  const { user, logOut } = useAuth();
+  const { user, logOut,loading } = useAuth();
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
   const handleNavLinkClick = () => {
     setIsSubMenuOpen(!isSubMenuOpen);
   };
   const [isAdmin,isAdminLoading] = useAdmin();
 
-if(isAdminLoading){
+if(isAdminLoading || loading){
   <LoadingSpinner />
 }
 

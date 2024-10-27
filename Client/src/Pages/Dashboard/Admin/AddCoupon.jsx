@@ -4,7 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchCoupons } from "../../Redux/Coupons/couponsSlice";
 import { MdDeleteForever, MdEdit } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
-
+import toast from "react-hot-toast";
+import { VscCloudUpload } from "react-icons/vsc";
+import { Form, Input } from "antd";
 const AddCoupon = () => {
   const { isLoading, Coupons, error } = useSelector((state) => state.Coupons);
   const dispatch = useDispatch();
@@ -29,7 +31,58 @@ const AddCoupon = () => {
       setModalContentVisible(false);
     }, 300); // Matches the transition duration for smooth closing
   };
+  // Image
 
+  const [file, setFile] = useState(null);
+  const [errors, setError] = useState("");
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      const isImage = /\.(gif|jpg|png|jpeg)$/i.test(selectedFile.name);
+      if (isImage) {
+        setFile(URL.createObjectURL(selectedFile));
+        setError("");
+      } else {
+        setError("Please select a valid image file.");
+        setFile(null);
+      }
+    }
+  };
+  const handleRemoveImage = () => {
+    setFile(null); // Clear the file state
+    setError(""); // Reset any errors
+    toast.success("image ");
+  };
+
+  //
+  const onFinish = (values) => {
+    RegisterUser(values.email, values.password)
+      .then((result) => {
+        const user = result.user;
+        updateUserProfile(values.name).then((data) => {
+          const currentUser = {
+            name: user?.displayName,
+            email: user?.email,
+          };
+          fetch(`${import.meta.env.VITE_LOCALHOST_KEY}/users`, {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify(currentUser),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              console.log(data);
+              toast.success("Registration successful! You can now log in.");
+              navigate("/");
+            });
+        });
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+  };
   return (
     <div>
       <section
@@ -173,10 +226,77 @@ const AddCoupon = () => {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6">
-              <p className="mb-4">Enter your coupon details below.</p>
-              {/* Add coupon form content here */}
-            </div>
+            <form className="p-6">
+              {/* Image Upload */}
+              <p className="mb-2">Upload Image</p>
+
+              <div className="flex justify-center items-center bg-gray-100">
+                <div className="bg-white rounded-lg  w-full max-w-lg ">
+                  <label className="flex flex-col items-center cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
+                    <div className="flex flex-col items-center justify-center w-full border-2 border-dashed border-blue-200 rounded-lg p-6 hover:border-blue-400 transition">
+                      {file ? (
+                        <div className="flex flex-col items-center justify-center relative">
+                          <div className="border p-2 rounded-md">
+                            <img
+                              src={file}
+                              alt="Preview"
+                              className="w-28 flex object-contain rounded-md"
+                            />
+                          </div>
+
+                          <button
+                            onClick={handleRemoveImage}
+                            className="bg-white"
+                          >
+                            <RxCross2
+                              className="absolute -top-2 right-12 border border-red-500 rounded-full"
+                              color="red"
+                            />
+                          </button>
+                          <p className="text-[12px] text-stone-700 pt-2">
+                            (Only png* jpg* jpeg* webp/ will be accepted)
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-center flex flex-col items-center justify-center text-gray-500">
+                          <VscCloudUpload size={35} />{" "}
+                          <span>Select a file or drag here</span>
+                          <p className="text-[12px] text-stone-700">
+                            (Only png* jpg* jpeg* webp/ will be accepted)
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    {errors && <p className="text-red-500 mt-2">{errors}</p>}
+                  </label>
+                </div>
+              </div>
+              <Form
+                name="register"
+                layout="vertical"
+                labelCol={{ span: 5 }}
+                wrapperCol={{ span: 35 }}
+                className="space-y-4 px-5"
+                onFinish={onFinish}
+              >
+                <Form.Item
+                  label="Your Name"
+                  name="name"
+                  rules={[
+                    { required: true, message: "Please input your Name" },
+                    { type: "string", message: "Please enter a valid Name " },
+                  ]}
+                >
+                  <Input placeholder="Enter your Name" />
+                </Form.Item>
+              </Form>
+            </form>
           </div>
         </>
       )}

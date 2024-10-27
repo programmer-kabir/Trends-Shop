@@ -13,7 +13,7 @@ const auth = getAuth(app);
 export const AuthContext = createContext(null);
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState("");
-  const [loading, setLoading] = useState("");
+  const [loading, setLoading] = useState(true);
 
 
   //   User Observer
@@ -25,13 +25,14 @@ const AuthProvider = ({ children }) => {
         .then(data=>{
             // console.log(data.data.token);
             localStorage.setItem('access-token', data.data.token)
+            setLoading(false);
         })
     }else{
         localStorage.removeItem('access-token')
+        setLoading(false);
     }
 
     });
-    setLoading(false);
     return () => {
       return unsubscribe;
     };
@@ -50,6 +51,7 @@ const AuthProvider = ({ children }) => {
   };
   // User Logout
   const logOut = () => {
+    setLoading(true);
     return signOut(auth);
   };
   // User name and photo

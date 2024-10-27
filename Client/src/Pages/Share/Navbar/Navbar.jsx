@@ -35,9 +35,8 @@ const Navbar = () => {
     : [];
   // console.log(currentUser[0]?.role);
   // const [isAdmin,isAdminLoading] = useAdmin();
-  // if(isAdminLoading || loading){
-  //   <LoadingSpinner />
-  // }
+ 
+  console.log(loading);
   const handleNav = () => {
     setNav(!nav);
   };
@@ -105,7 +104,8 @@ const handleSignOut = () =>{
       >
         <Content>
           <div className="mx-auto ">
-            <div className="z-50  bg-white  py-3  md:py-1 flex justify-between items-center text-white">
+            {
+              loading ? (<LoadingSpinner />):<div className="z-50  bg-white  py-3  md:py-1 flex justify-between items-center text-white">
               <Link to="/" className="flex items-center  ">
                 <img className="md:w-1/3 w-[80px]" src={logo} alt="" />
               </Link>
@@ -236,6 +236,8 @@ const handleSignOut = () =>{
                 </div>
               </div>
             </div>
+            }
+            
             <div className="flex justify-end">
               {isSidebarOpen && (
                 <div className="fixed top-0 bottom-0 flex justify-end left-0 right-0 bg-black bg-opacity-50 z-50 transition-opacity ease-in-out duration-500">

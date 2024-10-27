@@ -5,7 +5,7 @@ import RingLoader from "react-spinners/RingLoader";
 
 const Loader = () => {
   return (
-    <div className="flex items-center justify-center h-[100vh] bg-gray-700">
+    <div className="flex items-center justify-center">
       <RingLoader  color="#36d7b7" />
     </div>
   );
