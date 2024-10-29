@@ -6,22 +6,24 @@ import { fetchRequestPayment } from "../../Redux/RequestPayment/requestPaymentSl
 import { fetchBooked } from "../../Redux/Booked/bookedSlice";
 import useAuth from "../../../Components/Hooks/useAuth";
 import Table from "../../../Components/Dashboard/Table";
+import Loader from "../../../Components/Design/LoadingSpinner/LoadingSpinner";
+
 const MyOrder = () => {
   const { user } = useAuth();
-  const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
-  const {
-    isLoading: isPaymentLoading,
-    RequestPayment,
-    error: isPaymentError,
-  } = useSelector((state) => state.RequestPayment);
-  const { Booked } = useSelector((state) => state.Booked);
+  const { isLoading: isShoesLoading, Shoes, error } = useSelector((state) => state.Shoes);
+  const { isLoading: isPaymentLoading, RequestPayment, error: isPaymentError } = useSelector((state) => state.RequestPayment);
+  const { isLoading: isBookedLoading, Booked } = useSelector((state) => state.Booked);
 
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(fetchShoes());
     dispatch(fetchRequestPayment());
     dispatch(fetchBooked(user?.email));
-  }, []);
+  }, [dispatch, user?.email]);
+
+  // Combined loading state
+  const isLoading = isShoesLoading || isPaymentLoading || isBookedLoading;
 
   // Incomplete Data
   const matchIncompleteData = Booked.map((bookedItem) => {
@@ -42,8 +44,7 @@ const MyOrder = () => {
       };
     }
     return null;
-  }) // Remove null values
-    .filter((item) => item.status !== "Completed Order"); // Filter out items with "complete order" status
+  }).filter((item) => item && item.status !== "Completed Order"); // Remove null values and filter out "Completed Order" items
 
   // Match Complete Data
   const matchCompleteData = Booked.map((bookedItem) => {
@@ -64,15 +65,15 @@ const MyOrder = () => {
       };
     }
     return null;
-  }) // Remove null values
-    .filter((item) => item.status === "Completed Order");
-  console.log(matchCompleteData);
+  }).filter((item) => item && item.status === "Completed Order"); // Remove null values and filter out items with status not equal to "Completed Order"
+
   const [activeTab, setActiveTab] = useState("Completed");
   const tabs = ["Completed", "Incomplete"];
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
+
   const TableName = [
     "Invoice Id",
     "Product Name",
@@ -82,6 +83,13 @@ const MyOrder = () => {
     "Amount",
     "Delivery Status",
   ];
+
+  if (isLoading) {
+    // Show loader if data is loading
+    return <Loader />;
+  }
+
+  // Main content when data is loaded
   return (
     <div className="px-5 pt-7">
       <div className="flex border-b border-gray-400">
@@ -89,10 +97,8 @@ const MyOrder = () => {
           <div
             key={tab}
             onClick={() => handleTabClick(tab)}
-            className={`cursor-pointer  px-4 py-2 border-b-2 ${
-              activeTab === tab
-                ? "border-black font-bold"
-                : "border-transparent"
+            className={`cursor-pointer px-4 py-2 border-b-2 ${
+              activeTab === tab ? "border-black font-bold" : "border-transparent"
             }`}
           >
             {tab}

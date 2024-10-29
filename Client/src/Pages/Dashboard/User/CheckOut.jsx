@@ -90,10 +90,10 @@ const navigate = useNavigate()
       toast.error("Please provide a transaction ID.");
       return;
     }
-
     let mainData = {
       ...data,
       bookedId:CurrentProduct._id,
+      size:CurrentProduct.size,
       products: CurrentProduct.productId,
       shippingCost,
       name: matchingUsers[0]?.name,

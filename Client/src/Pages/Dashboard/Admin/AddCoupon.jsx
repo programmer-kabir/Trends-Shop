@@ -9,13 +9,15 @@ import { VscCloudUpload } from "react-icons/vsc";
 import { useForm } from "react-hook-form";
 import PropagateLoader from "react-spinners/PropagateLoader";
 import axios from "axios";
+import Swal from "sweetalert2";
+
 const AddCoupon = () => {
   const { isLoading, Coupons, error } = useSelector((state) => state.Coupons);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchCoupons());
-  }, [dispatch]);
+  }, [Coupons]);
 
   const [isModalOpen, setIsModalOpen] = useState(false); // Tracks if modal should be open
   const [modalContentVisible, setModalContentVisible] = useState(false); // Controls the content visibility for smooth animation
@@ -107,7 +109,7 @@ const AddCoupon = () => {
       .then((data) => {
         if (data.data.insertedId) {
           toast.success("Your Coupon is Post");
-          closeModal()
+          closeModal();
         }
       })
       .catch((error) => {
@@ -142,7 +144,30 @@ const AddCoupon = () => {
       availableDays: Math.round((startDate - currentDate) / oneDay),
     }; // Coupon hasn't started yet
   };
-
+  const handleDelete = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`${import.meta.env.VITE_LOCALHOST_KEY}/couponCode/${id}`)
+          .then((data) => {
+            console.log(data.data);
+          });
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your Code has been deleted.",
+          icon: "success",
+        });
+      }
+    });
+  };
   return (
     <div>
       <section
@@ -243,10 +268,10 @@ const AddCoupon = () => {
                     </td>
                     <td className="whitespace-nowrap px-4 py-2">
                       <div className="flex gap-2">
-                        <span className="bg-[#50cd89] px-3 py-2 rounded-md">
-                          <MdEdit color="white" size={20} />
-                        </span>
-                        <span className="border rounded-md border-[#50cd89] px-3 py-2">
+                        <span
+                          onClick={() => handleDelete(coupon._id)}
+                          className="border rounded-md border-[#50cd89] px-3 py-2"
+                        >
                           <MdDeleteForever size={20} />
                         </span>
                       </div>
