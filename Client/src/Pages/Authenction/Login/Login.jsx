@@ -100,7 +100,7 @@ const Login = () => {
 
         <Divider className="h-96 hidden md:flex" type="vertical" />
 
-        <div className="md:w-1/2 pt-5 ">
+        <div className="md:w-1/2 pt-5 md:flex">
           <div>
             <img className="w-1/4 mx-auto" src={logo} alt="" />
             <h1 className="text-2xl text-center text-[#f50400] font-semibold">
