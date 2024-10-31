@@ -37,7 +37,7 @@ const Sidebar = () => {
   return (
     <section>
       <nav className="shadow border-b">
-        <div className="flex px-1 md:px-0 items-center w-full md:w-[96%] mx-auto justify-between py-2">
+        <div className="flex px-2 md:px-0 items-center w-full md:w-[96%] mx-auto justify-between py-2">
           <button onClick={toggleSidebar} className="md:hidden">
             <HiMiniBars3BottomLeft size={25} />
           </button>

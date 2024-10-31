@@ -14,7 +14,7 @@ const AdminBoard = () => {
               Welcome to your dashboard {user?.displayName}
             </p>
           </div>
-          <section className="flex pt-8 items-center gap-7 justify-between">
+          <section className="md:flex pt-8 items-center gap-7 justify-between">
             <div className="flex  items-center justify-between bg-white shadow rounded-md px-6 w-full py-5">
               <div className="space-y-1 ">
                 <h2 className="text-base font-semibold">

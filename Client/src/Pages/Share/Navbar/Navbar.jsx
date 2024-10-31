@@ -154,13 +154,7 @@ const handleSignOut = () =>{
                           </div>
                         </Link>
                       )}
-                      <button className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
-                        <BsBagPlus size={18} />
-                        <div className="flex g">
-                          <TbCurrencyTaka size={17} />
-                          <p className="font-bold uppercase text-[15px]">0</p>
-                        </div>
-                      </button>
+                      
                       <button onClick={handleSignOut} className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
                         <LuUser2 size={18} />
                         <p className="font-bold uppercase text-[15px]">
@@ -178,13 +172,7 @@ const handleSignOut = () =>{
                           </p>
                         </button>
                       </Link>
-                      <button className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
-                        <BsBagPlus size={18} />
-                        <div className="flex ">
-                          <TbCurrencyTaka size={17} />
-                          <p className="font-bold uppercase text-[15px]">0</p>
-                        </div>
-                      </button>
+                     
                     </>
                   )}
                 </div>

@@ -105,12 +105,14 @@ console.log(matchIncompleteData);
           </div>
         ))}
       </div>
+      <div className="overflow-auto">
       {activeTab === "Incomplete" && (
         <Table name={TableName} matchData={matchIncompleteData} />
       )}
       {activeTab === "Completed" && (
         <Table name={TableName} matchData={matchCompleteData} />
       )}
+      </div>
     </div>
   );
 };
