@@ -8,7 +8,7 @@ const MobileDropDown = ({ name, items }) => {
   const toggleDropDown = () => {
     setIsDropDownOpen(!isDropDownOpen);
   };
-
+// console.log(items);
   return (
     <div className="w-full">
       <div className="flex w-full border-b pb-2 text-left items-center justify-between">
@@ -30,9 +30,10 @@ const MobileDropDown = ({ name, items }) => {
       {isDropDownOpen && (
         <div>
           {items.map((item) => (
+            <Link to={`${item.link}`}>
             <p className="border-b py-2 font-medium px-10 text-black cursor-pointer hover:text-[#F62977] text-left">
-              {item}
-            </p>
+              {item.name}
+            </p></Link>
           ))}
         </div>
       )}

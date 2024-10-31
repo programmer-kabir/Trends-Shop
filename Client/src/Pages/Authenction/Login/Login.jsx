@@ -59,9 +59,9 @@ const Login = () => {
 
 
     return (
-    <section className="mt-12 md:lg:mt-20 px-20">
+    <section className="mt-2 md:mt-12 md:lg:mt-20 md:px-20">
       <div className=" px-4 sm:px-2 w-full flex flex-col sm:flex-row justify-around gap-5 items-center">
-        <div className="w-1/2">
+        <div className="md:w-1/2">
           <h2 className="text-2xl uppercase">
             Discover all the
             <br />
@@ -98,9 +98,9 @@ const Login = () => {
           </Link>
         </div>
 
-        <Divider className="h-96 " type="vertical" />
+        <Divider className="h-96 hidden md:flex" type="vertical" />
 
-        <div className="w-1/2 flex ">
+        <div className="md:w-1/2 pt-5 ">
           <div>
             <img className="w-1/4 mx-auto" src={logo} alt="" />
             <h1 className="text-2xl text-center text-[#f50400] font-semibold">

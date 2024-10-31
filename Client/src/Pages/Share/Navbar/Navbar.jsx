@@ -30,12 +30,13 @@ const Navbar = () => {
   useEffect(() => {
     dispatch(fetchUser());
   }, []);
-  const currentUser = !isLoading && Users && user 
-    ? Users.filter((users) => users.email === user.email) 
-    : [];
+  const currentUser =
+    !isLoading && Users && user
+      ? Users.filter((users) => users.email === user.email)
+      : [];
   // console.log(currentUser[0]?.role);
   // const [isAdmin,isAdminLoading] = useAdmin();
- 
+
   console.log(loading);
   const handleNav = () => {
     setNav(!nav);
@@ -90,13 +91,12 @@ const Navbar = () => {
     { name: "CASUAL", link: "products/MAN'S-CASUAL" },
     { name: "SPORTS", link: "products/sports" },
   ];
-const handleSignOut = () =>{
-  logOut()
-}
+  const handleSignOut = () => {
+    logOut();
+  };
 
   return (
-
-   <div className="bg-white">
+    <div className="bg-white">
       <nav
         className={`w-[100%] fixed bg-white  border-b  z-50 mx-auto ${
           location.pathname === "/" ? (scrolled ? "shadow-sm" : "") : "shadow"
@@ -104,128 +104,130 @@ const handleSignOut = () =>{
       >
         <Content>
           <div className="mx-auto ">
-            {
-              loading ? (<LoadingSpinner />):<div className="z-50  bg-white  py-3  md:py-1 flex justify-between items-center text-white">
-              <Link to="/" className="flex items-center  ">
-                <img className="md:w-1/3 w-[80px]" src={logo} alt="" />
-              </Link>
-              <div className="hidden md:flex gap-5 items-center  font-medium">
-                <DropDown name="Mens's" items={MensItems} />
-                <DropDown name="Womens's" items={WomensItems} />
-                <DropDown name="Kid's" items={KidsItems} />
-              </div>
-
-              <div className="flex  items-center space-x-5">
-                {/* Search */}
-                <div className="w-64 py-2 hidden  md:flex  items-center gap-3 bg-gray-200 rounded-full">
-                  {" "}
-                  <div className="pl-4">
-                    <FiSearch className="primaryColor" size={23} />
-                  </div>
-                  <input
-                    type="search"
-                    name=""
-                    placeholder="Search"
-                    id=""
-                    className={`outline-none primaryColor bg-transparent ${
-                      nav ? "hidden" : ""
-                    }`}
-                  />
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              <div className="z-50  bg-white  py-3  md:py-1 flex justify-between items-center text-white">
+                <Link to="/" className="flex items-center  ">
+                  <img className="md:w-1/3 w-[80px]" src={logo} alt="" />
+                </Link>
+                <div className="hidden md:flex gap-5 items-center  font-medium">
+                  <DropDown name="Mens's" items={MensItems} />
+                  <DropDown name="Womens's" items={WomensItems} />
+                  <DropDown name="Kid's" items={KidsItems} />
                 </div>
-                {/* User */}
-                <div className="flex items-center justify-center gap-3">
-                <button className="text-[#f50400] hover:text-[#398EFA] py-1 transition-all duration-300 ease-in-out">
-                        <FaRegHeart  size={20} />
-                       
-                        
-                      </button>
-                  {user ? (
-                    <>
-                      {currentUser[0]?.role === "admin" ? (
-                        <Link to="admin/dashboard">
-                          <div className="secondaryColor">
-                            <MdDashboard size={22} />
-                          </div>
-                        </Link>
-                      ) : (
-                        <Link to="user/dashboard">
-                          <div className="secondaryColor">
-                            <MdDashboard size={22} />
-                          </div>
-                        </Link>
-                      )}
-                      
-                      <button onClick={handleSignOut} className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
-                        <LuUser2 size={18} />
-                        <p className="font-bold uppercase text-[15px]">
-                          Logout
-                        </p>
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link to={"/login"}>
-                        <button className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
-                          <LuUser2 size={18} />
-                          <p className="font-bold uppercase text-[15px]">
-                            Login
-                          </p>
-                        </button>
-                      </Link>
-                     
-                    </>
-                  )}
-                </div>
-              </div>
 
-              {/* Mobile Device */}
-              <div onClick={handleNav} className="block  md:hidden">
-                {nav ? (
-                  <p />
-                ) : (
-                  <div className="flex items-center gap-2 font-semibold">
-                    <HiOutlineMenuAlt3
-                      size={30}
-                      className="text-black cursor-pointer"
+                <div className="flex  items-center space-x-5">
+                  {/* Search */}
+                  <div className="w-64 py-2 hidden  md:flex  items-center gap-3 bg-gray-200 rounded-full">
+                    {" "}
+                    <div className="pl-4">
+                      <FiSearch className="primaryColor" size={23} />
+                    </div>
+                    <input
+                      type="search"
+                      name=""
+                      placeholder="Search"
+                      id=""
+                      className={`outline-none primaryColor bg-transparent ${
+                        nav ? "hidden" : ""
+                      }`}
                     />
                   </div>
-                )}
-              </div>
-              <div
-                className={
-                  nav
-                    ? "fixed right-0  top-0 w-full overflow-auto  h-full text-center md:hidden bg-white  border-r-gray-900 ease-in-out duration-500"
-                    : "ease-in-out duration-500 w-full h-full top-0 fixed overflow-auto right-[-100%]"
-                }
-              >
-                <div className="px-5 text-left pb-16">
-                  <div className="flex items-center justify-between py-3 ">
-                    <Link to="/" className="">
-                      <img className="w-1/3" src={logo} alt="" />
-                      {/* <h2 className="text-2xl text-black font-semibold ">MernShop</h2> */}
-                    </Link>
-                    <button onClick={handleNav}>
-                      <RxCross2
-                        size={40}
-                        className="primaryColor cursor-pointer hover:text-white border p-2 transition-background transition-text  duration-300 ease-in-out  hover:bg-[#F62977] rounded-full "
-                      />
+                  {/* User */}
+                  <div className="flex items-center justify-center gap-3">
+                    <button className="text-[#f50400] hover:text-[#398EFA] py-1 transition-all duration-300 ease-in-out">
+                      <FaRegHeart size={20} />
                     </button>
+                    {user ? (
+                      <>
+                        {currentUser[0]?.role === "admin" ? (
+                          <Link to="admin/dashboard">
+                            <div className="secondaryColor">
+                              <MdDashboard size={22} />
+                            </div>
+                          </Link>
+                        ) : (
+                          <Link to="user/dashboard">
+                            <div className="secondaryColor">
+                              <MdDashboard size={22} />
+                            </div>
+                          </Link>
+                        )}
+
+                        <button
+                          onClick={handleSignOut}
+                          className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out"
+                        >
+                          <LuUser2 size={18} />
+                          <p className="font-bold uppercase text-[15px]">
+                            Logout
+                          </p>
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link to={"/login"}>
+                          <button className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
+                            <LuUser2 size={18} />
+                            <p className="font-bold uppercase text-[15px]">
+                              Login
+                            </p>
+                          </button>
+                        </Link>
+                      </>
+                    )}
                   </div>
-                  <div className="flex flex-col justify-center items-start pt-10 font-medium space-y-3 ">
-                    <MobileDropDown name="Category" items={MensItems} />
-                    <MobileDropDown name="Brand" items={WomensItems} />
-                    <MobileDropDown name="Store" items={KidsItems} />
+                </div>
+
+                {/* Mobile Device */}
+                <div onClick={handleNav} className="block  md:hidden">
+                  {nav ? (
+                    <p />
+                  ) : (
+                    <div className="flex items-center gap-2 font-semibold">
+                      <HiOutlineMenuAlt3
+                        size={30}
+                        className="text-black cursor-pointer"
+                      />
+                    </div>
+                  )}
+                </div>
+                <div
+                  className={
+                    nav
+                      ? "fixed right-0  top-0 w-full overflow-auto  h-full text-center md:hidden bg-white  border-r-gray-900 ease-in-out duration-500"
+                      : "ease-in-out duration-500 w-full h-full top-0 fixed overflow-auto right-[-100%]"
+                  }
+                >
+                  <div className="px-5 text-left pb-16">
+                    <div className="flex items-center justify-between py-3 ">
+                      <Link to="/" className="">
+                        <img className="w-1/3" src={logo} alt="" />
+                        {/* <h2 className="text-2xl text-black font-semibold ">MernShop</h2> */}
+                      </Link>
+                      <button onClick={handleNav}>
+                        <RxCross2
+                          size={40}
+                          className="primaryColor cursor-pointer hover:text-white border p-2 transition-background transition-text  duration-300 ease-in-out  hover:bg-[#F62977] rounded-full "
+                        />
+                      </button>
+                    </div>
+                    <div className="flex flex-col justify-center items-start pt-10 font-medium space-y-3 ">
+                      <MobileDropDown name="Mens's" items={MensItems} />
+                      <MobileDropDown name="Womens's" items={WomensItems} />
+                      <MobileDropDown name="Kid's" items={KidsItems} />
+                    </div>
+                    <button className="bg-[#F50963] mt-8 flex gap-2 items-center px-5 py-3">
+                      <p className=" font-medium">Getting Started </p>
+                      <MdArrowForwardIos size={20} />
+                    </button>
+                    {/*  */}
                   </div>
-                  <button className="bg-[#F50963] mt-8 flex gap-2 items-center px-5 py-3">
-                    <p className=" font-medium">Getting Started </p>
-                    <MdArrowForwardIos size={20} />
-                  </button>
-                  {/*  */}
                 </div>
               </div>
-            </div>
-            }
-            
+            )}
+
             <div className="flex justify-end">
               {isSidebarOpen && (
                 <div className="fixed top-0 bottom-0 flex justify-end left-0 right-0 bg-black bg-opacity-50 z-50 transition-opacity ease-in-out duration-500">
@@ -285,7 +287,6 @@ const handleSignOut = () =>{
         </Content>
       </nav>
     </div>
-
   );
 };
 

@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import ProductCard from "../../Components/Design/ProductCard";
 import Content from "../../Components/Content/Content";
 import LoadingSpinner from "../../Components/Design/LoadingSpinner/LoadingSpinner"; // Import the spinner
+import EmptyCard from "../../Components/Design/Empty/Empty";
+import { Empty } from "antd";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -181,17 +183,25 @@ const Products = () => {
               </div>
             </div>
 
-            <div className="w-full grid md:grid-cols-3 gap-7 pt-5">
-              {isLoading ? (
-                <LoadingSpinner />
-              ) : error ? (
-                <p className="text-red-500 text-center">Error loading data!</p>
-              ) : (
-                filterShoes.map((shoes) => (
-                  <ProductCard key={shoes._id} shoes={shoes} />
-                ))
-              )}
-            </div>
+            <div className="w-full pt-5">
+  {isLoading ? (
+    <LoadingSpinner />
+  ) : error ? (
+    <p className="text-red-500 text-center">Error loading data!</p>
+  ) : filterShoes.length === 0 ? (
+    <p className="w-full flex items-center justify-center">
+      <Empty />
+    </p>
+  ) : (
+    <div className="grid md:grid-cols-3 gap-3">
+      {filterShoes.map((shoes) => (
+        <ProductCard key={shoes._id} shoes={shoes} />
+      ))}
+    </div>
+  )}
+</div>
+
+
           </section>
         </>
       )}
