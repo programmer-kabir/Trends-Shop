@@ -31,7 +31,6 @@ const BestSelling = () => {
   // Select the top 6 products
   const top10Products = sortedProducts.slice(0, 10);
 
-
   return (
     <Content>
       {/* <span className="flex items-center">
@@ -41,15 +40,23 @@ const BestSelling = () => {
         </span>
         <span className="h-[2px] flex-1 bg-black"></span>
       </span> */}
-      <Title title={"BEST SELLING'S PRODUCTS"}/>
+      <Title title={"BEST SELLING'S PRODUCTS"} />
 
       <div>
         <Swiper
-          slidesPerView={4}
           spaceBetween={10}
-          
           modules={[Pagination]}
           className="mySwiper mt-5"
+          breakpoints={{
+            // When the viewport width is >= 640px
+            640: {
+              slidesPerView: 4, // 4 slides per view on larger screens
+            },
+            // When the viewport width is < 640px
+            0: {
+              slidesPerView: 1, // 1 slide per view on small screens
+            },
+          }}
         >
           {top10Products.map((shoe) => (
             <SwiperSlide key={shoe._id}>

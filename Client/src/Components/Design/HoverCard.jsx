@@ -2,8 +2,6 @@ import { Badge, Button, Modal } from "antd";
 import React, { useState } from "react";
 import { TbCurrencyTaka } from "react-icons/tb";
 const HoverCard = ({ shoe }) => {
-
-
   const [open, setOpen] = useState(false);
   const showModal = () => {
     setOpen(true);
@@ -66,19 +64,26 @@ const HoverCard = ({ shoe }) => {
           </div>
           {/* Modal */}
           <Modal title="Product Details" open={open} onCancel={handleCancel}>
-            <div className="h-[300px]">
-              <img className="w-full h-full" src={shoe.mainImage} alt="" />
+            <div className="h-[200px] md:h-[300px]">
+              <img
+                className="w-full  h-full"
+                src={shoe.mainImage}
+                alt=""
+              />
             </div>
-             <p className="text-red-700 pt-2 font-semibold">{shoe.name}</p>
-             <p className="text-[#4D4F53] ">{shoe.shortDescription}</p>
-             <p className="font-bold text-red-700  flex items-center gap-0">Price: {updatePrice}<span className="-ml-1"><TbCurrencyTaka size={18}/></span></p>
-
-            
+            <p className="text-red-700 pt-2 font-semibold">{shoe.name}</p>
+            <p className="text-[#4D4F53] ">{shoe.shortDescription}</p>
+            <p className="font-bold text-red-700  flex items-center gap-0">
+              Price: {updatePrice}
+              <span className="-ml-1">
+                <TbCurrencyTaka size={18} />
+              </span>
+            </p>
           </Modal>
           {/* Last button at the bottom */}
-          <div className="mb-0 flex flex-col w-full">
-            <button className="w-full bg-[#f50400] hover:bg-[#4D4F53] py-2 rounded-md font-semibold text-white transition-all duration-700 ease-in-out">Buy Now</button>
-          </div>
+          {/* <div className="mb-0 flex flex-col w-full">
+            <button className="w-full bg-[#f50400] hover:bg-[#4D4F53] py-2 rounded-md font-semibold text-white transition-all duration-700 ease-in-out">Details</button>
+          </div> */}
         </div>
         {/* Content */}
         <div className="flex flex-col px-1  text-start">

@@ -161,9 +161,9 @@ const MyProfile = () => {
           </div>
         </div>
         {/* Profile */}
-        <div className="pt-10 flex gap-4">
+        <div className="pt-10 md:flex gap-4">
           <div
-            className="py-5 bg-white w-2/3 h-fit"
+            className="py-5 bg-white md:w-2/3 h-fit"
             style={{
               boxShadow:
                 "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px",
@@ -460,7 +460,7 @@ const MyProfile = () => {
               </div>
             )}
           </div>
-          <div className="w-[33%]">
+          <div className="md:w-[33%]">
             {!isEditMode && (
               <div className="">
                 <div

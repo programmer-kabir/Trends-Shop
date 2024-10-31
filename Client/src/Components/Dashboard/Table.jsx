@@ -6,7 +6,7 @@ const Table = ({ name, matchData = [] }) => {
   return (
     <div>
       <section>
-        <div className="mx-auto">
+        <div className="mx-auto overflow-x-scroll">
           <div className="relative flex flex-col w-full h-full text-black bg-white shadow-md rounded-lg bg-clip-border">
             <table className="w-full text-left table-auto pb-1">
               <thead>

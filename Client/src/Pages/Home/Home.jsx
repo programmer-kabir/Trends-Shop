@@ -10,8 +10,10 @@ import CouponCode from "../../Components/Home/CouponCode/CouponCode";
 const Home = () => {
   return (
     <div className="space-y-20">
-      <Banner />
-      <Collection />
+      <div>
+        <Banner />
+        <Collection />
+      </div>
       <BestSelling />
       <MensCollection />
       <WomensCollection />

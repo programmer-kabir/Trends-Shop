@@ -77,22 +77,23 @@ const CouponCode = () => {
     <Content>
       <section>
         <Title title={"Deal Of The Day"} />
-        <div className="pt-5 grid grid-cols-2 gap-5">
+        <div className="pt-5 grid md:grid-cols-2 gap-5">
           {Coupons.map((coupon, index) => (
             <div
               key={coupon._id}
-              className="flex items-center gap-7 border p-5"
+              className="md:flex items-center md:gap-4 gap-3 p-2 border md:p-4"
             >
-              <img className="w-[120px] h-[120px]" src={coupon.image} alt="" />
-              <div className="border-r border-dashed border-gray-400 pr-5">
-                <h2 className="text-black text-[18px] font-medium">
+             <div className="flex items-center md:gap-7 gap-3 ">
+             <img className="md:w-[120px] w-[80px] h-[80px] md:h-[120px]" src={coupon.image} alt="" />
+              <div className="md:border-r border-dashed border-gray-400 pr-5">
+                <h2 className="text-black text-[15px] md:text-[18px] font-medium">
                   {coupon.name}
                 </h2>
-                <h2 className="text-red-600 text-[18px] font-medium">
+                <h2 className="text-red-600 text-[16px] md:text-[18px] font-medium">
                   {coupon.amount}%{" "}
-                  <span className="font-semibold text-gray-600">Off</span>
+                  <span className="font-semibold text-[15px] md:text-base text-gray-600">Off</span>
                 </h2>
-                <div className="flex gap-5 pt-3">
+                <div className="flex gap-1 md:gap-5 pt-3">
                   {/* Days */}
                   <div className="text-sm uppercase border-r pr-3">
                     {timeLeftArray[index]?.days} <br />
@@ -115,7 +116,8 @@ const CouponCode = () => {
                   </div>
                 </div>
               </div>
-              <div className="space-y-2">
+             </div>
+              <div className="space-y-2 text-center pt-5 md:pt-0">
                 <h2 className="font-light">
                   
                   <span className="text-green-600 font-medium">
@@ -126,6 +128,7 @@ const CouponCode = () => {
                   <h2>{coupon?.code}</h2>
                 </button>
               </div>
+             
             </div>
           ))}
         </div>
