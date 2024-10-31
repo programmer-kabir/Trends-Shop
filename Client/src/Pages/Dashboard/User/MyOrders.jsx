@@ -45,7 +45,7 @@ const MyOrder = () => {
     }
     return null;
   }).filter((item) => item && item.status !== "Completed Order"); // Remove null values and filter out "Completed Order" items
-
+console.log(matchIncompleteData);
   // Match Complete Data
   const matchCompleteData = Booked.map((bookedItem) => {
     const matchingShoe = Shoes.find(

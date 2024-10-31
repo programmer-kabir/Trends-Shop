@@ -123,20 +123,20 @@ const ProductDetails = () => {
       <div className="bg-white">
         <Content>
           <section className="w-full">
-            <div className="flex gap-7">
-              <div className="w-3/4">
-                <div className="grid grid-cols-2">
+            <div className="md:flex gap-7">
+              <div className="md:w-3/4 w-full">
+                <div className="grid md:grid-cols-2">
                   {/* Left Side */}
                   <div>
-                    <div className="h-[400px] overflow-hidden rounded-lg">
+                    <div className="md:h-[400px] md:flex-none flex items-center justify-center md:justify-start overflow-hidden rounded-lg">
                       <img
-                        className="w-2/3 h-full object-fill"
+                        className="w-2/3 h-full  object-fill"
                         src={currentShoe[selectedImage]}
                         alt=""
                       />
                     </div>
 
-                    <div>
+                    <div className='flex gap-1 items-center'>
                       {Object.keys(currentShoe).map((key) => {
                         if (key.endsWith('Image')) {
                           return (
@@ -144,7 +144,7 @@ const ProductDetails = () => {
                               key={key}
                               type="button"
                               onClick={() => handleImageChange(key)}
-                              className={`flex-0 aspect-square mb-3 h-20 p-1 overflow-hidden rounded-sm border ${
+                              className={`aspect-square mb-3 h-20 p-1 overflow-hidden rounded-sm border ${
                                 key === selectedImage
                                   ? 'border-blue-700'
                                   : 'border-transparent'
@@ -205,19 +205,19 @@ const ProductDetails = () => {
                           </button>
                         ))}
                       </div>
-                      <div className="flex items-center gap-3 w-full pt-5 pb-8">
-                        <div className="flex items-center gap-1 border border-gray-500 rounded w-[144px]">
+                      <div className="flex items-center justify-center md:justify-start gap-3 w-full pt-5 pb-8">
+                        <div className="flex items-center gap-1 border border-gray-500 rounded w-[100px]  md:w-[144px]">
                           <input
                             type="text"
                             id="Quantity"
                             value={quantity}
-                            className="h-10 outline-none w-10 pl-5 border-gray-200 text-center"
+                            className="h-10 outline-none w-6 md:w-10 md:pl-5 border-gray-200 text-center"
                             readOnly
                           />
                           <button
                             type="button"
                             onClick={handleDecrement}
-                            className="w-7 h-7 mr-2 ml-3 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 transition hover:opacity-75"
+                            className="w-7 h-7  md:mr-2 mx-1 md:ml-3 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 transition hover:opacity-75"
                           >
                             &minus;
                           </button>
@@ -255,7 +255,7 @@ const ProductDetails = () => {
                   </div>
                 </div>
               </div>
-              <div className="w-1/4"><DeliveryOption /></div>
+              <div className="md:w-1/4"><DeliveryOption /></div>
             </div>
           </section>
         </Content>

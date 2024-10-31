@@ -16,22 +16,27 @@ import { toast } from "react-hot-toast";
 import { fetchBooked } from "../../Redux/Booked/bookedSlice";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { fetchShoes } from "../../Redux/Shoes/shoesSlice";
 const CheckOut = () => {
   // const [booked, loading] = useBooked();
   const {id} = useParams()
+  console.log(id);
   // console.log(id);
   const {  Booked } = useSelector((state) => state.Booked);
- 
+  const {  Shoes } = useSelector((state) => state.Shoes);
+
   const dispatch = useDispatch();
 const {user} = useAuth()
   const { isLoading, Users, error } = useSelector((state) => state.Users);
   const { isLoading: isCouponLoading, Coupons, error: isCouponError } = useSelector((state) => state.Coupons);
   useEffect(() => {
+    dispatch(fetchShoes())
     dispatch(fetchUser());
     dispatch(fetchCoupons());
     dispatch(fetchBooked(user.email));
   }, [dispatch,user]);
   const CurrentProduct = Booked.find((data) => data.productId === id); 
+
   // console.log(CurrentProduct.size);
     // console.log(CurrentProduct);
   const [shippingCost, setShippingCost] = useState(0);
@@ -122,7 +127,7 @@ const navigate = useNavigate()
     // console.log(mainData);
      axios.post(`${import.meta.env.VITE_LOCALHOST_KEY}/requestPayment`,mainData)
     .then(data =>{
-      console.log(data.data.bookedUpdateResult);
+      // console.log(data.data.bookedUpdateResult);
       if(data.data.bookedUpdateResult.acknowledged){
         toast.success('Please Waiting Your Payment Confirmation')
         navigate('/user/my_orders')
