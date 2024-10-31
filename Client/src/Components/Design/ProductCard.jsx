@@ -88,12 +88,12 @@ const ProductCard = ({ shoes }) => {
 
   return (
     <div>
-      <div className="bg-gray-100 pb-1 rounded-md">
+      <div className="bg-gray-100 px-1 md:px-0 pb-1 rounded-md">
         <div className="relative ">
           <div className="group relative block">
             <Link to={`../product-details/${shoes._id}`}>
               <div className="relative">
-                <div className="absolute  z-50 overflow-visible">
+                <div className="absolute  z-10 overflow-visible">
                   {shoes?.Discount ? (
                     <>
                       {" "}
@@ -119,14 +119,28 @@ const ProductCard = ({ shoes }) => {
             </Link>
             <div className="absolute bottom-0 w-full overflow-hidden">
               <div className="duration-500 translate-y-8 transform opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100">
-                <Link to="/checkout">
-                  <button className="primaryButton flex items-center justify-center  w-full uppercase font-black">
+                
+                  <button  onClick={() => handleAddToCart(shoes._id)} className="primaryButton hidden md:flex items-center justify-center  w-full uppercase font-black">
                     <FiPlus />
                     order
                   </button>
-                </Link>
+                 
+              
               </div>
             </div>
+          
+            <div className="absolute md:hidden bottom-0 w-full overflow-hidden">
+              <div className="duration-500 ">
+                
+                  <button  onClick={() => handleAddToCart(shoes._id)} className="primaryButton flex items-center justify-center  w-full uppercase font-black">
+                    <FiPlus />
+                    order
+                  </button>
+                 
+                
+              </div>
+            </div>
+          
 
             {/* Additional content */}
             <div className="right-2 cursor-pointer absolute top-10">

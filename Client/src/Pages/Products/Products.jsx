@@ -95,8 +95,8 @@ const Products = () => {
       ) : (
         <>
           {" "}
-          <section className="flex py-16 gap-5">
-            <div className="h-auto w-[30%] text-center text-[#4D4F53]">
+          <section className="md:flex w-full md:py-16 gap-5">
+            <div className="h-auto md:w-[30%] text-center text-[#4D4F53]">
               <p className="uppercase border-b-2 border-gray-400 font-bold text-center">
                 Shop by Filter
               </p>
@@ -181,7 +181,7 @@ const Products = () => {
               </div>
             </div>
 
-            <div className="w-full grid grid-cols-3 gap-7 pt-5">
+            <div className="w-full grid md:grid-cols-3 gap-7 pt-5">
               {isLoading ? (
                 <LoadingSpinner />
               ) : error ? (
