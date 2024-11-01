@@ -1,21 +1,23 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchShoes } from '../Redux/Shoes/shoesSlice';
-import Content from '../../Components/Content/Content';
-import Rating from 'react-rating';
-import { AiFillStar } from 'react-icons/ai';
-import { MdOutlineShoppingBag } from 'react-icons/md';
-import { FiHeart, FiPhone } from 'react-icons/fi';
-import { WishListDataContext } from '../../Components/Context/WishlistData';
-import toast from 'react-hot-toast';
-import useAuth from '../../Components/Hooks/useAuth';
-import axios from 'axios';
-import DeliveryOption from '../../Components/Design/DeliveryOption';
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchShoes } from "../Redux/Shoes/shoesSlice";
+import Content from "../../Components/Content/Content";
+import Rating from "react-rating";
+import { AiFillStar } from "react-icons/ai";
+import { MdOutlineShoppingBag } from "react-icons/md";
+import { FiHeart, FiPhone } from "react-icons/fi";
+import { WishListDataContext } from "../../Components/Context/WishlistData";
+import toast from "react-hot-toast";
+import useAuth from "../../Components/Hooks/useAuth";
+import axios from "axios";
+import DeliveryOption from "../../Components/Design/DeliveryOption";
+import Faqs from "../Faqs/Faqs";
+import Reviews from "../Reviews/Reviews";
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const {user} = useAuth()
+  const { user } = useAuth();
   const dispatch = useDispatch();
   const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
 
@@ -26,11 +28,20 @@ const ProductDetails = () => {
   // Ensure `Shoes` is loaded before trying to find `currentShoe`
   const currentShoe = Shoes?.find((shoe) => shoe._id === id);
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState('mainImage');
+  const [selectedImage, setSelectedImage] = useState("mainImage");
   const [activeSize, setActiveSize] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [rating, setRating] = useState(0);
+
   const { favoriteTShirtCount, setFavoriteTShirtCount } =
     useContext(WishListDataContext);
+
+  // Tabs
+  const [activeTab, setActiveTab] = useState("FAQ");
+
+  const handleTabClick = (tabName) => {
+    setActiveTab(tabName);
+  };
   useEffect(() => {
     // Check if the current product is in favorites when component mounts
     const storedIdsString = localStorage.getItem("favoriteTShirt");
@@ -93,30 +104,33 @@ const ProductDetails = () => {
   const handleAddToCart = (id) => {
     if (!activeSize) {
       toast.error("Please Select Your size");
-    }
-    else{
+    } else {
       const data = {
         productId: id,
         size: activeSize,
-        productName:currentShoe.name,
-        price:updatePrice,
-        discount:discount,
+        productName: currentShoe.name,
+        price: updatePrice,
+        discount: discount,
         quantity: 1,
         email: user.email,
       };
       axios
-      .post(`${import.meta.env.VITE_LOCALHOST_KEY}/booked`, data)
-      .then((data) => {
-        console.log(data.data);
-        if (data.data?.updateResult?.acknowledged) {
-          toast.success(`${currentShoe.name} quantity updated in the cart`);
-        } else if (data.data?.insertedId) {
-          toast.success(`${currentShoe.name} added to the cart`);
-        } else {
-          toast.error('Failed to add to cart');
-        }
-      });
+        .post(`${import.meta.env.VITE_LOCALHOST_KEY}/booked`, data)
+        .then((data) => {
+          console.log(data.data);
+          if (data.data?.updateResult?.acknowledged) {
+            toast.success(`${currentShoe.name} quantity updated in the cart`);
+          } else if (data.data?.insertedId) {
+            toast.success(`${currentShoe.name} added to the cart`);
+          } else {
+            toast.error("Failed to add to cart");
+          }
+        });
     }
+  };
+  const onFinish = (values) => {
+    const formData = { ...values, rating };
+    console.log("Submitted Data:", formData);
   };
   return (
     <div>
@@ -136,9 +150,9 @@ const ProductDetails = () => {
                       />
                     </div>
 
-                    <div className='flex gap-1 items-center'>
+                    <div className="flex gap-1 items-center">
                       {Object.keys(currentShoe).map((key) => {
-                        if (key.endsWith('Image')) {
+                        if (key.endsWith("Image")) {
                           return (
                             <button
                               key={key}
@@ -146,8 +160,8 @@ const ProductDetails = () => {
                               onClick={() => handleImageChange(key)}
                               className={`aspect-square mb-3 h-20 p-1 overflow-hidden rounded-sm border ${
                                 key === selectedImage
-                                  ? 'border-blue-700'
-                                  : 'border-transparent'
+                                  ? "border-blue-700"
+                                  : "border-transparent"
                               } text-center`}
                             >
                               <img
@@ -167,9 +181,7 @@ const ProductDetails = () => {
                     <h2 className="text-xl font-semibold">
                       {currentShoe?.name}
                     </h2>
-                    <p className="">
-                      {currentShoe?.shortDescription}
-                    </p>
+                    <p className="">{currentShoe?.shortDescription}</p>
                     <div className="flex items-center gap-2">
                       <Rating
                         className="mt-1"
@@ -197,8 +209,8 @@ const ProductDetails = () => {
                             onClick={() => handleSizeClick(size)}
                             className={`mx-2 py-1 px-2 border-2 font-medium ${
                               activeSize === size
-                                ? 'border-blue-500 text-blue-500'
-                                : 'border-gray-300 text-gray-700'
+                                ? "border-blue-500 text-blue-500"
+                                : "border-gray-300 text-gray-700"
                             }`}
                           >
                             {size}
@@ -237,9 +249,11 @@ const ProductDetails = () => {
                           Add to Cart
                         </button>
                         <button
-                        className={` border border-[#398EFA] px-2 py-2 rounded ${
-                          isFavorite ? "bg-[#f50400] border-none text-white" : "bg-white"
-                        }`}
+                          className={` border border-[#398EFA] px-2 py-2 rounded ${
+                            isFavorite
+                              ? "bg-[#f50400] border-none text-white"
+                              : "bg-white"
+                          }`}
                           onClick={() => handleAddToFavorite(currentShoe._id)}
                         >
                           <FiHeart size={25} />
@@ -255,7 +269,62 @@ const ProductDetails = () => {
                   </div>
                 </div>
               </div>
-              <div className="md:w-1/4"><DeliveryOption /></div>
+              <div className="md:w-1/4">
+                <DeliveryOption />
+              </div>
+            </div>
+
+            <div className="pt-7 md:pt-0">
+              {/* Dropdown for small screens */}
+              <div className="sm:hidden border border-gray-200 p-2 rounded-md">
+                <label htmlFor="Tab" className="sr-only">
+                  Tab
+                </label>
+                <select
+                  id="Tab"
+                  className="w-full rounded-md border-gray-200"
+                  value={activeTab}
+                  onChange={(e) => handleTabClick(e.target.value, e)}
+                >
+                  <option>Reviews</option>
+                  <option>FAQ</option>
+                </select>
+              </div>
+
+              {/* Tabs for larger screens */}
+              <div className="hidden sm:block">
+                <div className="border-b border-gray-200">
+                  <nav className="-mb-px flex gap-6">
+                    {["Reviews", "FAQ"].map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={(e) => handleTabClick(tab, e)}
+                        className={`shrink-0 border  p-3 text-sm font-medium ${
+                          activeTab === tab
+                            ? "text-sky-600 border-b-white rounded-t-lg border-gray-300"
+                            : "text-gray-500 border-transparent hover:text-gray-700"
+                        }`}
+                      >
+                        {tab}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+              </div>
+
+              {/* Tab Content */}
+              <div className="p-4 px-12">
+                {activeTab === "Reviews" && (
+                  <div className="md:w-2/3 mx-auto border rounded-md">
+                    <Reviews setRating={setRating} onFinish={onFinish} />
+                  </div>
+                )}
+                {activeTab === "FAQ" && (
+                  <div>
+                    <Faqs />
+                  </div>
+                )}
+              </div>
             </div>
           </section>
         </Content>
