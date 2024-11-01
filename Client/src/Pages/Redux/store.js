@@ -4,6 +4,7 @@ import userSlice from "./Users/userSlice";
 import couponSlice from "./Coupons/couponsSlice";
 import bookedSlice from "./Booked/bookedSlice";
 import requestPaymentSlice from "./RequestPayment/requestPaymentSlice";
+import reviewsSlice from "./Reviews/reviewsSlice";
 
 const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
     Users: userSlice,
     Coupons: couponSlice,
     Booked:bookedSlice,
-    RequestPayment:requestPaymentSlice
+    RequestPayment:requestPaymentSlice,
+    Reviews:reviewsSlice
   },
 });
 export default store;

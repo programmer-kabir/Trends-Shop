@@ -37,7 +37,7 @@ const ProductDetails = () => {
     useContext(WishListDataContext);
 
   // Tabs
-  const [activeTab, setActiveTab] = useState("FAQ");
+  const [activeTab, setActiveTab] = useState("Reviews");
 
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
@@ -129,8 +129,26 @@ const ProductDetails = () => {
     }
   };
   const onFinish = (values) => {
-    const formData = { ...values, rating };
-    console.log("Submitted Data:", formData);
+    const formData = {
+      productId: id,
+      ...values,
+      rating,
+      name: user?.displayName || "Anonymous",
+      email: user?.email || "anonymous@example.com",
+    };
+    if (!formData.rating) {
+      toast.error("Give your Star");
+      return;
+    }
+    // console.log("Submitted Data:", formData);
+    axios
+      .post(`${import.meta.env.VITE_LOCALHOST_KEY}/reviews`, formData)
+      .then((response) => {
+        const data = response.data;
+        if (data.insertedId) {
+          toast.success("Thanks For your review");
+        }
+      });
   };
   return (
     <div>
@@ -313,9 +331,9 @@ const ProductDetails = () => {
               </div>
 
               {/* Tab Content */}
-              <div className="p-4 px-12">
+              <div className="p-4 md:px-12">
                 {activeTab === "Reviews" && (
-                  <div className="md:w-2/3 mx-auto border rounded-md">
+                  <div className="md:w-3/4 w-full mx-auto ">
                     <Reviews setRating={setRating} onFinish={onFinish} />
                   </div>
                 )}

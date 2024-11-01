@@ -51,6 +51,7 @@ async function run() {
     const bookedCollection = client.db("TrendsShop").collection("booked");
     const couponCollection = client.db("TrendsShop").collection("coupon");
     const requestPaymentCollection = client.db("TrendsShop").collection("requestPayment");
+    const reviewsCollection = client.db("TrendsShop").collection("reviews");
 
         // JWT
         app.post("/jwt", (req, res) => {
@@ -505,8 +506,18 @@ async function run() {
       res.send(result)
     })
     
+// Reviews
+app.post('/reviews', async(req, res) =>{
+  const body = req.body
+  
+  const result = await reviewsCollection.insertOne(body)
+  res.send(result)
+})
 
-
+app.get('/reviews', async(req, res) =>{
+  const result = await reviewsCollection.find().toArray()
+  res.send(result)
+})
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("You successfully connected to MongoDB!");
