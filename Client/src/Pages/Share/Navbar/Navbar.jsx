@@ -111,7 +111,7 @@ const Navbar = () => {
                 <Link to="/" className="flex items-center  ">
                   <img className="md:w-1/3 w-[80px]" src={logo} alt="" />
                 </Link>
-                <div className="hidden md:flex gap-5 items-center  font-medium">
+                <div className="hidden md:flex gap-5 items-center">
                   <DropDown name="Mens's" items={MensItems} />
                   <DropDown name="Womens's" items={WomensItems} />
                   <DropDown name="Kid's" items={KidsItems} />

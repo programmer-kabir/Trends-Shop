@@ -260,12 +260,13 @@ const ProductDetails = () => {
                           </button>
                         </div>
                         <button
-                          onClick={() => handleAddToCart(currentShoe._id)}
-                          className="uppercase flex items-center gap-2 bg-[#439DDF] hover:bg-[#B63155] text-white rounded-sm font-semibold px-6 py-2"
-                        >
-                          <MdOutlineShoppingBag size={24} color="white" />
-                          Add to Cart
-                        </button>
+    onClick={() => handleAddToCart(currentShoe._id)}
+    className="uppercase flex items-center gap-2 border hover:bg-white hover:text-[#4096ff] hover:border-[#4096ff] bg-[#f50400] text-white rounded-sm font-semibold px-6 py-2 transform transition-transform duration-200 ease-in-out hover:scale-105"
+>
+    <MdOutlineShoppingBag size={24} />
+    Add to Cart
+</button>
+
                         <button
                           className={` border border-[#398EFA] px-2 py-2 rounded ${
                             isFavorite

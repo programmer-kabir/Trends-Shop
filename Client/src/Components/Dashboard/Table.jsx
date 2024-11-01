@@ -73,29 +73,29 @@ const Table = ({ name, matchData = [] }) => {
                   <td className="p-4 py-5">
                     <p className="text-sm text-gray-900 font-medium">
                       {data?.status === "Awaiting Check Payment" ? (
-                        <button className="cursor-not-allowed flex items-center gap-2 bg-[#439DDF] text-white rounded font-semibold px-3 py-1">
+                        <button className="cursor-not-allowed flex items-center gap-2 bg-[#398EFA] text-white rounded font-semibold px-3 py-1">
                           Waiting For Successful Payment
                         </button>
                       ) : data?.status === "Receive Payment" ? (
-                        <button className="cursor-not-allowed flex items-center gap-2 bg-[#439DDF] text-white rounded font-semibold px-3 py-1">
+                        <button className="cursor-not-allowed flex items-center gap-2 bg-[#398EFA] text-white rounded font-semibold px-3 py-1">
                           Payment Received
                         </button>
                       ) : data?.status === "Delivery" ? (
-                        <button className="cursor-not-allowed flex items-center gap-2 bg-[#439DDF] text-white rounded font-semibold px-3 py-1">
+                        <button className="cursor-not-allowed flex items-center gap-2 bg-[#398EFA] text-white rounded font-semibold px-3 py-1">
                           Delivery
                         </button>
                       ) : data?.status === "Completed Order" ? (
-                        <button className="cursor-not-allowed flex items-center gap-2 bg-[#439DDF] text-white rounded font-semibold px-3 py-1">
+                        <button className="cursor-not-allowed flex items-center gap-2 bg-[#398EFA] text-white rounded font-semibold px-3 py-1">
                           Completed Order
                         </button>
                       ) : (
                         <div className="flex gap-2 items-center">
                           <Link to={`/CheckOut/${data.productId}`}>
-                            <button className="uppercase flex items-center gap-2 bg-[#439DDF] hover:bg-[#B63155] text-white rounded font-semibold px-3 py-1">
+                            <button className="uppercase flex items-center gap-2 bg-[#f50400] border hover:border-[#398EFA] hover:bg-white hover:text-[#398EFA] text-white rounded font-semibold px-3 py-1">
                               Payment
                             </button>
                           </Link>
-                          <button className="uppercase flex items-center gap-2 bg-[#B63155] text-white rounded font-semibold px-3 py-1">
+                          <button className="uppercase flex items-center gap-2 bg-[#398EFA] text-white rounded font-semibold px-3 py-1">
                             Cancel
                           </button>
                         </div>
