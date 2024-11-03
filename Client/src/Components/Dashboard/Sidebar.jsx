@@ -104,6 +104,20 @@ const Sidebar = () => {
                   `font-normal transition-all py-3 text-base w-full flex items-center gap-4 px-5 capitalize ${
                     isActive ? "bg-[#e6f4ff] text-[#1677ff] rounded" : ""
                   }`
+                } to="create-product" >
+                <span>Create Product</span>
+              </NavLink>
+              <NavLink className={({ isActive }) =>
+                  `font-normal transition-all py-3 text-base w-full flex items-center gap-4 px-5 capitalize ${
+                    isActive ? "bg-[#e6f4ff] text-[#1677ff] rounded" : ""
+                  }`
+                } to="show-product" >
+                <span>Show Product</span>
+              </NavLink>
+              <NavLink className={({ isActive }) =>
+                  `font-normal transition-all py-3 text-base w-full flex items-center gap-4 px-5 capitalize ${
+                    isActive ? "bg-[#e6f4ff] text-[#1677ff] rounded" : ""
+                  }`
                 } to="coupon" >
                 <span>Coupon</span>
               </NavLink>
@@ -136,7 +150,7 @@ const Sidebar = () => {
         </div>
 
         {/* Main Content */}
-        <div className="md:w-[80%]">
+        <div className="md:w-[80%] overflow-x-scroll">
           <Outlet />
         </div>
       </div>

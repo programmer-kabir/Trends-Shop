@@ -14,7 +14,6 @@ import Content from "../../../Components/Content/Content";
 import { TbCurrencyTaka } from "react-icons/tb";
 import useAuth from "../../../Components/Hooks/useAuth";
 import LoadingSpinner from "../../../Components/Design/LoadingSpinner/LoadingSpinner";
-import { FaRegHeart } from "react-icons/fa";
 import useAdmin from "../../../Components/Hooks/useAdmin";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUser } from "../../Redux/Users/userSlice";
@@ -136,9 +135,7 @@ const Navbar = () => {
                   </div>
                   {/* User */}
                   <div className="flex items-center justify-center gap-3">
-                    <button className="text-[#f50400] hover:text-[#398EFA] py-1 transition-all duration-300 ease-in-out">
-                      <FaRegHeart size={20} />
-                    </button>
+                   
                     {user ? (
                       <>
                         {currentUser[0]?.role === "admin" ? (

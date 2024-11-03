@@ -14,6 +14,9 @@ import AdminBoard from "../Pages/Dashboard/Admin/AdminBoard";
 import ManagerUsers from "../Pages/Dashboard/Admin/ManagerUsers";
 import RequestPayment from "../Pages/Dashboard/Admin/RequestPayment";
 import AddCoupon from "../Pages/Dashboard/Admin/AddCoupon";
+import AddProduct from "../Pages/Dashboard/Admin/AddProduct";
+import ShowProduct from "../Pages/Dashboard/Admin/ShowProduct";
+import AdminRoute from "./AdminRoute";
 
 const router = createBrowserRouter([
   {
@@ -27,7 +30,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/products/:Name",
-      element: <Products />,
+        element: <Products />,
       },
       {
         path: "/register",
@@ -42,9 +45,9 @@ const router = createBrowserRouter([
         element: <ProductDetails />,
       },
       {
-        path:'/CheckOut/:id',
-        element:<CheckOut />  
-      }
+        path: "/CheckOut/:id",
+        element: <CheckOut />,
+      },
     ],
   },
   {
@@ -63,14 +66,15 @@ const router = createBrowserRouter([
         path: "my_orders",
         element: <MyOrders />,
       },
-      
     ],
   },
   {
     path: "admin",
     element: (
       <PrivateRoute>
-        <Dashboard />
+        <AdminRoute>
+          <Dashboard />
+        </AdminRoute>
       </PrivateRoute>
     ),
     children: [
@@ -90,7 +94,14 @@ const router = createBrowserRouter([
         path: "request_Payment",
         element: <RequestPayment />,
       },
-      
+      {
+        path: "create-product",
+        element: <AddProduct />
+      },
+      {
+        path: "show-product",
+        element: <ShowProduct />,
+      },
     ],
   },
 ]);

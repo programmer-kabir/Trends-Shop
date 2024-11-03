@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const Table = ({ name, matchData = [] }) => {
   return (
     <div className="w-full pt-2">
-      <div className="overflow-scroll">
+      <div className="overflow-x-scroll">
         <div className="flex flex-col w-full h-full text-black bg-white shadow-md rounded-lg bg-clip-border">
           <table className="pt-5 pb-5 w-full  text-left table-auto">
             <thead className="">
