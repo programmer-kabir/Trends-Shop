@@ -47,9 +47,12 @@ const RequestPayment = () => {
       ...prevState,
       [paymentId]: false,
     }));
-
-    const data = { newStatus, paymentId, bookedId };
-    console.log(data);
+    const matchPayment = RequestPayment.find(
+      (payment) => payment._id === paymentId
+    );
+    // console.log(matchPayment.products);
+    const data = { newStatus, paymentId, bookedId,productId:matchPayment.products };
+    // console.log(paymentId);
     axios
       .patch(`${import.meta.env.VITE_LOCALHOST_KEY}/requestPayment`, data)
       .then((data) => {

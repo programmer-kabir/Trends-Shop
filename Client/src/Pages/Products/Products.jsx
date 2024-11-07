@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchShoes } from "../Redux/Shoes/shoesSlice";
 import { IoIosArrowDown } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ProductCard from "../../Components/Design/ProductCard";
 import Content from "../../Components/Content/Content";
 import LoadingSpinner from "../../Components/Design/LoadingSpinner/LoadingSpinner"; // Import the spinner
@@ -13,15 +13,22 @@ const Products = () => {
   const dispatch = useDispatch();
   const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
 
-  useEffect(() => {
-    dispatch(fetchShoes());
-  }, [dispatch]);
+  const { subCategory } = useParams();
 
   const [openDropdown, setOpenDropdown] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
-  const [activeSubcategory, setActiveSubcategory] = useState("");
-  const [selectedSubcategory, setSelectedSubcategory] = useState("");
+  // const [activeSubcategory, setActiveSubcategory] = useState("");
+  // const [selectedSubcategory, setSelectedSubcategory] = useState("");
+  const [activeSubcategory, setActiveSubcategory] = useState(subCategory || "");
+  const [selectedSubcategory, setSelectedSubcategory] = useState(subCategory || "");
+  useEffect(() => {
+    // Dispatch the fetchShoes action whenever the subCategory changes
+    if (selectedSubcategory) {
+      dispatch(fetchShoes());
+    }
+  }, [dispatch, selectedSubcategory]);
 
+console.log(selectedSubcategory);
   const toggleDropdown = (index) => {
     if (openDropdown === index) {
       setOpenDropdown(null);
@@ -31,6 +38,7 @@ const Products = () => {
       setActiveCategory(index);
     }
   };
+
 
   const toggleSubcategory = (subcategory) => {
     setSelectedSubcategory(subcategory);
