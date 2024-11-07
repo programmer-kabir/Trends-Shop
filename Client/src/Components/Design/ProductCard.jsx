@@ -12,6 +12,7 @@ import { WishListDataContext } from "../Context/WishlistData";
 // import { WishListDataContext } from "../Context/WishlistData";
 const ProductCard = ({ shoes }) => {
   const { user } = useAuth();
+  console.log(user);
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeSize, setActiveSize] = useState(null);
   const { favoriteTShirtCount, setFavoriteTShirtCount } =
