@@ -172,22 +172,6 @@ const ProductCard = ({ shoes }) => {
                   </div>
                 </a>
 
-                {/* <div
-                  data-tooltip-id="favorite"
-                  data-tooltip-content="Quick View"
-                  data-tooltip-place="left"
-                  className="bg-white hover:bg-[#f50400] p-2 shadow-lg"
-                  style={{
-                    boxShadow:
-                      "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px",
-                    transition: "background-color 0.3s",
-                  }}
-                  onMouseEnter={() => setIsHoveredEye(true)}
-                  onMouseLeave={() => setIsHoveredEye(false)}
-                >
-                  <Tooltip id="favorite" />
-                  <FaRegEye size={20} color={isHoveredEye ? "white" : "#000"} />
-                </div> */}
                 <button
                   onClick={() => handleAddToCart(shoes._id)}
                   data-tooltip-id="favorite"

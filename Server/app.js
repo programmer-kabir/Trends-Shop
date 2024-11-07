@@ -415,8 +415,8 @@ async function run() {
     // });
 
     app.patch("/requestPayment", async (req, res) => {
-      const { paymentId, newStatus, bookedId, productId } = req.body;
-      console.log(newStatus);
+      const { paymentId, newStatus, bookedId, productId,deliveryDate } = req.body;
+
 
       try {
         // Step 1: Find the existing payment by paymentId
@@ -473,6 +473,7 @@ async function run() {
         // Update the payment status and new invoiceId only if the invoiceId was newly generated
         const paymentUpdate = {
           $set: {
+            deliveryDate,
             status: newStatus,
             ...(existingPayment.invoiceId ? {} : { invoiceId: newInvoiceId }),
           },

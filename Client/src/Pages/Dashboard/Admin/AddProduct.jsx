@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
@@ -8,6 +9,8 @@ import { VscCloudUpload } from "react-icons/vsc";
 import PropagateLoader from "react-spinners/PropagateLoader";
 
 const AddProduct = () => {
+  const navigate = useNavigate();
+
   const {
     handleSubmit,
     register,
@@ -207,32 +210,6 @@ const AddProduct = () => {
     return acc;
   }, {});
 
-  // const handleDelete = (id) => {
-  //   // Swal.fire({
-  //   //   title: "Are you sure?",
-  //   //   text: "You won't be able to revert this!",
-  //   //   icon: "warning",
-  //   //   showCancelButton: true,
-  //   //   confirmButtonColor: "#3085d6",
-  //   //   cancelButtonColor: "#d33",
-  //   //   confirmButtonText: "Yes, delete it!",
-  //   // }).then((result) => {
-  //   //   if (result.isConfirmed) {
-  //   //     axios
-  //   //       .delete(`${import.meta.env.VITE_LOCALHOST_KEY}/couponCode/${id}`)
-  //   //       .then((data) => {
-  //   //         console.log(data.data);
-  //   //       });
-  //   //     Swal.fire({
-  //   //       title: "Deleted!",
-  //   //       text: "Your Code has been deleted.",
-  //   //       icon: "success",
-  //   //     });
-  //   //   }
-  //   // });
-  //   console.log(id);
-  // };
-  // Register category as a required field
   register("category", { required: "Category is required" });
   register("size", { required: "Please select at least one size" });
   register("gender", {
@@ -281,6 +258,7 @@ const AddProduct = () => {
       if (response?.data?.insertedId) {
         // Show success message if insertedId exists in response
         toast.success("Your data has been successfully added!");
+        navigate('../show-product')
       }
     })
     .catch(error => {
@@ -299,6 +277,7 @@ const AddProduct = () => {
   
 
   };
+
   return (
     <div className="px-5 pt-7 mx-auto ">
       <span className="flex items-center">

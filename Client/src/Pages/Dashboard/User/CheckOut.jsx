@@ -95,14 +95,18 @@ const navigate = useNavigate()
       toast.error("Please provide a transaction ID.");
       return;
     }
+    const orderDate = new Date().toISOString().split('T')[0];
+    // console.log(orderDate);
     let mainData = {
       ...data,
+      price:CurrentProduct?.price,
       bookedId:CurrentProduct._id,
       size:CurrentProduct.size,
       products: CurrentProduct.productId,
       shippingCost,
       name: matchingUsers[0]?.name,
       email:user.email,
+      orderDate,
       status:"Awaiting Check Payment",
     };
 

@@ -13,20 +13,21 @@ const Products = () => {
   const dispatch = useDispatch();
   const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
 
-  const { subCategory } = useParams();
+  const { Name } = useParams();
 
   const [openDropdown, setOpenDropdown] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
   // const [activeSubcategory, setActiveSubcategory] = useState("");
   // const [selectedSubcategory, setSelectedSubcategory] = useState("");
-  const [activeSubcategory, setActiveSubcategory] = useState(subCategory || "");
-  const [selectedSubcategory, setSelectedSubcategory] = useState(subCategory || "");
+  const [activeSubcategory, setActiveSubcategory] = useState(Name || "");
+  const [selectedSubcategory, setSelectedSubcategory] = useState(Name || "");
   useEffect(() => {
     // Dispatch the fetchShoes action whenever the subCategory changes
     if (selectedSubcategory) {
       dispatch(fetchShoes());
     }
-  }, [dispatch, selectedSubcategory]);
+    // dispatch(fetchShoes());
+  }, [dispatch]);
 
 console.log(selectedSubcategory);
   const toggleDropdown = (index) => {
