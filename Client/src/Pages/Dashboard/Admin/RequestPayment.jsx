@@ -8,6 +8,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import useAuth from "../../../Components/Hooks/useAuth";
 import { Empty } from "antd";
+import { MdEdit } from "react-icons/md";
 const RequestPayment = () => {
   const { user } = useAuth();
   const { isLoading, RequestPayment, error } = useSelector(
@@ -142,13 +143,13 @@ const RequestPayment = () => {
   };
 
   // // Filter the payments by invoiceId based on the search input
-  // const filteredPayments = RequestPayment?.filter((payment) =>
-  //   payment?.invoiceId?.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
+  const filteredPayments = RequestPayment?.filter((payment) =>
+    payment?.invoiceId?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <section
-      className="mx-5 pb-32  rounded-md py-7 my-2 bg-white overflow-x-scroll"
+      className="mx-5 pb-32  rounded-md py-7 my-4 bg-white overflow-x-scroll"
       style={{
         boxShadow:
           "rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset",
@@ -238,22 +239,22 @@ const RequestPayment = () => {
             </thead>
 
             <tbody>
-            {RequestPayment?.map((payment) => {
-    if (!payment) return null;
-    const orderDate = new Date(payment.orderDate);
-    const formattedOrderDate = !isNaN(orderDate)
-      ? formatDate(orderDate)
-      : "Invalid Date";
-    
-    // Extract deliveryDate from deliveryDates using payment._id
-    const deliveryDate = deliveryDates[payment._id];
-    const formattedDeliveryDate = payment.deliveryDate
-      ? formatDate(new Date(payment.deliveryDate)) // Format the correct date
-      : "Select Date";
-    
-    const matchingShoe = Shoes.find(
-      (shoe) => shoe._id === payment.products
-    );
+              {RequestPayment?.map((payment) => {
+                if (!payment) return null;
+                const orderDate = new Date(payment.orderDate);
+                const formattedOrderDate = !isNaN(orderDate)
+                  ? formatDate(orderDate)
+                  : "Invalid Date";
+
+                // Extract deliveryDate from deliveryDates using payment._id
+                const deliveryDate = deliveryDates[payment._id];
+                const formattedDeliveryDate = payment.deliveryDate
+                  ? formatDate(new Date(payment.deliveryDate)) // Format the correct date
+                  : "Select Date";
+
+                const matchingShoe = Shoes.find(
+                  (shoe) => shoe._id === payment.products
+                );
                 return (
                   <tr key={payment._id} className="border-b border-slate-200">
                     <td className="whitespace-nowrap pr-7 py-2 text-gray-700 font-bold">
@@ -302,37 +303,45 @@ const RequestPayment = () => {
                         </>
                       )}
                     </td> */}
-                     <td className="whitespace-nowrap px-7 py-2 text-gray-700">
-          {payment.deliveryDate ? (
-            formattedDeliveryDate
-          ) : (
-            <>
-              {showDateInput[payment._id] ? (
-                <input
-                  type="date"
-                  value={deliveryDate || ""} // Use deliveryDate here
-                  onChange={(e) =>
-                    handleDateChange(payment._id, e.target.value)
-                  }
-                  onBlur={() =>
-                    setShowDateInput((prev) => ({
-                      ...prev,
-                      [payment._id]: false,
-                    }))
-                  }
-                  className="border rounded-md p-1"
-                />
-              ) : (
-                <span
-                  onClick={() => handleShowInput(payment._id)}
-                  className="cursor-pointer"
-                >
-                  {formattedDeliveryDate}
-                </span>
-              )}
-            </>
-          )}
-        </td>
+                    <td className="whitespace-nowrap px-7 py-2 text-gray-700">
+                      {payment.deliveryDate ? (
+                        <div className="flex items-center  gap-1 ">
+                          {formattedDeliveryDate}{" "}
+                          <button >
+                            <MdEdit
+                             
+                              size={19}
+                            />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          {showDateInput[payment._id] ? (
+                            <input
+                              type="date"
+                              value={deliveryDate || ""} // Use deliveryDate here
+                              onChange={(e) =>
+                                handleDateChange(payment._id, e.target.value)
+                              }
+                              onBlur={() =>
+                                setShowDateInput((prev) => ({
+                                  ...prev,
+                                  [payment._id]: false,
+                                }))
+                              }
+                              className="border rounded-md p-1"
+                            />
+                          ) : (
+                            <span
+                              onClick={() => handleShowInput(payment._id)}
+                              className="cursor-pointer"
+                            >
+                              {formattedDeliveryDate}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </td>
                     <td className="whitespace-nowrap px-7 py-2 text-gray-700">
                       ৳{payment?.price}
                     </td>

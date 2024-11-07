@@ -51,7 +51,7 @@ const AdminBoard = () => {
             <img className="text-white" src={TotalOrder} alt="" />
           </div>
         </div>
-        du
+        
       </section>
       <section className="md:flex gap-10 pt-7 p-2 items-center">
         <div className="md:w-2/3 shadow border rounded-md">

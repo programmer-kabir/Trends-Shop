@@ -70,10 +70,10 @@ const Sidebar = () => {
         </div>
       </nav>
 
-      <div className="flex">
+      <div className="flex max-h-screen">
         {/* Sidebar */}
         <div
-          className={`pt-5 px-5 overflow-hidden space-y-1 h-screen transition-transform duration-300 ${
+          className={`pt-5 px-5 fixed overflow-hidden space-y-1 h-screen transition-transform duration-300 ${
             isSidebarOpen ? "block" : "hidden"
           } lg:block lg:w-[20%] bg-white fixed lg:static z-50 w-[70%] md:w-[40%]`}
           style={{

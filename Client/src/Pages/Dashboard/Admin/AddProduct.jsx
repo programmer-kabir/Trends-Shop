@@ -283,7 +283,7 @@ const AddProduct = () => {
       <span className="flex items-center">
         <span className="h-px flex-1 bg-black"></span>
         <span className="shrink-0 px-3 uppercase font-semibold text-[#0284C7]">
-          Review's
+          Add Product 
         </span>
         <span className="h-px flex-1 bg-black"></span>
       </span>
