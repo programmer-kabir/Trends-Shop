@@ -42,84 +42,85 @@ const ShowProduct = () => {
   const totalPages = Math.ceil(sortedShoes.length / itemsPerPage);
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
-  console.log(currentItems.length);
+  // console.log(currentItems.length);
   return (
-    <section  style={{
+    <section
+      style={{
         boxShadow:
           "rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset",
-      }} className="mx-5 pb-5 px-5 rounded-md py-7 my-4 bg-white ">
-     
-
+      }}
+      className="mx-5 pb-5 px-5 rounded-md py-7 my-4 bg-white "
+    >
       {/* Table */}
-    {/* Table */}
-<div className="pt-5 overflow-x-auto w-full"> {/* Ensure the outer container is scrollable */}
-  {currentItems.length === 0 ? (
-    <div className="flex py-5 mx-auto items-center justify-center">
-      <EmptyCard />
-    </div>
-  ) : (
-    <table className="w-full min-w-[500px] md:min-w-[1000px] border">
-      <thead>
-        <tr className="bg-gray-50 border-b">
-          <th className="px-4 border-r text-sm font-medium text-start py-5">
-            Image
-          </th>
-          <th className="px-4 border-r text-sm font-medium text-start py-5">
-            Product Name
-          </th>
-          <th className="px-4 border-r text-sm font-medium text-start py-5">
-            Gender
-          </th>
-          <th className="px-4 border-r text-sm font-medium text-start py-5">
-            Price
-          </th>
-          <th className="px-4 border-r text-sm font-medium text-start py-5">
-            Category
-          </th>
-          <th className="px-4 border-r text-sm font-medium text-start py-5">
-            Product Code
-          </th>
-          <th className="px-4 border-r text-sm font-medium text-start py-5">
-            Action
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {currentItems.map((shoe, index) => (
-          <tr
-            key={index}
-            className="text-start border-b text-sm text-gray-800"
-          >
-            <td className="p-2 border-r">
-              <img
-                src={shoe.mainImage}
-                className="w-[50px] h-auto"
-                alt={shoe.name}
-              />
-            </td>
-            <td className="p-2 border-r">{shoe.name}</td>
-            <td className="p-2 border-r">{shoe.gender}</td>
-            <td className="p-2 border-r">{shoe.price}</td>
-            <td className="p-2 border-r">{shoe.category}</td>
-            <td className="p-2 border-r">
-              {shoe.Description?.Item_code}
-            </td>
-            <td className="p-2 border-r flex items-center gap-2">
-              <div className="border p-1.5 border-gray-500 rounded cursor-pointer">
-                <FiEdit size={16} />
-              </div>
-              <div className="border p-1.5 border-gray-500 rounded cursor-pointer">
-                <FaPlus className="rotate-45" size={16} />
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )}
-</div>
-
-
+      {/* Table */}
+      <div className="pt-5 overflow-x-auto w-full">
+        {" "}
+        {/* Ensure the outer container is scrollable */}
+        {currentItems.length === 0 ? (
+          <div className="flex py-5 mx-auto items-center justify-center">
+            <EmptyCard />
+          </div>
+        ) : (
+          <table className="w-full min-w-[500px] md:min-w-[1000px] border">
+            <thead>
+              <tr className="bg-gray-50 border-b">
+                <th className="px-4 border-r text-sm font-medium text-start py-5">
+                  Image
+                </th>
+                <th className="px-4 border-r text-sm font-medium text-start py-5">
+                  Product Name
+                </th>
+                <th className="px-4 border-r text-sm font-medium text-start py-5">
+                  Gender
+                </th>
+                <th className="px-4 border-r text-sm font-medium text-start py-5">
+                  Price
+                </th>
+                <th className="px-4 border-r text-sm font-medium text-start py-5">
+                  Category
+                </th>
+                <th className="px-4 border-r text-sm font-medium text-start py-5">
+                  Product Code
+                </th>
+                <th className="px-4 border-r text-sm font-medium text-start py-5">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentItems.map((shoe, index) => (
+                <tr
+                  key={index}
+                  className="text-start border-b text-sm text-gray-800"
+                >
+                  <td className="p-2 border-r">
+                    <img
+                      src={shoe.mainImage}
+                      className="w-[50px] h-auto"
+                      alt={shoe.name}
+                    />
+                  </td>
+                  <td className="p-2 border-r">{shoe.name}</td>
+                  <td className="p-2 border-r">{shoe.gender}</td>
+                  <td className="p-2 border-r">{shoe.price}</td>
+                  <td className="p-2 border-r">{shoe.category}</td>
+                  <td className="p-2 border-r">
+                    {shoe.Description?.Item_code}
+                  </td>
+                  <td className="p-2 border-r flex items-center gap-2">
+                    <div  className="border p-1.5 border-gray-500 rounded cursor-pointer">
+                      <FiEdit size={16} />
+                    </div>
+                    <div className="border p-1.5 border-gray-500 rounded cursor-pointer">
+                      <FaPlus className="rotate-45" size={16} />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
 
       {/* Pagination Controls */}
       <div className="flex justify-center mt-4">

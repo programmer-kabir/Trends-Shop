@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Badge, Card, Space } from "antd";
 import { FaCartPlus, FaRegHeart } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa6";
@@ -12,6 +12,7 @@ import { WishListDataContext } from "../Context/WishlistData";
 import { FavoritesContext } from "../../Provider/FavoritesContext";
 // import { WishListDataContext } from "../Context/WishlistData";
 const ProductCard = ({ shoes }) => {
+  const navigate = useNavigate()
   const { user } = useAuth();
 
   const [isFavorite, setIsFavorite] = useState(false);
@@ -47,7 +48,6 @@ const ProductCard = ({ shoes }) => {
     }
   };
   const [isHoveredHeart, setIsHoveredHeart] = useState(false);
-  const [isHoveredEye, setIsHoveredEye] = useState(false);
   const [isHoveredCompare, setIsHoveredCompare] = useState(false);
   //
   const mainPrice = shoes.price;
@@ -65,6 +65,7 @@ const ProductCard = ({ shoes }) => {
   };
   // Add to Cart
   const handleAddToCart = (id) => {
+    
     if (!activeSize) {
       toast.error("Please Select Your size");
     } else {
@@ -80,7 +81,7 @@ const ProductCard = ({ shoes }) => {
       axios
         .post(`${import.meta.env.VITE_LOCALHOST_KEY}/booked`, data)
         .then((data) => {
-          console.log(data.data);
+          // console.log(data.data);
           if (data.data?.updateResult?.acknowledged) {
             toast.success(`${shoes.name} quantity updated in the cart`);
           } else if (data.data?.insertedId) {

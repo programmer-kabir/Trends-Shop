@@ -220,7 +220,7 @@ const AddProduct = () => {
   // Form submit handler
   const onSubmit = (data) => {
     const name = data.name;
-
+const stock = data.stock;
     const category = data.category;
     const size = data.size;
     const price = data.price;
@@ -228,7 +228,7 @@ const AddProduct = () => {
     const star = data.star;
     const Discount = data.Discount;
     const shortDescription = data.shortDescription;
-    const formattedDescription = {
+    const Description = {
       Item_code: data.Item_code,
       Brand: data.Brand,
       Upper_Material: data.Upper_Material,
@@ -244,38 +244,46 @@ const AddProduct = () => {
       gender,
       star,
       Discount,
+      stock,
       shortDescription,
-      formattedDescription,
+      Description,
       selling,
       mainImage,
-      ...(renamedImages?.hoverImage && { hoverImage: renamedImages.hoverImage }),
-      ...(renamedImages?.thirdImage && { thirdImage: renamedImages.thirdImage }),
-      ...(renamedImages?.fourthImage && { fourthImage: renamedImages.fourthImage }),
+      ...(renamedImages?.hoverImage && {
+        hoverImage: renamedImages.hoverImage,
+      }),
+      ...(renamedImages?.thirdImage && {
+        thirdImage: renamedImages.thirdImage,
+      }),
+      ...(renamedImages?.fourthImage && {
+        fourthImage: renamedImages.fourthImage,
+      }),
     };
     console.log(mainData);
-    axios.post(`${import.meta.env.VITE_LOCALHOST_KEY}/shoes`, mainData)
-    .then(response => {
-      if (response?.data?.insertedId) {
-        // Show success message if insertedId exists in response
-        toast.success("Your data has been successfully added!");
-        navigate('../show-product')
-      }
-    })
-    .catch(error => {
-      // Show error message if something goes wrong
-      if (error.response) {
-        // Server responded with a status code other than 2xx
-        toast.error(`Error: ${error.response?.data?.message || 'Something went wrong'}`);
-      } else if (error.request) {
-        // Request was made but no response was received
-        toast.error("No response from server, please try again later.");
-      } else {
-        // Something else went wrong
-        toast.error("An unexpected error occurred.");
-      }
-    });
-  
-
+    axios
+      .post(`${import.meta.env.VITE_LOCALHOST_KEY}/shoes`, mainData)
+      .then((response) => {
+        if (response?.data?.insertedId) {
+          // Show success message if insertedId exists in response
+          toast.success("Your data has been successfully added!");
+          navigate("../show-product");
+        }
+      })
+      .catch((error) => {
+        // Show error message if something goes wrong
+        if (error.response) {
+          // Server responded with a status code other than 2xx
+          toast.error(
+            `Error: ${error.response?.data?.message || "Something went wrong"}`
+          );
+        } else if (error.request) {
+          // Request was made but no response was received
+          toast.error("No response from server, please try again later.");
+        } else {
+          // Something else went wrong
+          toast.error("An unexpected error occurred.");
+        }
+      });
   };
 
   return (
@@ -283,7 +291,7 @@ const AddProduct = () => {
       <span className="flex items-center">
         <span className="h-px flex-1 bg-black"></span>
         <span className="shrink-0 px-3 uppercase font-semibold text-[#0284C7]">
-          Add Product 
+          Add Product
         </span>
         <span className="h-px flex-1 bg-black"></span>
       </span>

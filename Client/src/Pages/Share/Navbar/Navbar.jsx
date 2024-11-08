@@ -73,9 +73,7 @@ const Navbar = () => {
     if (user && user.email) {
       const firstLetter = user.email.charAt(0).toUpperCase();
       setLetter(firstLetter);
-    } else {
-      console.log("User email not available");
-    }
+    } 
   }, [user]);
 
   const MensItems = [
@@ -104,7 +102,7 @@ const Navbar = () => {
   };
 
   const { favoriteTShirtCount } = useContext(FavoritesContext);
-console.log(favoriteTShirtCount);
+// console.log(favoriteTShirtCount);
 
   return (
     <div className="bg-white">

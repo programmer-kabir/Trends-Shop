@@ -76,7 +76,7 @@ async function run() {
     
       // Check if the Item_code already exists in the database
       const existingItem = await shoesCollection.findOne({
-        "formattedDescription.Item_code": data.formattedDescription.Item_code
+        "formattedDescription.Item_code": data.Description.Item_code
       });
     
       // If the item with the same Item_code exists, do not insert and return a message

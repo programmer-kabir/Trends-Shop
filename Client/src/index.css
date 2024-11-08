@@ -39,3 +39,28 @@ body{
 .ant-divider{
   color: rgb(0, 0, 0);
 }
+.btn{
+  margin: 5px;
+}
+.btn-success{
+  padding: 5px 19px;
+  border-radius: 3px;
+background-color: #28a745;
+color: white;
+}
+.btn-success:hover{
+
+background-color: #149131;
+
+}
+.btn-danger{
+  padding: 5px 19px;
+  border-radius: 3px;
+background-color: #d33;
+color: white;
+}
+.btn-danger:hover{
+
+background-color: rgb(214, 21, 21);
+
+}

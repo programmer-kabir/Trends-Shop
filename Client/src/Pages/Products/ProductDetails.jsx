@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchShoes } from "../Redux/Shoes/shoesSlice";
 import Content from "../../Components/Content/Content";
@@ -21,7 +21,7 @@ const ProductDetails = () => {
   const { user } = useAuth();
   const dispatch = useDispatch();
   const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
-
+const navigate = useNavigate()
   useEffect(() => {
     dispatch(fetchShoes());
   }, [dispatch]);
@@ -51,22 +51,8 @@ const ProductDetails = () => {
   }, [currentShoe?._id]);
   const { updateFavoriteCount } = useContext(FavoritesContext);
 
-  // const [storedIds, setId] = useState("");
-  // const handleAddToFavorite = (id) => {
-  //   const storedIdsString = localStorage.getItem("favoriteTShirt");
-  //   const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
-  //   setId(storedIds);
 
-  //   if (!storedIds.includes(id)) {
-  //     storedIds.push(id);
-  //     localStorage.setItem("favoriteTShirt", JSON.stringify(storedIds));
-  //     setIsFavorite(true);
-  //     setFavoriteTShirtCount((pre) => pre + 1);
-  //     toast.success("Item is added");
-  //   } else {
-  //     toast.error("Item is already a favorite");
-  //   }
-  // };
+ 
   const handleAddToFavorite = (id) => {
     // const { updateFavoriteCount } = useContext(FavoritesContext);
     
@@ -122,6 +108,10 @@ const ProductDetails = () => {
     updatePrice = mainPrice;
   }
   const handleAddToCart = (id) => {
+    if(!user){
+      toast.error("Please Login Now")
+      return navigate("/login")
+    }
     if (!activeSize) {
       toast.error("Please Select Your size");
     } else {
@@ -137,7 +127,7 @@ const ProductDetails = () => {
       axios
         .post(`${import.meta.env.VITE_LOCALHOST_KEY}/booked`, data)
         .then((data) => {
-          console.log(data.data);
+          // console.log(data.data);
           if (data.data?.updateResult?.acknowledged) {
             toast.success(`${currentShoe.name} quantity updated in the cart`);
           } else if (data.data?.insertedId) {
