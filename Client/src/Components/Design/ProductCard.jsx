@@ -13,7 +13,7 @@ import { FavoritesContext } from "../../Provider/FavoritesContext";
 import useAdmin from "../Hooks/useAdmin";
 // import { WishListDataContext } from "../Context/WishlistData";
 const ProductCard = ({ shoes }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [isAdmin, isAdminLoading] = useAdmin();
   const [isFavorite, setIsFavorite] = useState(false);
@@ -32,17 +32,16 @@ const ProductCard = ({ shoes }) => {
   const { updateFavoriteCount } = useContext(FavoritesContext);
 
   const handleAddToFavorite = (id) => {
-    
     const storedIdsString = localStorage.getItem("favoriteTShirt");
     const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
-  
+
     if (!storedIds.includes(id)) {
       storedIds.push(id);
       localStorage.setItem("favoriteTShirt", JSON.stringify(storedIds));
-  
+
       // Update the favorite count using context function
       updateFavoriteCount(storedIds.length);
-  
+
       toast.success("Item added to favorites");
     } else {
       toast.error("Item is already a favorite");
@@ -66,7 +65,10 @@ const ProductCard = ({ shoes }) => {
   };
   // Add to Cart
   const handleAddToCart = (id) => {
-    
+    if (shoes?.stock === shoes?.selling) {
+      toast.error("Stock Out! This item is no longer available.");
+      return; // Prevent adding to the cart if stock is out
+    }
     if (!activeSize) {
       toast.error("Please Select Your size");
     } else {
@@ -127,17 +129,16 @@ const ProductCard = ({ shoes }) => {
             </Link>
             <div className="absolute bottom-0 w-full overflow-hidden">
               <div className="duration-500 translate-y-8 transform opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100">
-                
-<button
-  onClick={() => handleAddToCart(shoes._id)}
-  className={`primaryButton hidden md:flex items-center justify-center w-full uppercase font-black ${
-    isAdmin ? 'opacity-50 cursor-not-allowed' : ''
-  }`}
-  disabled={isAdmin || isAdminLoading}
->
-  <FiPlus />
-  order
-</button>
+                <button
+                  onClick={() => handleAddToCart(shoes._id)}
+                  className={`primaryButton hidden md:flex items-center justify-center w-full uppercase font-black ${
+                    isAdmin ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  disabled={isAdmin || isAdminLoading}
+                >
+                  <FiPlus />
+                  order
+                </button>
               </div>
             </div>
 
@@ -146,10 +147,9 @@ const ProductCard = ({ shoes }) => {
                 <button
                   onClick={() => handleAddToCart(shoes._id)}
                   className={`primaryButton hidden md:flex items-center justify-center w-full uppercase font-black ${
-                    isAdmin ? 'opacity-50 cursor-not-allowed' : ''
+                    isAdmin ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                   disabled={isAdmin || isAdminLoading}
-
                 >
                   <FiPlus />
                   order
@@ -168,23 +168,24 @@ const ProductCard = ({ shoes }) => {
                   <Tooltip id="favorite" />
 
                   <div
-  onClick={() => {
-    if (!isAdmin && !isAdminLoading) {
-      handleAddToFavorite(shoes._id);
-    }
-  }}
-  className={`hover:bg-[#f50400] p-2 ${
-    isFavorite ? 'bg-[#f50400] text-white' : 'bg-white'
-  }`}
-  style={{
-    boxShadow:
-      'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',
-    transition: 'background-color 0.3s',
-    cursor: isAdmin || isAdminLoading ? 'not-allowed' : 'pointer',
-  }}
-  onMouseEnter={() => setIsHoveredHeart(true)}
-  onMouseLeave={() => setIsHoveredHeart(false)}
->
+                    onClick={() => {
+                      if (!isAdmin && !isAdminLoading) {
+                        handleAddToFavorite(shoes._id);
+                      }
+                    }}
+                    className={`hover:bg-[#f50400] p-2 ${
+                      isFavorite ? "bg-[#f50400] text-white" : "bg-white"
+                    }`}
+                    style={{
+                      boxShadow:
+                        "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px",
+                      transition: "background-color 0.3s",
+                      cursor:
+                        isAdmin || isAdminLoading ? "not-allowed" : "pointer",
+                    }}
+                    onMouseEnter={() => setIsHoveredHeart(true)}
+                    onMouseLeave={() => setIsHoveredHeart(false)}
+                  >
                     <FaRegHeart
                       size={20}
                       color={isHoveredHeart ? "white" : ""}
@@ -193,26 +194,26 @@ const ProductCard = ({ shoes }) => {
                 </a>
 
                 <button
-  onClick={() => {
-    if (!isAdmin) {
-      handleAddToCart(shoes._id);
-    }
-  }}
-  data-tooltip-id="favorite"
-  data-tooltip-content="Add To Cart"
-  data-tooltip-place="left"
-  className={`bg-white hover:bg-[#f50400] p-2 shadow-lg ${
-    isAdmin ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
-  }`}
-  style={{
-    boxShadow:
-      'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',
-    transition: 'background-color 0.3s',
-  }}
-  onMouseEnter={() => setIsHoveredCompare(true)}
-  onMouseLeave={() => setIsHoveredCompare(false)}
-  disabled={isAdmin} // You can still disable the button if needed
->
+                  onClick={() => {
+                    if (!isAdmin) {
+                      handleAddToCart(shoes._id);
+                    }
+                  }}
+                  data-tooltip-id="favorite"
+                  data-tooltip-content="Add To Cart"
+                  data-tooltip-place="left"
+                  className={`bg-white hover:bg-[#f50400] p-2 shadow-lg ${
+                    isAdmin ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                  }`}
+                  style={{
+                    boxShadow:
+                      "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px",
+                    transition: "background-color 0.3s",
+                  }}
+                  onMouseEnter={() => setIsHoveredCompare(true)}
+                  onMouseLeave={() => setIsHoveredCompare(false)}
+                  disabled={isAdmin} // You can still disable the button if needed
+                >
                   <Tooltip id="favorite" />
                   <FaCartPlus
                     size={20}
@@ -237,8 +238,17 @@ const ProductCard = ({ shoes }) => {
             )}
             <p></p>
             {shoes?.Discount ? (
-              <p className="text-[#f50400] font-semibold text-xl">
+              <p className="text-[#f50400] flex items-center gap-4 font-semibold text-xl">
                 {updatePrice}৳
+                <span className="text-sm pt-2" >
+                  {shoes?.stock === shoes?.selling ? (
+                    <p className="text-red-500 font-medium">Stock Out</p>
+                  ) : (
+                    <p className="text-green-500 font-medium">
+                      Available: {shoes?.stock - shoes?.selling}
+                    </p>
+                  )}
+                </span>
               </p>
             ) : (
               <></>
