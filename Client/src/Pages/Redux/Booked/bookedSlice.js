@@ -4,16 +4,20 @@ import axios from "axios";
 // import { useContext } from "react";
 // import { AuthContext } from "../../../Provider/AuthProvider";
 // const {user} = useContext(AuthContext)
-export const fetchBooked = createAsyncThunk('book/fetchBooked', async (userEmail) => {
+export const fetchBooked = createAsyncThunk(
+  "book/fetchBooked",
+  async (userEmail) => {
     try {
       // Send userEmail in the API request
-      const response = await axios.get(`http://localhost:3000/booked?email=${userEmail}`);
+      const response = await axios.get(
+        `https://trends-shop-serverr.vercel.app/booked?email=${userEmail}`
+      );
       return response.data;
     } catch (error) {
       throw error;
     }
-  });
-  
+  }
+);
 
 const bookedSlice = createSlice({
   name: "Booked",

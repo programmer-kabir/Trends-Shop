@@ -1,13 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-export const fetchRequestPayment = createAsyncThunk('requestPayments/fetchRequestPayment', async () => {
-  try {
-    const response = await axios.get('http://localhost:3000/requestPayment');
-    return response.data;
-  } catch (error) {
-    throw error;
+export const fetchRequestPayment = createAsyncThunk(
+  "requestPayments/fetchRequestPayment",
+  async () => {
+    try {
+      const response = await axios.get(
+        "https://trends-shop-serverr.vercel.app/requestPayment"
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
-});
+);
 
 const requestPaymentSlice = createSlice({
   name: "RequestPayment",

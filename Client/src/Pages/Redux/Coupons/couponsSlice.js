@@ -1,13 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-export const fetchCoupons = createAsyncThunk('coupons/fetchCoupons', async () => {
-  try {
-    const response = await axios.get('http://localhost:3000/couponCode');
-    return response.data;
-  } catch (error) {
-    throw error;
+export const fetchCoupons = createAsyncThunk(
+  "coupons/fetchCoupons",
+  async () => {
+    try {
+      const response = await axios.get(
+        "https://trends-shop-serverr.vercel.app/couponCode"
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
-});
+);
 
 const couponsSlice = createSlice({
   name: "Coupons",
