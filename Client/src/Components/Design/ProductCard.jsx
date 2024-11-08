@@ -10,11 +10,12 @@ import useAuth from "../Hooks/useAuth";
 import axios from "axios";
 import { WishListDataContext } from "../Context/WishlistData";
 import { FavoritesContext } from "../../Provider/FavoritesContext";
+import useAdmin from "../Hooks/useAdmin";
 // import { WishListDataContext } from "../Context/WishlistData";
 const ProductCard = ({ shoes }) => {
   const navigate = useNavigate()
   const { user } = useAuth();
-
+  const [isAdmin, isAdminLoading] = useAdmin();
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeSize, setActiveSize] = useState(null);
   const { favoriteTShirtCount, setFavoriteTShirtCount } =
@@ -126,13 +127,17 @@ const ProductCard = ({ shoes }) => {
             </Link>
             <div className="absolute bottom-0 w-full overflow-hidden">
               <div className="duration-500 translate-y-8 transform opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100">
-                <button
-                  onClick={() => handleAddToCart(shoes._id)}
-                  className="primaryButton hidden md:flex items-center justify-center  w-full uppercase font-black"
-                >
-                  <FiPlus />
-                  order
-                </button>
+                
+<button
+  onClick={() => handleAddToCart(shoes._id)}
+  className={`primaryButton hidden md:flex items-center justify-center w-full uppercase font-black ${
+    isAdmin ? 'opacity-50 cursor-not-allowed' : ''
+  }`}
+  disabled={isAdmin || isAdminLoading}
+>
+  <FiPlus />
+  order
+</button>
               </div>
             </div>
 
@@ -140,7 +145,11 @@ const ProductCard = ({ shoes }) => {
               <div className="duration-500 ">
                 <button
                   onClick={() => handleAddToCart(shoes._id)}
-                  className="primaryButton flex items-center justify-center  w-full uppercase font-black"
+                  className={`primaryButton hidden md:flex items-center justify-center w-full uppercase font-black ${
+                    isAdmin ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                  disabled={isAdmin || isAdminLoading}
+
                 >
                   <FiPlus />
                   order
@@ -159,18 +168,23 @@ const ProductCard = ({ shoes }) => {
                   <Tooltip id="favorite" />
 
                   <div
-                    onClick={() => handleAddToFavorite(shoes._id)}
-                    className={` hover:bg-[#f50400] p-2 ${
-                      isFavorite ? "bg-[#f50400] text-white" : "bg-white"
-                    }`}
-                    style={{
-                      boxShadow:
-                        "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px",
-                      transition: "background-color 0.3s",
-                    }}
-                    onMouseEnter={() => setIsHoveredHeart(true)}
-                    onMouseLeave={() => setIsHoveredHeart(false)}
-                  >
+  onClick={() => {
+    if (!isAdmin && !isAdminLoading) {
+      handleAddToFavorite(shoes._id);
+    }
+  }}
+  className={`hover:bg-[#f50400] p-2 ${
+    isFavorite ? 'bg-[#f50400] text-white' : 'bg-white'
+  }`}
+  style={{
+    boxShadow:
+      'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',
+    transition: 'background-color 0.3s',
+    cursor: isAdmin || isAdminLoading ? 'not-allowed' : 'pointer',
+  }}
+  onMouseEnter={() => setIsHoveredHeart(true)}
+  onMouseLeave={() => setIsHoveredHeart(false)}
+>
                     <FaRegHeart
                       size={20}
                       color={isHoveredHeart ? "white" : ""}
@@ -179,19 +193,26 @@ const ProductCard = ({ shoes }) => {
                 </a>
 
                 <button
-                  onClick={() => handleAddToCart(shoes._id)}
-                  data-tooltip-id="favorite"
-                  data-tooltip-content="Add To Cart"
-                  data-tooltip-place="left"
-                  className="bg-white  hover:bg-[#f50400] p-2 shadow-lg"
-                  style={{
-                    boxShadow:
-                      "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px",
-                    transition: "background-color 0.3s",
-                  }}
-                  onMouseEnter={() => setIsHoveredCompare(true)}
-                  onMouseLeave={() => setIsHoveredCompare(false)}
-                >
+  onClick={() => {
+    if (!isAdmin) {
+      handleAddToCart(shoes._id);
+    }
+  }}
+  data-tooltip-id="favorite"
+  data-tooltip-content="Add To Cart"
+  data-tooltip-place="left"
+  className={`bg-white hover:bg-[#f50400] p-2 shadow-lg ${
+    isAdmin ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+  }`}
+  style={{
+    boxShadow:
+      'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',
+    transition: 'background-color 0.3s',
+  }}
+  onMouseEnter={() => setIsHoveredCompare(true)}
+  onMouseLeave={() => setIsHoveredCompare(false)}
+  disabled={isAdmin} // You can still disable the button if needed
+>
                   <Tooltip id="favorite" />
                   <FaCartPlus
                     size={20}

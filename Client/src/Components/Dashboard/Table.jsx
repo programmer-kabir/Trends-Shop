@@ -1,5 +1,7 @@
 import { Empty } from "antd";
+import axios from "axios";
 import React from "react";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
 const Table = ({ name, matchData = [] }) => {
@@ -27,6 +29,21 @@ const Table = ({ name, matchData = [] }) => {
 
     return `${month} ${day}${getOrdinal(day)}, ${year}`;
   };
+  const handleDelete = (id) => {
+    console.log(id);
+    axios
+      .delete(`${import.meta.env.VITE_LOCALHOST_KEY}/book/${id}`) // Pass id as part of URL
+      .then((data) => {
+        console.log(data.data);
+        if(data.data.deletedCount==1){
+          toast.success('Your Cart Data delete')
+        } // Server response after deletion
+      })
+      .catch((error) => {
+        console.error("Error deleting book:", error);
+      });
+  };
+  
   return (
     <div className="">
       <div className="">
@@ -134,7 +151,7 @@ const Table = ({ name, matchData = [] }) => {
                               Payment
                             </button>
                           </Link>
-                          <button className="uppercase flex items-center gap-2 bg-[#398EFA] text-white rounded font-semibold px-3 py-1">
+                          <button onClick={()=>handleDelete(data._id)} className="uppercase flex items-center gap-2 bg-[#398EFA] text-white rounded font-semibold px-3 py-1">
                             Cancel
                           </button>
                         </div>

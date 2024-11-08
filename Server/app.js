@@ -72,7 +72,7 @@ async function run() {
 
     app.post("/shoes", async (req, res) => {
       const data = req.body;
-      console.log(data);
+      // console.log(data);
 
       // Check if the Item_code already exists in the database
       const existingItem = await shoesCollection.findOne({
@@ -105,7 +105,7 @@ async function run() {
         query, // Correctly pass the query object here
         { $set: updatedData }
       );
-      console.log(result);
+      // console.log(result);
       // Check if any documents were updated
       if (result.modifiedCount === 0) {
         return res.status(400).send({ message: "No changes made." });
@@ -113,6 +113,22 @@ async function run() {
 
       // Send success response
       res.send({ message: "Item updated successfully.", result });
+    });
+
+    // shoe get
+    app.get("/shoe/:id", async (req, res) => {
+      const { id } = req.body;
+      console.log(id);
+    });
+
+    app.delete("/shoe/:id", async (req, res) => {
+      const id = req.params; // Get the id from the URL params
+console.log(id);
+      const query = { _id: new ObjectId(id) };
+
+      const result = await shoesCollection.deleteOne(query);
+
+      res.send(result);
     });
 
     // User
@@ -246,6 +262,20 @@ async function run() {
       const data = await bookedCollection.find(query).toArray();
       res.send(data);
     });
+
+    app.delete('/book/:id', async (req, res) => {
+      const { id } = req.params; // Access the id from the URL
+      const query = {_id:new ObjectId(id)}
+      // console.log(query);
+      const result = await bookedCollection.deleteOne(query);
+      res.send(result);
+      // Perform your deletion logic here, e.g., using a database query
+      // const result = await yourDatabase.deleteOne({ _id: id });
+    
+      // res.send({ message: "Book deleted successfully", id });
+    });
+    
+
     app.get("/userBookedData", async (req, res) => {
       const data = await bookedCollection.find().toArray();
       res.send(data);
@@ -354,90 +384,6 @@ async function run() {
         res.status(500).send({ message: "Server error" });
       }
     });
-
-    // app.patch('/requestPayment', async (req, res) => {
-    //   const { paymentId, newStatus, bookedId } = req.body;
-    // console.log(newStatus);
-    // if(newStatus == "Transition ID Error"){
-    //   console.log('object');
-    //   console.log(paymentId);
-    // }
-    //   try {
-    //     // Step 1: Find the existing payment by paymentId
-    //     const paymentFilter = { _id: new ObjectId(paymentId) };
-    //     const existingPayment = await requestPaymentCollection.findOne(paymentFilter);
-
-    //     if (!existingPayment) {
-    //       return res.status(404).json({ message: "Payment not found" });
-    //     }
-
-    //     if (!newStatus) {
-    //       return res.status(400).json({ message: "New status not provided" });
-    //     }
-
-    //     // Step 2: Check if the payment already has an invoiceId
-    //     let newInvoiceId = existingPayment.invoiceId;
-
-    //     if (!existingPayment.invoiceId) {
-    //       // Step 3: Generate a new unique invoice ID (e.g., tr00001, tr00002, etc.)
-    //       const lastPayment = await requestPaymentCollection
-    //         .find({})
-    //         .sort({ invoiceId: -1 })
-    //         .limit(1)
-    //         .toArray();
-
-    //       if (lastPayment.length === 0 || !lastPayment[0].invoiceId) {
-    //         newInvoiceId = "tr00001"; // Start with tr00001 if no payments exist
-    //       } else {
-    //         // Increment the numeric part of the last invoice ID
-    //         const lastInvoiceId = lastPayment[0].invoiceId;
-    //         const invoiceNumber = parseInt(lastInvoiceId.slice(2)) + 1; // Extract the numeric part and increment it
-    //         newInvoiceId = "tr" + invoiceNumber.toString().padStart(5, "0"); // Create new invoice ID with padded zeros
-    //       }
-    //     }
-
-    //     // Step 4: Update the payment status and set the new invoiceId in requestPaymentCollection, but only if the invoiceId was newly generated
-    //     const paymentUpdate = {
-    //       $set: {
-    //         status: newStatus,
-    //         ...(existingPayment.invoiceId ? {} : { invoiceId: newInvoiceId }), // Only set invoiceId if it doesn't already exist
-    //       },
-    //     };
-    //     await requestPaymentCollection.updateOne(paymentFilter, paymentUpdate);
-
-    //     // Step 5: Check if the bookedId matches any document in bookedCollection
-    //     const bookingFilter = { _id: new ObjectId(bookedId) };
-    //     const existingBooking = await bookedCollection.findOne(bookingFilter);
-
-    //     if (!existingBooking) {
-    //       return res.status(404).json({ message: "No matching booking found for the provided bookedId" });
-    //     }
-
-    //     // Step 6: Update the booking status and set the new invoiceId in bookedCollection, but only if the invoiceId was newly generated
-    //     const bookingUpdate = {
-    //       $set: {
-    //         status: newStatus,
-    //         ...(existingBooking.invoiceId ? {} : { invoiceId: newInvoiceId }), // Only set invoiceId if it doesn't already exist
-    //       },
-    //     };
-    //     await bookedCollection.updateOne(bookingFilter, bookingUpdate);
-
-    //     // Step 7: Fetch the updated payment and booking for the response
-    //     const updatedPayment = await requestPaymentCollection.findOne(paymentFilter);
-    //     const updatedBooking = await bookedCollection.findOne(bookingFilter);
-
-    //     // Step 8: Return the success response
-    //     return res.status(200).json({
-    //       message: `Payment and booking status updated to ${newStatus}, Invoice ID: ${newInvoiceId}`,
-    //       payment: updatedPayment,
-    //       booking: updatedBooking,
-    //     });
-
-    //   } catch (error) {
-    //     console.error(error);
-    //     return res.status(500).json({ message: "Server error" });
-    //   }
-    // });
 
     app.patch("/requestPayment", async (req, res) => {
       const { paymentId, newStatus, bookedId, productId, deliveryDate } =
@@ -578,7 +524,7 @@ async function run() {
           booking: updatedBooking,
         });
       } catch (error) {
-        console.error(error);
+        // console.error(error);
         return res.status(500).json({ message: "Server error" });
       }
     });
@@ -602,7 +548,7 @@ async function run() {
     });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
-    console.log("You successfully connected to MongoDB!");
+    // console.log("You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();

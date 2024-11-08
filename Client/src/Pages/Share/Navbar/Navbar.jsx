@@ -157,12 +157,7 @@ const Navbar = () => {
                             </div>
                           </Link>
                         ) : (
-                          <> <div className="relative cursor-pointer">
-                          <AiOutlineShoppingCart color="#f50400" size={25} />
-                          <span className="absolute text-xs border-2 border-white -top-2 left-4 flex items-center  justify-center w-5 h-5 rounded-full bg-[#f50400]">
-                            {Booked.length}
-                          </span>
-                        </div>
+                          <>
                           <Link to="user/dashboard">
                             <div className="secondaryColor">
                               <MdDashboard size={22} />

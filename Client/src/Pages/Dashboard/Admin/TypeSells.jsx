@@ -1,39 +1,85 @@
-import React, { Component } from 'react';
-import CanvasJSReact from '@canvasjs/react-charts';
-//var CanvasJSReact = require('@canvasjs/react-charts');
- 
-var CanvasJS = CanvasJSReact.CanvasJS;
-var CanvasJSChart = CanvasJSReact.CanvasJSChart;
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  BarChart,
+  Bar,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+} from "recharts";
+import { fetchRequestPayment } from "../../Redux/RequestPayment/requestPaymentSlice";
+import { fetchShoes } from "../../Redux/Shoes/shoesSlice";
+
+const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "red", "pink"];
+
+const data = [
+  {
+    name: "MEN'S",
+    uv: 4000,
+  },
+  {
+    name: "WOMEN'S",
+    uv: 360,
+  },
+  {
+    name: "KID'S",
+    uv: 2000,
+  },
+];
+
+const getPath = (x, y, width, height) => {
+  return `M${x},${y + height}C${x + width / 3},${y + height} ${x + width / 2},${
+    y + height / 3
+  }
+  ${x + width / 2}, ${y}
+  C${x + width / 2},${y + height / 3} ${x + (2 * width) / 3},${y + height} ${
+    x + width
+  }, ${y + height}
+  Z`;
+};
+
+const TriangleBar = (props) => {
+  const { fill, x, y, width, height } = props;
+
+  return <path d={getPath(x, y, width, height)} stroke="none" fill={fill} />;
+};
+
 const TypeSells = () => {
+  return (
+    <div style={{ width: "100%", height: "300px" }}>
+      {" "}
+      {/* Ensure the container has a height */}
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          width={500}
+          height={300}
+          data={data}
+          margin={{
+            top: 20,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Bar
+            dataKey="uv"
+            fill="#8884d8"
+            shape={<TriangleBar />}
+            label={{ position: "top" }}
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={colors[index % 20]} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
 
-const options = {
-			animationEnabled: true,
-			exportEnabled: true,
-			theme: "light1", // "light1", "dark1", "dark2"
-			title:{
-				text: "INVENTORY STOCK"
-			},
-			data: [{
-				type: "pie",
-				indexLabel: "{label}: {y}%",		
-				startAngle: -90,
-				dataPoints: [
-					{ y: 1520, label: "Men's" },
-					{ y: 4524, label: "Women's" },
-					{ y: 1563, label: "Kid's" }	
-				]
-			}]
-		}
-		
-		return (
-		<div>
-			<CanvasJSChart options = {options} 
-				/* onRef={ref => this.chart = ref} */
-			/>
-			{/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
-		</div>
-		);
-	}
-
-
-export default TypeSells
+export default TypeSells;

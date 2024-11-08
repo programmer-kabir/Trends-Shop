@@ -93,13 +93,19 @@ const Sidebar = () => {
               >
                 <span>Dashboard</span>
               </NavLink>
-              <NavLink className={({ isActive }) =>
-                  `font-normal transition-all py-3 text-base w-full flex items-center gap-4 px-5 capitalize ${
-                    isActive ? "bg-[#e6f4ff] text-[#1677ff] rounded" : ""
-                  }`
-                } to="manage_users" >
-                <span>Users</span>
-              </NavLink>
+              {user.email === "kabirr@gmail.com" && (
+  <NavLink
+    className={({ isActive }) =>
+      `font-normal transition-all py-3 text-base w-full flex items-center gap-4 px-5 capitalize ${
+        isActive ? "bg-[#e6f4ff] text-[#1677ff] rounded" : ""
+      }`
+    }
+    to="manage_users"
+  >
+    <span>Users</span>
+  </NavLink>
+)}
+
               <NavLink className={({ isActive }) =>
                   `font-normal transition-all py-3 text-base w-full flex items-center gap-4 px-5 capitalize ${
                     isActive ? "bg-[#e6f4ff] text-[#1677ff] rounded" : ""
