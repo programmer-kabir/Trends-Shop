@@ -1,3 +1,4 @@
+import { Empty } from "antd";
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -29,9 +30,9 @@ const Table = ({ name, matchData = [] }) => {
   return (
     <div className="">
       <div className="">
-        <div className="flex  flex-col w-full h-full text-black bg-white shadow-md rounded-lg bg-clip-border">
+        <div className="flex  items-center justify-center w-full h-full text-black bg-white shadow-md rounded-lg bg-clip-border">
           <table className="pt-5 pb-5 w-full text-left">
-            <thead className="">
+            <thead className="py-2">
               <tr className="">
                 {name.map((na, index) => (
                   <th
@@ -45,8 +46,8 @@ const Table = ({ name, matchData = [] }) => {
                 ))}
               </tr>
             </thead>
-            <tbody className="">
-              {matchData.map((data, index) => (
+            <tbody className="w-full py-6">
+              {matchData.length === 0 ? <div className="flex items-center justify-center mx-auto py-2"><Empty /></div>: matchData.map((data, index) => (
                 <tr
                   key={data._id || index}
                   className="hover:bg-slate-50 border-b border-slate-200"
@@ -142,6 +143,7 @@ const Table = ({ name, matchData = [] }) => {
                   </td>
                 </tr>
               ))}
+             
             </tbody>
           </table>
         </div>

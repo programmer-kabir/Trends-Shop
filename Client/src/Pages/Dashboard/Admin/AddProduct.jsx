@@ -220,12 +220,13 @@ const AddProduct = () => {
   // Form submit handler
   const onSubmit = (data) => {
     const name = data.name;
-const stock = data.stock;
+const stock = data.stock
     const category = data.category;
     const size = data.size;
     const price = data.price;
     const gender = data.gender;
     const star = data.star;
+    
     const Discount = data.Discount;
     const shortDescription = data.shortDescription;
     const Description = {
@@ -233,6 +234,7 @@ const stock = data.stock;
       Brand: data.Brand,
       Upper_Material: data.Upper_Material,
       Sole_Material: data.Sole_Material,
+      Color : data.color,
       product: data.product.split("\n"), // Convert product to array by splitting input on newline
     };
     const selling = 0;

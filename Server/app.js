@@ -73,22 +73,47 @@ async function run() {
     app.post("/shoes", async (req, res) => {
       const data = req.body;
       console.log(data);
-    
+
       // Check if the Item_code already exists in the database
       const existingItem = await shoesCollection.findOne({
-        "formattedDescription.Item_code": data.Description.Item_code
+        "formattedDescription.Item_code": data.Description.Item_code,
       });
-    
+
       // If the item with the same Item_code exists, do not insert and return a message
       if (existingItem) {
         return res.status(400).send({ message: "Item already exists." });
       }
-    
+
       // If the Item_code is unique, insert the new data
       const result = await shoesCollection.insertOne(data);
       res.send(result);
     });
-    
+
+    app.patch("/shoes", async (req, res) => {
+      const { id, updatedData } = req.body;
+      const query = { _id: id };
+      // Check if the Item_code exists in the database
+      const existingItem = await shoesCollection.findOne(query);
+      // console.log(existingItem);
+      // If no item with the given Item_code exists, return a 404 error
+      if (!existingItem) {
+        return res.status(404).send({ message: "Item not found." });
+      }
+
+      // Update the item with the new data
+      const result = await shoesCollection.updateOne(
+        query, // Correctly pass the query object here
+        { $set: updatedData }
+      );
+      console.log(result);
+      // Check if any documents were updated
+      if (result.modifiedCount === 0) {
+        return res.status(400).send({ message: "No changes made." });
+      }
+
+      // Send success response
+      res.send({ message: "Item updated successfully.", result });
+    });
 
     // User
     // Post all User
@@ -415,8 +440,8 @@ async function run() {
     // });
 
     app.patch("/requestPayment", async (req, res) => {
-      const { paymentId, newStatus, bookedId, productId,deliveryDate } = req.body;
-
+      const { paymentId, newStatus, bookedId, productId, deliveryDate } =
+        req.body;
 
       try {
         // Step 1: Find the existing payment by paymentId
@@ -529,19 +554,22 @@ async function run() {
         const updatedBooking = await bookedCollection.findOne(bookingFilter);
 
         if (newStatus === "Delivery" && productId) {
-          const productFilter = { _id: productId };  // No ObjectId conversion
+          const productFilter = { _id: productId }; // No ObjectId conversion
           const productUpdateResult = await shoesCollection.updateOne(
             productFilter,
             { $inc: { selling: 1 } }
           );
-    
+
           if (productUpdateResult.modifiedCount === 1) {
-            console.log(`Product with ID ${productId} selling count incremented by 1`);
+            console.log(
+              `Product with ID ${productId} selling count incremented by 1`
+            );
           } else {
-            console.log(`Failed to increment selling count for product with ID ${productId}`);
+            console.log(
+              `Failed to increment selling count for product with ID ${productId}`
+            );
           }
         }
-    
 
         // Return success response
         return res.status(200).json({

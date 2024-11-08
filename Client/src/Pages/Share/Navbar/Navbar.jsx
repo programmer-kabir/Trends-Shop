@@ -77,25 +77,19 @@ const Navbar = () => {
   }, [user]);
 
   const MensItems = [
-    { name: "BOOT", link: "products/boot" },
-    { name: "LOAFER", link: "products/loafer" },
-    { name: "SANDALS", link: "products/sandals" },
     { name: "CASUAL", link: "products/MAN'S-CASUAL" },
     { name: "FORMAL", link: "products/MAN'S-FORMAL" },
     { name: "SPORTS", link: "products/MAN'S-SPORT" },
   ];
   const WomensItems = [
-    { name: "BOOT", link: "products/boot" },
-    { name: "LOAFER", link: "products/loafer" },
-    { name: "SANDALS", link: "products/sandals" },
-    { name: "CASUAL", link: "products/MAN'S-CASUAL" },
-    { name: "SPORTS", link: "products/sports" },
+    { name: "CASUAL", link: "products/WOMEN'S-CASUAL" },
+    { name: "FORMAL", link: "products/WOMEN'S-FORMAL" },
+    { name: "SPORTS", link: "products/WOMEN'S-SPORT" },
   ];
   const KidsItems = [
-    { name: "FORMAL", link: "products/FORMAL" },
-    { name: "SANDALS", link: "products/sandals" },
-    { name: "CASUAL", link: "products/MAN'S-CASUAL" },
-    { name: "SPORTS", link: "products/sports" },
+    { name: "FORMAL", link: "products/KID'S-FORMAL" },
+    { name: "CASUAL", link: "products/KID'S-CASUAL" },
+    { name: "SPORTS", link: "products/KID'S-SPORT" },
   ];
   const handleSignOut = () => {
     logOut();
@@ -147,8 +141,8 @@ const Navbar = () => {
                   <div className="flex items-center justify-center gap-3">
                     <div className="flex gap-5 items-center pr-1 ">
                      <Link to={'wishlist'}> <div to='/wishlist' className="relative cursor-pointer">
-                        <FaRegHeart color="black" size={23} />
-                        <span className="absolute text-xs border-2 border-white -top-2 left-4 flex items-center  justify-center w-5 h-5 rounded-full bg-black">
+                        <FaRegHeart color="#f50400" size={23} />
+                        <span className="absolute text-xs border-2 border-white -top-2 left-4 flex items-center  justify-center w-5 h-5 rounded-full bg-[#f50400]">
                         {favoriteTShirtCount}
                         </span>
                       </div></Link>
@@ -164,8 +158,8 @@ const Navbar = () => {
                           </Link>
                         ) : (
                           <> <div className="relative cursor-pointer">
-                          <AiOutlineShoppingCart color="black" size={25} />
-                          <span className="absolute text-xs border-2 border-white -top-2 left-4 flex items-center  justify-center w-5 h-5 rounded-full bg-black">
+                          <AiOutlineShoppingCart color="#f50400" size={25} />
+                          <span className="absolute text-xs border-2 border-white -top-2 left-4 flex items-center  justify-center w-5 h-5 rounded-full bg-[#f50400]">
                             {Booked.length}
                           </span>
                         </div>

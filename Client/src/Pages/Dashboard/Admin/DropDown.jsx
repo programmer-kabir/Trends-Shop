@@ -13,16 +13,16 @@ const Dropdown = ({ title, options, onSelect, mainTitle }) => {
     setIsOpen(false);        // Close dropdown after selection
   };
   const dropdownWidth =
-  title === "Select Gender" ? "w-[214px]" :
-  title === "Select SubCategory" ? "w-[290px]" :
-  title === "Select Price" ? "w-[213px]" : "w-[213px]";
+  title === "Select Gender" ? " md:w-[214px] w-[200px] z-50" :
+  title === "Select SubCategory" ? "md:w-[290px] w-[200px] z-50" :
+  title === "Select Price" ? "md:w-[213px] w-[200px]" : "w-[213px]";
   return (
     <div className="relative inline-block text-left">
       <h2 className="text-[14px] tracking-wider font-semibold text-gray-500 uppercase">{mainTitle}:</h2>
       
       <div
         onClick={toggleDropdown}
-        className={`flex ${dropdownWidth} justify-between cursor-pointer items-center px-2 py-1 border border-gray-400 rounded-md`}
+        className={`flex ${dropdownWidth}  bg-white  justify-between cursor-pointer items-center px-2 py-1 border border-gray-400 rounded-md`}
       >
         <span
           className={`mr-2 text-[14px] ${

@@ -10,7 +10,7 @@ const ManagerUsers = () => {
       dispatch(fetchUser());
     }, []);
     const [user, setUsers] = useState(Users);
-    console.log(Users);
+    // console.log(Users);
     useEffect(() => {
         setUsers(Users);
       }, [Users]);

@@ -14,13 +14,15 @@ const Products = () => {
   const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
 
   const { Name } = useParams();
+  const formattedName = Name.replace(/-/g, ' ');
 
+  // console.log(formattedName);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
   // const [activeSubcategory, setActiveSubcategory] = useState("");
   // const [selectedSubcategory, setSelectedSubcategory] = useState("");
-  const [activeSubcategory, setActiveSubcategory] = useState(Name || "");
-  const [selectedSubcategory, setSelectedSubcategory] = useState(Name || "");
+  const [activeSubcategory, setActiveSubcategory] = useState(formattedName || "");
+  const [selectedSubcategory, setSelectedSubcategory] = useState(formattedName || "");
   useEffect(() => {
     // Dispatch the fetchShoes action whenever the subCategory changes
     if (selectedSubcategory) {
