@@ -9,6 +9,7 @@ import { Tooltip } from "react-tooltip";
 import useAuth from "../Hooks/useAuth";
 import axios from "axios";
 import { WishListDataContext } from "../Context/WishlistData";
+import { FavoritesContext } from "../../Provider/FavoritesContext";
 // import { WishListDataContext } from "../Context/WishlistData";
 const ProductCard = ({ shoes }) => {
   const { user } = useAuth();
@@ -25,18 +26,22 @@ const ProductCard = ({ shoes }) => {
   }, [shoes._id]);
 
   const [storedIds, setId] = useState("");
+
+  const { updateFavoriteCount } = useContext(FavoritesContext);
+
   const handleAddToFavorite = (id) => {
+    
     const storedIdsString = localStorage.getItem("favoriteTShirt");
     const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
-    setId(storedIds);
-    const newFavorite = { id, size: activeSize };
-
+  
     if (!storedIds.includes(id)) {
       storedIds.push(id);
       localStorage.setItem("favoriteTShirt", JSON.stringify(storedIds));
-      setIsFavorite(true);
-      setFavoriteTShirtCount((pre) => pre + 1);
-      toast.success("Item is added");
+  
+      // Update the favorite count using context function
+      updateFavoriteCount(storedIds.length);
+  
+      toast.success("Item added to favorites");
     } else {
       toast.error("Item is already a favorite");
     }

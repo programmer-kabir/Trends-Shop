@@ -47,117 +47,79 @@ const ShowProduct = () => {
     <section  style={{
         boxShadow:
           "rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset",
-      }} className="mx-5 pb-32 px-5 rounded-md py-7 my-4 bg-white overflow-x-scroll">
-      <span className="flex items-center">
-        <span className="h-px flex-1 bg-black"></span>
-        <span className="shrink-0 px-3 uppercase font-semibold text-[#0284C7]">
-          Show Product
-        </span>
-        <span className="h-px flex-1 bg-black"></span>
-      </span>
-      <div className="flex gap-8 items-center justify-center">
-        {/* Gender Dropdown */}
-        <Dropdown
-          mainTitle="Filter by Category"
-          title="Select Gender"
-          options={["MEN'S", "WOMEN'S", "KID'S"]}
-          onSelect={(value) => setSelectedGender(value)}
-        />
-
-        {/* Filter by subCategory Dropdown */}
-        <Dropdown
-          mainTitle="Filter by SubCategory"
-          title="Select SubCategory"
-          options={[
-            "MAN'S CASUAL",
-            "MAN'S FORMAL",
-            "MAN'S SPORT",
-            "WOMEN'S CASUAL",
-            "WOMEN'S FORMAL",
-            "WOMEN'S SPORT",
-            "KID'S CASUAL",
-            "KID'S FORMAL",
-            "KID'S FORMAL",
-          ]}
-          onSelect={(value) => setSelectedSubCategory(value)}
-        />
-
-        {/* Sort By Price Dropdown */}
-        <Dropdown
-          mainTitle="Sort By Price"
-          title="Sort By Price"
-          options={["Low to High", "High to Low"]}
-          onSelect={(value) => setSelectedPriceSort(value)}
-        />
-      </div>
+      }} className="mx-5 pb-5 px-5 rounded-md py-7 my-4 bg-white ">
+     
 
       {/* Table */}
-      <div className="pt-5">
-        <table className="w-full border">
-          <thead>
-            <tr className="bg-gray-50 border-b">
-              <th className="px-4 border-r text-sm font-medium text-start py-5">
-                Image
-              </th>
-              <th className="px-4 border-r text-sm font-medium text-start py-5">
-                Product Name
-              </th>
-              <th className="px-4 border-r text-sm font-medium text-start py-5">
-                Gender
-              </th>
-              <th className="px-4 border-r text-sm font-medium text-start py-5">
-                Price
-              </th>
-              <th className="px-4 border-r text-sm font-medium text-start py-5">
-                Category
-              </th>
-              <th className="px-4 border-r text-sm font-medium text-start py-5">
-                Product Code
-              </th>
-              <th className="px-4 border-r text-sm font-medium text-start py-5">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody className="w-full">
-            {currentItems.length === 0 ? (
-              <div className="flex py-5 mx-auto items-center justify-center">
-                <EmptyCard />
+    {/* Table */}
+<div className="pt-5 overflow-x-auto w-full"> {/* Ensure the outer container is scrollable */}
+  {currentItems.length === 0 ? (
+    <div className="flex py-5 mx-auto items-center justify-center">
+      <EmptyCard />
+    </div>
+  ) : (
+    <table className="w-full min-w-[500px] md:min-w-[1000px] border">
+      <thead>
+        <tr className="bg-gray-50 border-b">
+          <th className="px-4 border-r text-sm font-medium text-start py-5">
+            Image
+          </th>
+          <th className="px-4 border-r text-sm font-medium text-start py-5">
+            Product Name
+          </th>
+          <th className="px-4 border-r text-sm font-medium text-start py-5">
+            Gender
+          </th>
+          <th className="px-4 border-r text-sm font-medium text-start py-5">
+            Price
+          </th>
+          <th className="px-4 border-r text-sm font-medium text-start py-5">
+            Category
+          </th>
+          <th className="px-4 border-r text-sm font-medium text-start py-5">
+            Product Code
+          </th>
+          <th className="px-4 border-r text-sm font-medium text-start py-5">
+            Action
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {currentItems.map((shoe, index) => (
+          <tr
+            key={index}
+            className="text-start border-b text-sm text-gray-800"
+          >
+            <td className="p-2 border-r">
+              <img
+                src={shoe.mainImage}
+                className="w-[50px] h-auto"
+                alt={shoe.name}
+              />
+            </td>
+            <td className="p-2 border-r">{shoe.name}</td>
+            <td className="p-2 border-r">{shoe.gender}</td>
+            <td className="p-2 border-r">{shoe.price}</td>
+            <td className="p-2 border-r">{shoe.category}</td>
+            <td className="p-2 border-r">
+              {shoe.Description?.Item_code}
+            </td>
+            <td className="p-2 border-r flex items-center gap-2">
+              <div className="border p-1.5 border-gray-500 rounded cursor-pointer">
+                <FiEdit size={16} />
               </div>
-            ) : (
-              currentItems.map((shoe, index) => (
-                <tr
-                  key={index}
-                  className="text-start border-b text-sm text-gray-800"
-                >
-                  <td className="p-2 border-r">
-                    <img
-                      src={shoe.mainImage}
-                      className="w-[50px]"
-                      alt={shoe.name}
-                    />
-                  </td>
-                  <td className="p-2 border-r">{shoe.name}</td>
-                  <td className="p-2 border-r">{shoe.gender}</td>
-                  <td className="p-2 border-r">{shoe.price}</td>
-                  <td className="p-2 border-r">{shoe.category}</td>
-                  <td className="p-2 border-r">
-                    {shoe.Description?.Item_code}
-                  </td>
-                  <td className="p-2 border-r flex items-center gap-2">
-                    <div className="border p-1.5 border-gray-500 rounded cursor-pointer">
-                      <FiEdit size={16} />
-                    </div>
-                    <div className="border p-1.5 border-gray-500 rounded cursor-pointer">
-                      <FaPlus className="rotate-45" size={16} />
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              <div className="border p-1.5 border-gray-500 rounded cursor-pointer">
+                <FaPlus className="rotate-45" size={16} />
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</div>
+
+
 
       {/* Pagination Controls */}
       <div className="flex justify-center mt-4">

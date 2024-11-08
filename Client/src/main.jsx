@@ -9,6 +9,7 @@ import { Provider } from "react-redux";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "./Provider/AuthProvider";
 import WishlistData from "./Components/Context/WishlistData";
+import FavoritesProvider from "./Provider/FavoritesContext";
 
 const queryClient = new QueryClient();
 
@@ -18,9 +19,11 @@ createRoot(document.getElementById("root")).render(
       <QueryClientProvider client={queryClient}>
         <Toaster />
         <WishlistData>
+        <FavoritesProvider>
         <Provider store={store}>
           <RouterProvider router={router} />
         </Provider>
+        </FavoritesProvider>
         </WishlistData>
       </QueryClientProvider>
     </AuthProvider>

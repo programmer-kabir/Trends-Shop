@@ -14,6 +14,7 @@ import axios from "axios";
 import DeliveryOption from "../../Components/Design/DeliveryOption";
 import Faqs from "../Faqs/Faqs";
 import Reviews from "../Reviews/Reviews";
+import { FavoritesContext } from "../../Provider/FavoritesContext";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -48,19 +49,38 @@ const ProductDetails = () => {
     const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
     setIsFavorite(storedIds.includes(currentShoe?._id));
   }, [currentShoe?._id]);
+  const { updateFavoriteCount } = useContext(FavoritesContext);
 
-  const [storedIds, setId] = useState("");
+  // const [storedIds, setId] = useState("");
+  // const handleAddToFavorite = (id) => {
+  //   const storedIdsString = localStorage.getItem("favoriteTShirt");
+  //   const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
+  //   setId(storedIds);
+
+  //   if (!storedIds.includes(id)) {
+  //     storedIds.push(id);
+  //     localStorage.setItem("favoriteTShirt", JSON.stringify(storedIds));
+  //     setIsFavorite(true);
+  //     setFavoriteTShirtCount((pre) => pre + 1);
+  //     toast.success("Item is added");
+  //   } else {
+  //     toast.error("Item is already a favorite");
+  //   }
+  // };
   const handleAddToFavorite = (id) => {
+    // const { updateFavoriteCount } = useContext(FavoritesContext);
+    
     const storedIdsString = localStorage.getItem("favoriteTShirt");
     const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
-    setId(storedIds);
-
+  
     if (!storedIds.includes(id)) {
       storedIds.push(id);
       localStorage.setItem("favoriteTShirt", JSON.stringify(storedIds));
-      setIsFavorite(true);
-      setFavoriteTShirtCount((pre) => pre + 1);
-      toast.success("Item is added");
+  
+      // Update the favorite count using context function
+      updateFavoriteCount(storedIds.length);
+  
+      toast.success("Item added to favorites");
     } else {
       toast.error("Item is already a favorite");
     }

@@ -1,7 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
-import { FaArrowRightToBracket, FaCodeCompare } from "react-icons/fa6";
+import {
+  FaArrowRightToBracket,
+  FaCodeCompare,
+  FaHeart,
+  FaRegHeart,
+} from "react-icons/fa6";
 import { FiSearch, FiShoppingCart, FiUser } from "react-icons/fi";
 import { BsBagPlus } from "react-icons/bs";
 import logo from "../../../assets/LOGO/LOGO.png";
@@ -17,6 +22,9 @@ import LoadingSpinner from "../../../Components/Design/LoadingSpinner/LoadingSpi
 import useAdmin from "../../../Components/Hooks/useAdmin";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUser } from "../../Redux/Users/userSlice";
+import { AiOutlineShoppingCart } from "react-icons/ai";
+import { fetchBooked } from "../../Redux/Booked/bookedSlice";
+import { FavoritesContext } from "../../../Provider/FavoritesContext";
 const Navbar = () => {
   const { user, logOut, loading } = useAuth();
   const [letter, setLetter] = useState("");
@@ -24,19 +32,20 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { isLoading:isBookedLoading, Booked, error:isBookedError } = useSelector((state) => state.Booked);
+
   const { isLoading, Users, error } = useSelector((state) => state.Users);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchUser());
-  }, []);
+    dispatch(fetchBooked(user?.email));
+  }, [dispatch]);
+  
   const currentUser =
     !isLoading && Users && user
       ? Users.filter((users) => users.email === user.email)
       : [];
-  // console.log(currentUser[0]?.role);
-  // const [isAdmin,isAdminLoading] = useAdmin();
 
-  console.log(loading);
   const handleNav = () => {
     setNav(!nav);
   };
@@ -94,6 +103,9 @@ const Navbar = () => {
     logOut();
   };
 
+  const { favoriteTShirtCount } = useContext(FavoritesContext);
+console.log(favoriteTShirtCount);
+
   return (
     <div className="bg-white">
       <nav
@@ -135,7 +147,15 @@ const Navbar = () => {
                   </div>
                   {/* User */}
                   <div className="flex items-center justify-center gap-3">
-                   
+                    <div className="flex gap-5 items-center pr-1 ">
+                     <Link to={'wishlist'}> <div to='/wishlist' className="relative cursor-pointer">
+                        <FaRegHeart color="black" size={23} />
+                        <span className="absolute text-xs border-2 border-white -top-2 left-4 flex items-center  justify-center w-5 h-5 rounded-full bg-black">
+                        {favoriteTShirtCount}
+                        </span>
+                      </div></Link>
+                     
+                    </div>
                     {user ? (
                       <>
                         {currentUser[0]?.role === "admin" ? (
@@ -145,11 +165,18 @@ const Navbar = () => {
                             </div>
                           </Link>
                         ) : (
+                          <> <div className="relative cursor-pointer">
+                          <AiOutlineShoppingCart color="black" size={25} />
+                          <span className="absolute text-xs border-2 border-white -top-2 left-4 flex items-center  justify-center w-5 h-5 rounded-full bg-black">
+                            {Booked.length}
+                          </span>
+                        </div>
                           <Link to="user/dashboard">
                             <div className="secondaryColor">
                               <MdDashboard size={22} />
                             </div>
                           </Link>
+                          </>
                         )}
 
                         <button
@@ -165,7 +192,7 @@ const Navbar = () => {
                     ) : (
                       <>
                         <Link to={"/login"}>
-                          <button className="border border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
+                          <button className="border ml-2 border-slate-200 hover:border-[#398EFA] rounded-md flex gap-1 items-center bg-[#f50400] hover:bg-transparent hover:text-[#398EFA] px-3 py-1 transition-all duration-300 ease-in-out">
                             <LuUser2 size={18} />
                             <p className="font-bold uppercase text-[15px]">
                               Login

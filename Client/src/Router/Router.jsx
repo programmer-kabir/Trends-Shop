@@ -17,6 +17,7 @@ import AddCoupon from "../Pages/Dashboard/Admin/AddCoupon";
 import AddProduct from "../Pages/Dashboard/Admin/AddProduct";
 import ShowProduct from "../Pages/Dashboard/Admin/ShowProduct";
 import AdminRoute from "./AdminRoute";
+import Wishlist from "../Pages/Wishlist/Wishlist";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "/CheckOut/:id",
         element: <CheckOut />,
+      },
+      {
+        path: "/wishlist",
+        element: <Wishlist />,
       },
     ],
   },
@@ -96,7 +101,7 @@ const router = createBrowserRouter([
       },
       {
         path: "create-product",
-        element: <AddProduct />
+        element: <AddProduct />,
       },
       {
         path: "show-product",
