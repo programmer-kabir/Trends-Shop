@@ -5,6 +5,7 @@ Trends Shop is a modern e-commerce platform designed for discovering and buying 
 ## Live Demo
 
 Check out the live demo: [Trends Shop](https://trends-shop-5f3a7.web.app/)
+Check out the Server demo: [Trends Shop Server]([https://trends-shop-5f3a7.web.app/](https://trends-shop-serverr.vercel.app/)
 
 ## Features
 
