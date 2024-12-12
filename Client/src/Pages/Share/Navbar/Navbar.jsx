@@ -32,8 +32,6 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isLoading:isBookedLoading, Booked, error:isBookedError } = useSelector((state) => state.Booked);
-
   const { isLoading, Users, error } = useSelector((state) => state.Users);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -107,9 +105,7 @@ const Navbar = () => {
       >
         <Content>
           <div className="mx-auto ">
-            {loading ? (
-              <LoadingSpinner />
-            ) : (
+           
               <div className="z-50  bg-white  py-3  md:py-1 flex justify-between items-center text-white">
                 <Link to="/" className="flex items-center  ">
                   <img className="md:w-1/3 w-[80px]" src={logo} alt="" />
@@ -237,7 +233,7 @@ const Navbar = () => {
                   </div>
                 </div>
               </div>
-            )}
+          
 
             <div className="flex justify-end">
               {isSidebarOpen && (

@@ -8,7 +8,6 @@ import toast from 'react-hot-toast'
 import useAuth from "../../../Components/Hooks/useAuth";
 const Login = () => {
   const {SingInUser,setLoading} = useAuth()
-
   const [open, setOpen] = useState(false);
   const showModal = () => {
     setOpen(true);
@@ -27,7 +26,12 @@ const Login = () => {
       setLoading(false);
       toast.success('login successful')
       navigate(from , {replace:true})
-    });
+    })
+    .catch(error=>{
+      toast.error(error.message)
+      setLoading(false)
+    })
+
   };
   
   // Email
