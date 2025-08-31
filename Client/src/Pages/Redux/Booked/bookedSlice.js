@@ -10,7 +10,7 @@ export const fetchBooked = createAsyncThunk(
     try {
       // Send userEmail in the API request
       const response = await axios.get(
-        `https://trends-shop-serverr.vercel.app/booked?email=${userEmail}`
+        `https://tendsserver.vercel.app/booked?email=${userEmail}`
       );
       return response.data;
     } catch (error) {

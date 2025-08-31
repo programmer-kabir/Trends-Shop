@@ -5,7 +5,7 @@ Trends Shop is a modern e-commerce platform designed for discovering and buying 
 ## Live Demo
 
 Check out the live demo: [Trends Shop](https://trends-shop-5f3a7.web.app/)
-Check out the Server demo: [Trends Shop Server]([https://trends-shop-5f3a7.web.app/](https://trends-shop-serverr.vercel.app/)
+Check out the Server demo: [Trends Shop Server]([https://trends-shop-5f3a7.web.app/](https://tendsserver.vercel.app/)
 
 ## Features
 
@@ -18,6 +18,7 @@ Check out the Server demo: [Trends Shop Server]([https://trends-shop-5f3a7.web.a
 - **Order Tracking**: Customers can track their orders in real-time, ensuring they know the status of their deliveries.
 - **Product Recommendations**: The platform suggests products based on browsing history and preferences, enhancing the shopping experience.
 - **Easy Returns**: Hassle-free returns and exchanges within 30 days, making shopping stress-free.
+
 ## Technology Stack
 
 ### Front-end
@@ -32,62 +33,57 @@ Check out the Server demo: [Trends Shop Server]([https://trends-shop-5f3a7.web.a
 - React Hook Form
 - Firebase
 - TanStack Query
-  
 
 ### Back-end
 
 - Express.js
-- MongoDB 
+- MongoDB
 - JWT for Authentication
 
 ## Installation
 
-
 **Clone the repository:**
-   ```sh
-   git clone https://github.com/yourusername/trendy-leather.git](https://github.com/programmer-kabir/Trends-Shop
-   ```
+
+```sh
+git clone https://github.com/yourusername/trendy-leather.git](https://github.com/programmer-kabir/Trends-Shop
+```
 
 ```bash
  cd client
 npm install
 ```
 
-   ```bash
- cd server
+```bash
+cd server
 npm install
 ```
 
-Create a ``.env`` file in the server directory and add the following:
-
+Create a `.env` file in the server directory and add the following:
 
 ```bash
 DB_USER=your_mongoDb_porject_userName
 DB_PASS=your_mongoDb_porject_Password
 ACCESS_TOKEN=your_jwt_secret_token
 ```
+
 ```bash
  cd client
 npm start
 ```
-Open ```http://localhost:3000``` in your browser.
 
-   ```bash
+Open `http://localhost:3000` in your browser.
+
+```bash
 cd server
 npm start
 ```
-Open ```http://localhost:5000``` in your browser.
 
-
-
-
+Open `http://localhost:5000` in your browser.
 
 ## Contributing
 
 Contributions are welcome! Please fork the repository and submit a pull request for any improvements or bug fixes.
 License
-
-
 
 ## Contact
 

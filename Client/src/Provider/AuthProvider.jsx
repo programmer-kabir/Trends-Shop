@@ -21,7 +21,7 @@ const AuthProvider = ({ children }) => {
       setUser(currentUser);
       if (currentUser) {
         axios
-          .post("https://trends-shop-serverr.vercel.app/jwt", {
+          .post("https://tendsserver.vercel.app/jwt", {
             email: currentUser?.email,
           })
           .then((data) => {

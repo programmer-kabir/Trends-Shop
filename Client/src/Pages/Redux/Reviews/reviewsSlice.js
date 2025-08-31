@@ -5,7 +5,7 @@ export const fetchReviews = createAsyncThunk(
   async () => {
     try {
       const response = await axios.get(
-        "https://trends-shop-serverr.vercel.app/reviews"
+        "https://tendsserver.vercel.app/reviews"
       );
       return response.data;
     } catch (error) {

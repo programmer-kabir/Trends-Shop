@@ -5,7 +5,7 @@ export const fetchCoupons = createAsyncThunk(
   async () => {
     try {
       const response = await axios.get(
-        "https://trends-shop-serverr.vercel.app/couponCode"
+        "https://tendsserver.vercel.app/couponCode"
       );
       return response.data;
     } catch (error) {

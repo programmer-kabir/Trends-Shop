@@ -5,7 +5,7 @@ export const fetchRequestPayment = createAsyncThunk(
   async () => {
     try {
       const response = await axios.get(
-        "https://trends-shop-serverr.vercel.app/requestPayment"
+        "https://tendsserver.vercel.app/requestPayment"
       );
       return response.data;
     } catch (error) {

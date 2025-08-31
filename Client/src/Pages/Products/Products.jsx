@@ -11,7 +11,7 @@ import { Empty } from "antd";
 
 const Products = () => {
   const dispatch = useDispatch();
-  const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
+  const { isLoading, Shoes, error } = useSelector((state) => state?.Shoes);
 
   const { Name } = useParams();
   const formattedName = Name.replace(/-/g, ' ');
@@ -29,9 +29,9 @@ const Products = () => {
       dispatch(fetchShoes());
     }
     // dispatch(fetchShoes());
-  }, [dispatch]);
+  }, [dispatch,selectedSubcategory]);
 
-console.log(selectedSubcategory);
+// console.log(selectedSubcategory);
   const toggleDropdown = (index) => {
     if (openDropdown === index) {
       setOpenDropdown(null);
@@ -87,15 +87,15 @@ console.log(selectedSubcategory);
     setIsDropdownOpen(false);
   };
 
-  const filterShoes = Shoes.filter((shoe) => {
+  const filterShoes = Shoes?.filter((shoe) => {
     const isGenderFilter = ["MEN'S", "WOMEN'S", "KID'S"].includes(
       selectedSubcategory
     );
     const matchesGender = isGenderFilter
-      ? shoe.gender === selectedSubcategory
+      ? shoe?.gender === selectedSubcategory
       : true;
     const matchesCategory = !isGenderFilter
-      ? shoe.category === selectedSubcategory
+      ? shoe?.category === selectedSubcategory
       : true;
     return matchesGender && matchesCategory;
   });

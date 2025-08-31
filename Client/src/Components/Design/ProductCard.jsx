@@ -10,12 +10,16 @@ import useAuth from "../Hooks/useAuth";
 import axios from "axios";
 import { WishListDataContext } from "../Context/WishlistData";
 import { FavoritesContext } from "../../Provider/FavoritesContext";
-import useAdmin from "../Hooks/useAdmin";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUser } from "../../Pages/Redux/Users/userSlice";
 // import { WishListDataContext } from "../Context/WishlistData";
 const ProductCard = ({ shoes }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isLoading, Users, error } = useSelector((state) => state?.Users);
+
   const { user } = useAuth();
-  const [isAdmin, isAdminLoading] = useAdmin();
+
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeSize, setActiveSize] = useState(null);
   const { favoriteTShirtCount, setFavoriteTShirtCount } =
@@ -25,8 +29,10 @@ const ProductCard = ({ shoes }) => {
     const storedIdsString = localStorage.getItem("favoriteTShirt");
     const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
     setIsFavorite(storedIds.includes(shoes._id));
+dispatch(fetchUser());
   }, [shoes._id]);
-
+const currentUser = Users?.find((u) => u?.email === user?.email);
+console.log(currentUser);
   const [storedIds, setId] = useState("");
 
   const { updateFavoriteCount } = useContext(FavoritesContext);
@@ -132,9 +138,9 @@ const ProductCard = ({ shoes }) => {
                 <button
                   onClick={() => handleAddToCart(shoes._id)}
                   className={`primaryButton hidden md:flex items-center justify-center w-full uppercase font-black ${
-                    isAdmin ? "opacity-50 cursor-not-allowed" : ""
+                    currentUser?.role ? "opacity-50 cursor-not-allowed" : ""
                   }`}
-                  disabled={isAdmin || isAdminLoading}
+                  disabled={currentUser?.role==="admin"}
                 >
                   <FiPlus />
                   order
@@ -147,9 +153,9 @@ const ProductCard = ({ shoes }) => {
                 <button
                   onClick={() => handleAddToCart(shoes._id)}
                   className={`primaryButton hidden md:flex items-center justify-center w-full uppercase font-black ${
-                    isAdmin ? "opacity-50 cursor-not-allowed" : ""
+                    currentUser?.role ? "opacity-50 cursor-not-allowed" : ""
                   }`}
-                  disabled={isAdmin || isAdminLoading}
+                   disabled={currentUser?.role==="admin"}
                 >
                   <FiPlus />
                   order
@@ -169,7 +175,7 @@ const ProductCard = ({ shoes }) => {
 
                   <div
                     onClick={() => {
-                      if (!isAdmin && !isAdminLoading) {
+                      if (!currentUser?.role==="admin") {
                         handleAddToFavorite(shoes._id);
                       }
                     }}
@@ -181,7 +187,7 @@ const ProductCard = ({ shoes }) => {
                         "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px",
                       transition: "background-color 0.3s",
                       cursor:
-                        isAdmin || isAdminLoading ? "not-allowed" : "pointer",
+                        currentUser?.role==="admin" ? "not-allowed" : "pointer",
                     }}
                     onMouseEnter={() => setIsHoveredHeart(true)}
                     onMouseLeave={() => setIsHoveredHeart(false)}
@@ -195,7 +201,7 @@ const ProductCard = ({ shoes }) => {
 
                 <button
                   onClick={() => {
-                    if (!isAdmin) {
+                    if (!currentUser?.role === "admin") {
                       handleAddToCart(shoes._id);
                     }
                   }}
@@ -203,7 +209,7 @@ const ProductCard = ({ shoes }) => {
                   data-tooltip-content="Add To Cart"
                   data-tooltip-place="left"
                   className={`bg-white hover:bg-[#f50400] p-2 shadow-lg ${
-                    isAdmin ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                    currentUser?.role === "admin" ? "cursor-not-allowed opacity-50" : "cursor-pointer"
                   }`}
                   style={{
                     boxShadow:
@@ -212,7 +218,7 @@ const ProductCard = ({ shoes }) => {
                   }}
                   onMouseEnter={() => setIsHoveredCompare(true)}
                   onMouseLeave={() => setIsHoveredCompare(false)}
-                  disabled={isAdmin} // You can still disable the button if needed
+                  disabled={currentUser?.role === "admin"} // You can still disable the button if needed
                 >
                   <Tooltip id="favorite" />
                   <FaCartPlus

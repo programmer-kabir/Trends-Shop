@@ -19,7 +19,6 @@ import Content from "../../../Components/Content/Content";
 import { TbCurrencyTaka } from "react-icons/tb";
 import useAuth from "../../../Components/Hooks/useAuth";
 import LoadingSpinner from "../../../Components/Design/LoadingSpinner/LoadingSpinner";
-import useAdmin from "../../../Components/Hooks/useAdmin";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUser } from "../../Redux/Users/userSlice";
 import { AiOutlineShoppingCart } from "react-icons/ai";

@@ -3,7 +3,7 @@ import axios from "axios";
 export const fetchShoes = createAsyncThunk("shoes/fetchShoes", async () => {
   try {
     const response = await axios.get(
-      "https://trends-shop-serverr.vercel.app/shoes"
+      "https://tendsserver.vercel.app/shoes"
     );
     return response.data;
   } catch (error) {

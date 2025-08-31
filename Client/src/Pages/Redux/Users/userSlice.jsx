@@ -2,9 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 export const fetchUser = createAsyncThunk("users/fetchUser", async () => {
   try {
-    const response = await axios.get(
-      "https://trends-shop-serverr.vercel.app/users"
-    );
+    const response = await axios.get("https://tendsserver.vercel.app/users");
     return response.data;
   } catch (error) {
     throw error;
