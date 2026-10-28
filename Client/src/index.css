@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    @apply bg-slate-50 text-slate-900 transition-colors duration-300 antialiased selection:bg-amber-500 selection:text-white;
+  }
+
+  .dark body {
+    @apply bg-[#0B0F19] text-slate-100;
+  }
+}
+
+.font-serif-luxury {
+  font-family: 'Playfair Display', serif;
+}
+
+
+
+
+.primaryColor {
+  color: #4D4F53;
+}
+.secondaryColor {
+  color: #f50400;
+}
+/* #4096ff */
+/* #B63155  */
+.primaryButton{
+  background-color: #080921;
+  color: white;
+  font-weight: 500;
+  padding: 7px 0px;
+  transition: all 0.3s ease-in-out;
+}
+.primaryButton:hover{
+  background-color: #f50400;
+  color: white;
+
+}
+.ant-modal-footer{
+  display: none;
+}
+
+.ant-divider{
+  color: rgb(0, 0, 0);
+}
+.btn{
+  margin: 5px;
+}
+.btn-success{
+  padding: 5px 19px;
+  border-radius: 3px;
+background-color: #28a745;
+color: white;
+}
+.btn-success:hover{
+
+background-color: #149131;
+
+}
+.btn-danger{
+  padding: 5px 19px;
+  border-radius: 3px;
+background-color: #d33;
+color: white;
+}
+.btn-danger:hover{
+
+background-color: rgb(214, 21, 21);
+
+}

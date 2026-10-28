@@ -1,0 +1,15 @@
+.stroke-white {
+  -webkit-text-stroke: 2px white;
+  text-stroke: 2px white; /* Fallback for other browsers */
+}
+.bannerHeder {
+  font-family: "Damion", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+.bannerText {
+    font-family: "Josefin Sans", sans-serif;
+}
+.bannerButton {
+  font-family: "Nunito Sans", sans-serif;
+}
