@@ -58,6 +58,27 @@
 background-color: #28a745;
 color: white;
 }
+
+/* Sleek minimalist scrollbar for fixed sidebar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(217, 119, 6, 0.25);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(217, 119, 6, 0.6);
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(245, 158, 11, 0.2);
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.5);
+}
 .btn-success:hover{
 
 background-color: #149131;

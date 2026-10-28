@@ -20,8 +20,9 @@ const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
+        const apiBase = import.meta.env.VITE_LOCALHOST_KEY || "http://localhost:5000";
         axios
-          .post("https://tendsserver.vercel.app/jwt", {
+          .post(`${apiBase}/jwt`, {
             email: currentUser?.email,
           })
           .then((data) => {

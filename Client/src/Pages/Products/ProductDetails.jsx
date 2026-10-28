@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchShoes } from "../Redux/Shoes/shoesSlice";
 import Content from "../../Components/Content/Content";
 import Rating from "react-rating";
 import { AiFillStar } from "react-icons/ai";
-import { MdOutlineShoppingBag } from "react-icons/md";
-import { FiHeart, FiPhone } from "react-icons/fi";
-import { WishListDataContext } from "../../Components/Context/WishlistData";
+import { MdOutlineShoppingBag, MdElectricBolt } from "react-icons/md";
+import { FiHeart, FiPhone, FiCheck, FiChevronRight, FiShield, FiTruck, FiRefreshCw, FiZoomIn } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa6";
 import toast from "react-hot-toast";
 import useAuth from "../../Components/Hooks/useAuth";
 import axios from "axios";
@@ -15,349 +15,448 @@ import DeliveryOption from "../../Components/Design/DeliveryOption";
 import Faqs from "../Faqs/Faqs";
 import Reviews from "../Reviews/Reviews";
 import { FavoritesContext } from "../../Provider/FavoritesContext";
+import LoadingSpinner from "../../Components/Design/LoadingSpinner/LoadingSpinner";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { isLoading, Shoes, error } = useSelector((state) => state.Shoes);
-const navigate = useNavigate()
+
   useEffect(() => {
     dispatch(fetchShoes());
   }, [dispatch]);
 
-  // Ensure `Shoes` is loaded before trying to find `currentShoe`
   const currentShoe = Shoes?.find((shoe) => shoe._id === id);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState("mainImage");
   const [activeSize, setActiveSize] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [rating, setRating] = useState(0);
-
-  const { favoriteTShirtCount, setFavoriteTShirtCount } =
-    useContext(WishListDataContext);
-
-  // Tabs
+  const [rating, setRating] = useState(5);
   const [activeTab, setActiveTab] = useState("Reviews");
 
-  const handleTabClick = (tabName) => {
-    setActiveTab(tabName);
+  // Mouse hover zoom states
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const [isZoomed, setIsZoomed] = useState(false);
+
+  const handleMouseMove = (e) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((e.clientX - left) / width) * 100));
+    const y = Math.max(0, Math.min(100, ((e.clientY - top) / height) * 100));
+    setZoomPos({ x, y });
   };
-  useEffect(() => {
-    // Check if the current product is in favorites when component mounts
-    const storedIdsString = localStorage.getItem("favoriteTShirt");
-    const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
-    setIsFavorite(storedIds.includes(currentShoe?._id));
-  }, [currentShoe?._id]);
+
+  const handleMouseEnter = () => {
+    setIsZoomed(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsZoomed(false);
+    setZoomPos({ x: 50, y: 50 });
+  };
+
   const { updateFavoriteCount } = useContext(FavoritesContext);
 
-
- 
-  const handleAddToFavorite = (id) => {
-    // const { updateFavoriteCount } = useContext(FavoritesContext);
-    
-    const storedIdsString = localStorage.getItem("favoriteTShirt");
-    const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
-  
-    if (!storedIds.includes(id)) {
-      storedIds.push(id);
-      localStorage.setItem("favoriteTShirt", JSON.stringify(storedIds));
-  
-      // Update the favorite count using context function
-      updateFavoriteCount(storedIds.length);
-  
-      toast.success("Item added to favorites");
-    } else {
-      toast.error("Item is already a favorite");
+  useEffect(() => {
+    if (currentShoe) {
+      const storedIdsString = localStorage.getItem("favoriteTShirt");
+      const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
+      setIsFavorite(storedIds.includes(currentShoe._id));
+      if (Array.isArray(currentShoe.size) && currentShoe.size.length > 0 && !activeSize) {
+        setActiveSize(currentShoe.size[0]);
+      }
     }
-  };
-  const handleImageChange = (imageProperty) => {
-    setSelectedImage(imageProperty);
+  }, [currentShoe]);
+
+  const toggleFavorite = () => {
+    if (!currentShoe) return;
+    const storedIdsString = localStorage.getItem("favoriteTShirt");
+    let storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
+
+    if (storedIds.includes(currentShoe._id)) {
+      storedIds = storedIds.filter((itemId) => itemId !== currentShoe._id);
+      setIsFavorite(false);
+      toast.success("Removed from wishlist");
+    } else {
+      storedIds.push(currentShoe._id);
+      setIsFavorite(true);
+      toast.success("Added to wishlist ❤️");
+    }
+    localStorage.setItem("favoriteTShirt", JSON.stringify(storedIds));
+    updateFavoriteCount(storedIds.length);
   };
 
-  const handleSizeClick = (size) => {
-    setActiveSize(size);
+  const handleImageChange = (imageKey) => {
+    setSelectedImage(imageKey);
   };
 
   const handleIncrement = () => {
-    setQuantity((prevQuantity) => prevQuantity + 1);
+    setQuantity((prev) => prev + 1);
   };
 
   const handleDecrement = () => {
     if (quantity > 1) {
-      setQuantity((prevQuantity) => prevQuantity - 1);
+      setQuantity((prev) => prev - 1);
     }
   };
 
-  // If loading or no shoe data, return a loading spinner or message
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="py-32 flex flex-col items-center justify-center bg-slate-50 dark:bg-[#0B0F19] min-h-[60vh]">
+        <LoadingSpinner />
+        <p className="text-xs text-slate-400 mt-4 font-semibold uppercase tracking-wider">
+          Loading Luxury Footwear Details...
+        </p>
+      </div>
+    );
   }
 
   if (!currentShoe) {
-    return <div>Product not found</div>;
+    return (
+      <div className="py-24 text-center bg-slate-50 dark:bg-[#0B0F19] min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Footwear Not Found</h2>
+        <p className="text-sm text-slate-500 max-w-sm">
+          The selected pair may be out of stock or no longer available in this season's catalog.
+        </p>
+        <Link
+          to="/products/ALL"
+          className="px-6 py-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs uppercase tracking-wider"
+        >
+          Back to Footwear Catalog
+        </Link>
+      </div>
+    );
   }
-  const mainPrice = currentShoe.price;
-  let updatePrice;
-  const discount = currentShoe?.Discount;
 
-  if (discount) {
-    // Calculate the updated price with the discount
-    updatePrice = mainPrice - mainPrice * (discount / 100);
-  } else {
-    updatePrice = mainPrice;
-  }
-  const handleAddToCart = (id) => {
-    if(!user){
-      toast.error("Please Login Now")
-      return navigate("/login")
+  const mainPrice = Number(currentShoe.price) || 0;
+  const discount = Number(currentShoe?.Discount) || 0;
+  const finalPrice = discount
+    ? Math.round(mainPrice - mainPrice * (discount / 100))
+    : mainPrice;
+
+  const handleAddToCart = () => {
+    if (!user) {
+      toast.error("Please login to add items to your cart");
+      return navigate("/login");
     }
     if (!activeSize) {
-      toast.error("Please Select Your size");
-    } else {
-      const data = {
-        productId: id,
-        size: activeSize,
-        productName: currentShoe.name,
-        price: updatePrice,
-        discount: discount,
-        quantity: 1,
-        email: user.email,
-      };
-      axios
-        .post(`${import.meta.env.VITE_LOCALHOST_KEY}/booked`, data)
-        .then((data) => {
-          // console.log(data.data);
-          if (data.data?.updateResult?.acknowledged) {
-            toast.success(`${currentShoe.name} quantity updated in the cart`);
-          } else if (data.data?.insertedId) {
-            toast.success(`${currentShoe.name} added to the cart`);
-          } else {
-            toast.error("Failed to add to cart");
-          }
-        });
+      return toast.error("Please select a shoe size");
     }
+    const data = {
+      productId: currentShoe._id,
+      size: activeSize,
+      productName: currentShoe.name,
+      price: finalPrice,
+      discount: discount,
+      quantity: quantity,
+      email: user.email,
+    };
+    axios
+      .post(`${import.meta.env.VITE_LOCALHOST_KEY}/booked`, data)
+      .then((res) => {
+        if (res.data?.updateResult?.acknowledged) {
+          toast.success(`${currentShoe.name} quantity updated in cart`);
+        } else if (res.data?.insertedId) {
+          toast.success(`${currentShoe.name} added to cart`);
+        } else {
+          toast.error("Failed to add to cart");
+        }
+      })
+      .catch(() => toast.error("Failed to add to cart"));
   };
-  const onFinish = (values) => {
+
+  const handleBuyNow = () => {
+    if (!user) {
+      toast.error("Please login to proceed with instant checkout");
+      return navigate("/login");
+    }
+    navigate(`/CheckOut/${currentShoe._id}`);
+  };
+
+  const onFinishReview = (values) => {
     const formData = {
-      productId: id,
+      productId: currentShoe._id,
       ...values,
       rating,
-      name: user?.displayName || "Anonymous",
-      email: user?.email || "anonymous@example.com",
+      name: user?.displayName || "Verified Customer",
+      email: user?.email || "customer@trendsshop.com",
     };
     if (!formData.rating) {
-      toast.error("Give your Star");
+      toast.error("Please select a star rating");
       return;
     }
-    // console.log("Submitted Data:", formData);
     axios
       .post(`${import.meta.env.VITE_LOCALHOST_KEY}/reviews`, formData)
-      .then((response) => {
-        const data = response.data;
-        if (data.insertedId) {
-          toast.success("Thanks For your review");
+      .then((res) => {
+        if (res.data.insertedId) {
+          toast.success("Thank you for your verified review!");
         }
       });
   };
+
   return (
-    <div>
-      <div className="bg-white">
-        <Content>
-          <section className="w-full">
-            <div className="md:flex gap-7">
-              <div className="md:w-3/4 w-full">
-                <div className="grid md:grid-cols-2">
-                  {/* Left Side */}
-                  <div>
-                    <div className="md:h-[400px] md:flex-none flex items-center justify-center md:justify-start overflow-hidden rounded-lg">
-                      <img
-                        className="w-2/3 h-full  object-fill"
-                        src={currentShoe[selectedImage]}
-                        alt=""
-                      />
-                    </div>
+    <div className="bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 min-h-screen py-6 md:py-10 transition-colors  mt-5">
+      <Content>
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-6">
+          <Link to="/" className="hover:text-amber-500 transition-colors">Home</Link>
+          <FiChevronRight className="text-slate-400" />
+          <Link to="/products/ALL" className="hover:text-amber-500 transition-colors">Footwear</Link>
+          <FiChevronRight className="text-slate-400" />
+          <Link to={`/products/${currentShoe.category.replace(/ /g, "-")}`} className="hover:text-amber-500 transition-colors">
+            {currentShoe.category}
+          </Link>
+          <FiChevronRight className="text-slate-400" />
+          <span className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[200px]">
+            {currentShoe.name}
+          </span>
+        </nav>
 
-                    <div className="flex gap-1 items-center">
-                      {Object.keys(currentShoe).map((key) => {
-                        if (key.endsWith("Image")) {
-                          return (
-                            <button
-                              key={key}
-                              type="button"
-                              onClick={() => handleImageChange(key)}
-                              className={`aspect-square mb-3 h-20 p-1 overflow-hidden rounded-sm border ${
-                                key === selectedImage
-                                  ? "border-blue-700"
-                                  : "border-transparent"
-                              } text-center`}
-                            >
-                              <img
-                                className="h-full w-full object-cover"
-                                src={currentShoe[key]}
-                                alt=""
-                              />
-                            </button>
-                          );
-                        }
-                        return null;
-                      })}
-                    </div>
-                  </div>
-                  {/* Right Side */}
-                  <div className="pt-10 space-y-1">
-                    <h2 className="text-xl font-semibold">
-                      {currentShoe?.name}
-                    </h2>
-                    <p className="">{currentShoe?.shortDescription}</p>
-                    <div className="flex items-center gap-2">
-                      <Rating
-                        className="mt-1"
-                        readonly
-                        placeholderRating={currentShoe?.star}
-                        emptySymbol={<AiFillStar color="#D6D6D6" size={16} />}
-                        placeholderSymbol={
-                          <AiFillStar color="#FF9933" size={16} />
-                        }
-                        fullSymbol={<AiFillStar color="#FF9933" size={16} />}
-                      />
-                      <span className="text-gray-600">
-                        {currentShoe?.reviews?.length} Review(s)
-                      </span>
-                    </div>
-                    <div>
-                      <p className="pt-1">
-                        Select a size: <span className="text-red-700">*</span>
-                      </p>
+        {/* Main Product Showcase Card */}
+        <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-3xl p-6 md:p-8 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            
+            {/* Left Image Gallery Column (5 cols) */}
+            <div className="lg:col-span-5 space-y-4">
+              <div 
+                onMouseEnter={handleMouseEnter}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                className="relative aspect-square w-full rounded-2xl bg-slate-100 dark:bg-slate-800/60 overflow-hidden border border-slate-200 dark:border-white/10 flex items-center justify-center group shadow-inner cursor-zoom-in"
+              >
+                {discount > 0 && (
+                  <span className="absolute top-4 left-4 z-10 px-3 py-1 text-xs font-extrabold uppercase rounded-lg bg-amber-500 text-slate-950 shadow-md pointer-events-none">
+                    -{discount}% OFF
+                  </span>
+                )}
 
-                      <div className="pt-3">
-                        {currentShoe?.size.map((size, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleSizeClick(size)}
-                            className={`mx-2 py-1 px-2 border-2 font-medium ${
-                              activeSize === size
-                                ? "border-blue-500 text-blue-500"
-                                : "border-gray-300 text-gray-700"
-                            }`}
-                          >
-                            {size}
-                          </button>
-                        ))}
-                      </div>
-                      <div className="flex items-center justify-center md:justify-start gap-3 w-full pt-5 pb-8">
-                        <div className="flex items-center gap-1 border border-gray-500 rounded w-[100px]  md:w-[144px]">
-                          <input
-                            type="text"
-                            id="Quantity"
-                            value={quantity}
-                            className="h-10 outline-none w-6 md:w-10 md:pl-5 border-gray-200 text-center"
-                            readOnly
-                          />
-                          <button
-                            type="button"
-                            onClick={handleDecrement}
-                            className="w-7 h-7  md:mr-2 mx-1 md:ml-3 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 transition hover:opacity-75"
-                          >
-                            &minus;
-                          </button>
-                          <button
-                            type="button"
-                            onClick={handleIncrement}
-                            className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 transition hover:opacity-75"
-                          >
-                            +
-                          </button>
-                        </div>
-                        <button
-    onClick={() => handleAddToCart(currentShoe._id)}
-    className="uppercase flex items-center gap-2 border hover:bg-white hover:text-[#4096ff] hover:border-[#4096ff] bg-[#f50400] text-white rounded-sm font-semibold px-6 py-2 transform transition-transform duration-200 ease-in-out hover:scale-105"
->
-    <MdOutlineShoppingBag size={24} />
-    Add to Cart
-</button>
-
-                        <button
-                          className={` border border-[#398EFA] px-2 py-2 rounded ${
-                            isFavorite
-                              ? "bg-[#f50400] border-none text-white"
-                              : "bg-white"
-                          }`}
-                          onClick={() => handleAddToFavorite(currentShoe._id)}
-                        >
-                          <FiHeart size={25} />
-                        </button>
-                      </div>
-                      <div className="py-4 flex hover:text-blue-400 items-center gap-3 border-y">
-                        <FiPhone size={33} />
-                        <p className="font-semibold text-xl">
-                          Call For Order: 09613-800800
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                {/* Interactive Zoom Indicator Pill */}
+                <div className={`absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-lg bg-slate-950/75 backdrop-blur-md text-white text-[11px] font-semibold flex items-center gap-1.5 transition-all duration-300 pointer-events-none ${isZoomed ? "opacity-0 translate-y-1" : "opacity-90"}`}>
+                  <FiZoomIn size={13} className="text-amber-400" />
+                  <span>Hover to Zoom</span>
                 </div>
+
+                <img
+                  src={currentShoe[selectedImage] || currentShoe.mainImage}
+                  alt={currentShoe.name}
+                  style={{
+                    transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                    transform: isZoomed ? "scale(2.2)" : "scale(1)",
+                  }}
+                  className="w-full h-full object-cover transition-transform duration-200 ease-out pointer-events-none select-none"
+                />
               </div>
-              <div className="md:w-1/4">
-                <DeliveryOption />
+
+              {/* Thumbnails */}
+              <div className="flex gap-3 overflow-x-auto pb-1">
+                {["mainImage", "firstImage", "secondImage", "thirdImage"].map((key, idx) => {
+                  const imgUrl = currentShoe[key];
+                  if (!imgUrl) return null;
+                  const isCurrent = selectedImage === key;
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleImageChange(key)}
+                      className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 ${
+                        isCurrent
+                          ? "border-amber-500 shadow-md scale-105"
+                          : "border-slate-200 dark:border-white/10 hover:border-amber-400 opacity-70 hover:opacity-100"
+                      }`}
+                    >
+                      <img src={imgUrl} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            <div className="pt-7 md:pt-0">
-              {/* Dropdown for small screens */}
-              <div className="sm:hidden border border-gray-200 p-2 rounded-md">
-                <label htmlFor="Tab" className="sr-only">
-                  Tab
-                </label>
-                <select
-                  id="Tab"
-                  className="w-full rounded-md border-gray-200"
-                  value={activeTab}
-                  onChange={(e) => handleTabClick(e.target.value, e)}
-                >
-                  <option>Reviews</option>
-                  <option>FAQ</option>
-                </select>
+            {/* Middle Product Info Column (4 cols) */}
+            <div className="lg:col-span-4 space-y-5 text-left">
+              <div>
+                <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-2">
+                  <span>{currentShoe.Brand || "Trends Signature"}</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                  <span>{currentShoe.category}</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                  {currentShoe.name}
+                </h1>
+                
+                {/* Rating & Reviews */}
+                <div className="flex items-center gap-2.5 mt-2">
+                  <Rating
+                    readonly
+                    initialRating={currentShoe.star || 5}
+                    emptySymbol={<AiFillStar className="text-slate-300 dark:text-slate-600 text-base" />}
+                    fullSymbol={<AiFillStar className="text-amber-500 text-base" />}
+                  />
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    ({currentShoe.star || 5}.0) • {currentShoe.selling || 12} Sold
+                  </span>
+                </div>
               </div>
 
-              {/* Tabs for larger screens */}
-              <div className="hidden sm:block">
-                <div className="border-b border-gray-200">
-                  <nav className="-mb-px flex gap-6">
-                    {["Reviews", "FAQ"].map((tab) => (
+              {/* Price Block */}
+              <div className="p-4 rounded-2xl bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 flex items-baseline gap-3">
+                <span className="text-3xl font-extrabold text-amber-600 dark:text-amber-400">
+                  ৳{finalPrice.toLocaleString()}
+                </span>
+                {discount > 0 && (
+                  <>
+                    <span className="text-base text-slate-400 line-through">
+                      ৳{mainPrice.toLocaleString()}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-lg text-xs font-extrabold bg-amber-500 text-slate-950">
+                      Save ৳{(mainPrice - finalPrice).toLocaleString()}
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {/* Description */}
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                {currentShoe.shortDescription}
+              </p>
+
+              {/* Size Selector */}
+              <div className="space-y-2.5 pt-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                    Select Size (EU):
+                  </span>
+                  <span className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold cursor-pointer hover:underline">
+                    Fit Advisor Guide
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {(Array.isArray(currentShoe.size) ? currentShoe.size : [currentShoe.size]).map((sz, idx) => {
+                    const isSelected = activeSize === sz;
+                    return (
                       <button
-                        key={tab}
-                        onClick={(e) => handleTabClick(tab, e)}
-                        className={`shrink-0 border  p-3 text-sm font-medium ${
-                          activeTab === tab
-                            ? "text-sky-600 border-b-white rounded-t-lg border-gray-300"
-                            : "text-gray-500 border-transparent hover:text-gray-700"
+                        key={idx}
+                        onClick={() => setActiveSize(sz)}
+                        className={`w-11 h-11 rounded-xl text-xs font-bold transition-all border ${
+                          isSelected
+                            ? "bg-amber-500 text-slate-950 border-amber-500 shadow-md shadow-amber-500/25 scale-105"
+                            : "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-amber-400"
                         }`}
                       >
-                        {tab}
+                        {sz}
                       </button>
-                    ))}
-                  </nav>
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Tab Content */}
-              <div className="p-4 md:px-12">
-                {activeTab === "Reviews" && (
-                  <div className="md:w-3/4 w-full mx-auto ">
-                    <Reviews setRating={setRating} onFinish={onFinish} />
+              {/* Quantity & CTA Buttons */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center gap-3">
+                  {/* Quantity */}
+                  <div className="flex items-center border border-slate-200 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-slate-800/60 p-1">
+                    <button
+                      onClick={handleDecrement}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    >
+                      -
+                    </button>
+                    <span className="w-10 text-center font-extrabold text-sm text-slate-800 dark:text-slate-100">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={handleIncrement}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    >
+                      +
+                    </button>
                   </div>
-                )}
-                {activeTab === "FAQ" && (
-                  <div>
-                    <Faqs />
-                  </div>
-                )}
+
+                  {/* Add to Cart */}
+                  <button
+                    onClick={handleAddToCart}
+                    className="flex-1 py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-colors border border-white/10"
+                  >
+                    <MdOutlineShoppingBag size={18} />
+                    <span>Add to Bag</span>
+                  </button>
+
+                  {/* Wishlist */}
+                  <button
+                    onClick={toggleFavorite}
+                    className="p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-amber-500 transition-colors"
+                    title="Wishlist"
+                  >
+                    {isFavorite ? (
+                      <FaHeart className="text-red-500 text-lg" />
+                    ) : (
+                      <FiHeart className="text-lg" />
+                    )}
+                  </button>
+                </div>
+
+                {/* Instant Buy Now Button */}
+                <button
+                  onClick={handleBuyNow}
+                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 transition-all"
+                >
+                  <MdElectricBolt size={18} />
+                  <span>Instant Checkout / Buy Now</span>
+                </button>
+              </div>
+
+              {/* Call Hotline */}
+              <div className="py-3 px-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-white/5 flex items-center gap-3">
+                <FiPhone className="text-amber-500 text-lg" />
+                <div>
+                  <p className="text-[11px] text-slate-400">Order by Phone / Helpline</p>
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    +880 1800-TRENDS (09613-800800)
+                  </p>
+                </div>
               </div>
             </div>
-          </section>
-        </Content>
-      </div>
+
+            {/* Right Delivery & Trust Column (3 cols) */}
+            <div className="lg:col-span-3">
+              <DeliveryOption />
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews and FAQ Tabs */}
+        <div className="mt-12 bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-3xl p-6 md:p-8 shadow-sm">
+          <div className="flex border-b border-slate-200 dark:border-white/10 mb-6">
+            {["Reviews", "FAQ"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`py-3 px-6 text-xs font-extrabold uppercase tracking-wider border-b-2 transition-all ${
+                  activeTab === tab
+                    ? "border-amber-500 text-amber-600 dark:text-amber-400"
+                    : "border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                }`}
+              >
+                {tab === "Reviews" ? `Customer Reviews (${currentShoe.reviews?.length || 0})` : "Footwear FAQs"}
+              </button>
+            ))}
+          </div>
+
+          <div>
+            {activeTab === "Reviews" && (
+              <div className="max-w-3xl mx-auto">
+                <Reviews setRating={setRating} onFinish={onFinishReview} />
+              </div>
+            )}
+            {activeTab === "FAQ" && (
+              <div>
+                <Faqs />
+              </div>
+            )}
+          </div>
+        </div>
+      </Content>
     </div>
   );
 };

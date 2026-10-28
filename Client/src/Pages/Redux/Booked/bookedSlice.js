@@ -8,9 +8,9 @@ export const fetchBooked = createAsyncThunk(
   "book/fetchBooked",
   async (userEmail) => {
     try {
-      // Send userEmail in the API request
+      const apiBase = import.meta.env.VITE_LOCALHOST_KEY || "http://localhost:5000";
       const response = await axios.get(
-        `https://tendsserver.vercel.app/booked?email=${userEmail}`
+        `${apiBase}/booked?email=${userEmail}`
       );
       return response.data;
     } catch (error) {

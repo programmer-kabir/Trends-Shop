@@ -30,12 +30,14 @@ const {user} = useAuth()
   const { isLoading, Users, error } = useSelector((state) => state.Users);
   const { isLoading: isCouponLoading, Coupons, error: isCouponError } = useSelector((state) => state.Coupons);
   useEffect(() => {
-    dispatch(fetchShoes())
+    dispatch(fetchShoes());
     dispatch(fetchUser());
     dispatch(fetchCoupons());
-    dispatch(fetchBooked(user.email));
-  }, [dispatch,user]);
-  const CurrentProduct = Booked.find((data) => data.productId === id); 
+    if (user?.email) {
+      dispatch(fetchBooked(user.email));
+    }
+  }, [dispatch, user]);
+  const CurrentProduct = Booked ? Booked.find((data) => data.productId === id) : null; 
 
   // console.log(CurrentProduct.size);
     // console.log(CurrentProduct);
@@ -45,7 +47,7 @@ const {user} = useAuth()
   const [number, setNumber] = useState(0);
   const [address, setAddress] = useState();
   const [discount, setDiscount] = useState(0);
-  const matchingUsers = Users.filter((userData) => userData.email === user?.email);
+  const matchingUsers = Users ? Users.filter((userData) => userData.email === user?.email) : [];
 
   useEffect(() => {
     if (matchingUsers.length > 0) {

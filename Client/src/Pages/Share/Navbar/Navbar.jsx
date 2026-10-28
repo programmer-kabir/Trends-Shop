@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useContext, useEffect, useState, useMemo } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import {
   FaArrowRightToBracket,
@@ -21,22 +21,30 @@ import useAuth from "../../../Components/Hooks/useAuth";
 import LoadingSpinner from "../../../Components/Design/LoadingSpinner/LoadingSpinner";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUser } from "../../Redux/Users/userSlice";
+import { fetchCategories } from "../../Redux/Categories/categoriesSlice";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import { fetchBooked } from "../../Redux/Booked/bookedSlice";
 import { FavoritesContext } from "../../../Provider/FavoritesContext";
 import { useTheme } from "../../../Provider/ThemeContext";
+import AnnouncementBar from "../../../Components/Home/Announcement/AnnouncementBar";
+
 const Navbar = () => {
   const { user, logOut, loading } = useAuth();
   const [letter, setLetter] = useState("");
   const [nav, setNav] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [navSearch, setNavSearch] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isLoading, Users, error } = useSelector((state) => state.Users);
+  const { Categories = [] } = useSelector((state) => state.Categories || {});
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(fetchUser());
     dispatch(fetchBooked(user?.email));
+    dispatch(fetchCategories());
   }, [dispatch]);
   
   const currentUser =
@@ -74,21 +82,94 @@ const Navbar = () => {
     } 
   }, [user]);
 
-  const MensItems = [
-    { name: "CASUAL", link: "products/MAN'S-CASUAL" },
-    { name: "FORMAL", link: "products/MAN'S-FORMAL" },
-    { name: "SPORTS", link: "products/MAN'S-SPORT" },
-  ];
-  const WomensItems = [
-    { name: "CASUAL", link: "products/WOMEN'S-CASUAL" },
-    { name: "FORMAL", link: "products/WOMEN'S-FORMAL" },
-    { name: "SPORTS", link: "products/WOMEN'S-SPORT" },
-  ];
-  const KidsItems = [
-    { name: "FORMAL", link: "products/KID'S-FORMAL" },
-    { name: "CASUAL", link: "products/KID'S-CASUAL" },
-    { name: "SPORTS", link: "products/KID'S-SPORT" },
-  ];
+  const handleNavSearch = (e) => {
+    e.preventDefault();
+    if (navSearch.trim()) {
+      navigate(`/products/ALL?search=${encodeURIComponent(navSearch.trim())}`);
+      setNavSearch("");
+    }
+  };
+
+  const getSafeSubName = (sub) =>
+    typeof sub === "object" && sub !== null ? sub.name || sub.title || "" : String(sub || "");
+
+  const MensItems = useMemo(() => {
+    const defaultItems = [
+      { name: "All Men's Footwear", link: "/products/MEN'S" },
+      { name: "Formal Shoes (Oxford & Derby)", link: "/products/MAN'S-FORMAL" },
+      { name: "Casual Loafers & Slip-ons", link: "/products/MAN'S-CASUAL" },
+      { name: "Sports & Athletic Shoes", link: "/products/MAN'S-SPORT" },
+    ];
+    const cat = Categories.find(
+      (c) =>
+        ((c.department || c.gender) === "MEN'S" || c.name.toLowerCase().includes("men")) &&
+        !c.name.toLowerCase().includes("women")
+    );
+    if (!cat || !cat.subcategories || cat.subcategories.length === 0) {
+      return defaultItems;
+    }
+    return [
+      { name: "All Men's Footwear", link: "/products/MEN'S" },
+      ...cat.subcategories.map((sub) => {
+        const subName = getSafeSubName(sub);
+        return {
+          name: subName,
+          link: `/products/${encodeURIComponent(subName.replace(/\s+/g, "-"))}`,
+        };
+      }),
+    ];
+  }, [Categories]);
+
+  const WomensItems = useMemo(() => {
+    const defaultItems = [
+      { name: "All Women's Footwear", link: "/products/WOMEN'S" },
+      { name: "Formal Heels & Pumps", link: "/products/WOMEN'S-FORMAL" },
+      { name: "Casual Loafers & Flats", link: "/products/WOMEN'S-CASUAL" },
+      { name: "Sports & Running Shoes", link: "/products/WOMEN'S-SPORT" },
+    ];
+    const cat = Categories.find(
+      (c) =>
+        (c.department || c.gender) === "WOMEN'S" || c.name.toLowerCase().includes("women")
+    );
+    if (!cat || !cat.subcategories || cat.subcategories.length === 0) {
+      return defaultItems;
+    }
+    return [
+      { name: "All Women's Footwear", link: "/products/WOMEN'S" },
+      ...cat.subcategories.map((sub) => {
+        const subName = getSafeSubName(sub);
+        return {
+          name: subName,
+          link: `/products/${encodeURIComponent(subName.replace(/\s+/g, "-"))}`,
+        };
+      }),
+    ];
+  }, [Categories]);
+
+  const KidsItems = useMemo(() => {
+    const defaultItems = [
+      { name: "All Kid's Footwear", link: "/products/KID'S" },
+      { name: "School & Formal Shoes", link: "/products/KID'S-FORMAL" },
+      { name: "Casual Slip-ons & Loafers", link: "/products/KID'S-CASUAL" },
+      { name: "Active Runners & Trainers", link: "/products/KID'S-SPORT" },
+    ];
+    const cat = Categories.find(
+      (c) => (c.department || c.gender) === "KID'S" || c.name.toLowerCase().includes("kid")
+    );
+    if (!cat || !cat.subcategories || cat.subcategories.length === 0) {
+      return defaultItems;
+    }
+    return [
+      { name: "All Kid's Footwear", link: "/products/KID'S" },
+      ...cat.subcategories.map((sub) => {
+        const subName = getSafeSubName(sub);
+        return {
+          name: subName,
+          link: `/products/${encodeURIComponent(subName.replace(/\s+/g, "-"))}`,
+        };
+      }),
+    ];
+  }, [Categories]);
   const handleSignOut = () => {
     logOut();
   };
@@ -103,11 +184,16 @@ const Navbar = () => {
           scrolled ? "shadow-md" : ""
         } text-slate-800 dark:text-slate-100`}
       >
+        {!scrolled && <AnnouncementBar />}
         <Content>
           <div className="mx-auto">
             <div className="py-3 md:py-2 flex justify-between items-center">
               <Link to="/" className="flex items-center gap-2">
-                <img className="h-9 md:h-11 w-auto object-contain dark:brightness-110" src={logo} alt="Trends Shop" />
+                <img
+                  className="h-9 md:h-11 w-auto object-contain dark:invert dark:hue-rotate-180 transition-all duration-300"
+                  src={logo}
+                  alt="Trends Shop"
+                />
               </Link>
 
               <div className="hidden md:flex gap-6 items-center">
@@ -118,14 +204,19 @@ const Navbar = () => {
 
               <div className="flex items-center space-x-4 md:space-x-5">
                 {/* Search */}
-                <div className="w-56 lg:w-64 py-1.5 px-3 hidden md:flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 rounded-full transition-all focus-within:ring-2 focus-within:ring-amber-500">
-                  <FiSearch className="text-slate-400 dark:text-slate-300 text-lg" />
+                <form
+                  onSubmit={handleNavSearch}
+                  className="w-56 lg:w-64 py-1.5 px-3 hidden md:flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 rounded-full transition-all focus-within:ring-2 focus-within:ring-amber-500"
+                >
+                  <FiSearch className="text-slate-400 dark:text-slate-300 text-lg cursor-pointer" onClick={handleNavSearch} />
                   <input
                     type="search"
-                    placeholder="Search premium shoes..."
+                    value={navSearch}
+                    onChange={(e) => setNavSearch(e.target.value)}
+                    placeholder="Search luxury shoes..."
                     className="w-full text-sm outline-none bg-transparent text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
-                </div>
+                </form>
 
                 {/* Dark / Light Mode Toggle Button */}
                 <button
@@ -185,7 +276,7 @@ const Navbar = () => {
                     <div className="flex items-center gap-2 font-semibold">
                       <HiOutlineMenuAlt3
                         size={30}
-                        className="text-black cursor-pointer"
+                        className="text-slate-800 dark:text-slate-100 cursor-pointer"
                       />
                     </div>
                   )}
@@ -193,33 +284,39 @@ const Navbar = () => {
                 <div
                   className={
                     nav
-                      ? "fixed right-0  top-0 w-full overflow-auto  h-full text-center md:hidden bg-white  border-r-gray-900 ease-in-out duration-500"
-                      : "ease-in-out duration-500 w-full h-full top-0 fixed overflow-auto right-[-100%]"
+                      ? "fixed right-0 top-0 w-full overflow-auto h-full text-center md:hidden bg-white dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 ease-in-out duration-500 z-50 shadow-2xl"
+                      : "ease-in-out duration-500 w-full h-full top-0 fixed overflow-auto right-[-100%] z-50"
                   }
                 >
                   <div className="px-5 text-left pb-16">
-                    <div className="flex items-center justify-between py-3 ">
-                      <Link to="/" className="">
-                        <img className="w-1/3" src={logo} alt="" />
-                        {/* <h2 className="text-2xl text-black font-semibold ">MernShop</h2> */}
-                      </Link>
-                      <button onClick={handleNav}>
-                        <RxCross2
-                          size={40}
-                          className="primaryColor cursor-pointer hover:text-white border p-2 transition-background transition-text  duration-300 ease-in-out  hover:bg-[#F62977] rounded-full "
+                    <div className="flex items-center justify-between py-4 border-b border-slate-100 dark:border-white/10">
+                      <Link to="/" onClick={handleNav}>
+                        <img
+                          className="h-9 w-auto object-contain dark:invert dark:hue-rotate-180"
+                          src={logo}
+                          alt="Trends Shop"
                         />
+                      </Link>
+                      <button
+                        onClick={handleNav}
+                        className="p-2 rounded-full border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:text-white hover:bg-amber-500 transition-colors"
+                      >
+                        <RxCross2 size={24} />
                       </button>
                     </div>
-                    <div className="flex flex-col justify-center items-start pt-10 font-medium space-y-3 ">
-                      <MobileDropDown name="Mens's" items={MensItems} />
-                      <MobileDropDown name="Womens's" items={WomensItems} />
+
+                    <div className="flex flex-col justify-center items-start pt-6 font-medium space-y-3">
+                      <MobileDropDown name="Men's" items={MensItems} />
+                      <MobileDropDown name="Women's" items={WomensItems} />
                       <MobileDropDown name="Kid's" items={KidsItems} />
                     </div>
-                    <button className="bg-[#F50963] mt-8 flex gap-2 items-center px-5 py-3">
-                      <p className=" font-medium">Getting Started </p>
-                      <MdArrowForwardIos size={20} />
-                    </button>
-                    {/*  */}
+
+                    <Link to="/products/MAN'S-FORMAL" onClick={handleNav}>
+                      <button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl mt-8 flex justify-center gap-2 items-center px-5 py-3 shadow-lg shadow-amber-500/25 transition-all">
+                        <span>Explore Collection</span>
+                        <MdArrowForwardIos size={16} />
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -227,55 +324,51 @@ const Navbar = () => {
 
             <div className="flex justify-end">
               {isSidebarOpen && (
-                <div className="fixed top-0 bottom-0 flex justify-end left-0 right-0 bg-black bg-opacity-50 z-50 transition-opacity ease-in-out duration-500">
+                <div 
+                  className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity flex justify-end"
+                  onClick={toggleSidebar}
+                >
                   <div
-                    className={`w-[360px]   bg-white h-full  transform transition-transform duration-500 ease-in-out ${
-                      isSidebarOpen
-                        ? "translate-x-0 overflow-auto bg-white transition-all duration-700 ease-in-out"
-                        : "translate-x-full transition-all bg-white 0.3s ease-in-out"
-                    }`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full max-w-[380px] bg-white dark:bg-[#111827] text-slate-800 dark:text-slate-100 h-full shadow-2xl p-6 flex flex-col justify-between transform transition-transform duration-300 border-l border-slate-200 dark:border-white/10"
                   >
-                    <div className="flex justify-between p-5">
-                      <h2 className="text-base font-medium">SHOPPING CART</h2>
-                      <button
-                        className="flex items-center gap-2 hover:text-blue-500"
+                    <div>
+                      <div className="flex justify-between items-center pb-4 border-b border-slate-200 dark:border-white/10">
+                        <h2 className="text-base font-extrabold tracking-wide uppercase">Shopping Bag</h2>
+                        <button
+                          className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+                          onClick={toggleSidebar}
+                        >
+                          <RxCross2 size={20} />
+                        </button>
+                      </div>
+
+                      <div className="py-12 flex flex-col items-center justify-center text-center">
+                        <div className="w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 mb-4">
+                          <FiShoppingCart size={32} />
+                        </div>
+                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">Your Cart is Empty</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[220px]">
+                          Discover our handcrafted collection of luxury leather footwear.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-white/10">
+                      <Link
+                        to="/products/ALL"
                         onClick={toggleSidebar}
+                        className="w-full block py-3 text-center text-xs font-bold uppercase tracking-wider rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg shadow-amber-500/25 transition-all"
                       >
-                        <span className="text-base">close</span>
-                        <FaArrowRightToBracket size={20} />
+                        Explore Footwear Shop
+                      </Link>
+                      <button
+                        onClick={toggleSidebar}
+                        className="w-full py-2.5 text-xs font-bold text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors"
+                      >
+                        Continue Browsing
                       </button>
                     </div>
-                    <div className="mt-32 border-b-2 pb-7 flex px-10 items-center flex-col justify-center ">
-                      <img
-                        className="p-2"
-                        src="https://i.ibb.co/8XZwct2/empty-cart.png"
-                        alt=""
-                      />
-                      <p className="py-5 font-medium ">Your Cart is empty</p>
-                      <button className="primaryButton w-[140px]">
-                        Go To Shop
-                      </button>
-                    </div>
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Qui, alias! Nobis provident sunt quod architecto tenetur
-                    praesentium, doloremque quos neque quaerat repellendus id
-                    accusamus pariatur ratione magnam accusantium ipsam animi?
-                    Voluptatum neque sapiente officiis dolor tempore et, magnam
-                    vel quia! Quos fugiat neque fuga quaerat vitae ducimus sunt
-                    est impedit reprehenderit, a quae aut accusamus maxime
-                    magnam suscipit veritatis, odit odio accusantium laboriosam
-                    quisquam voluptates. Eos odit accusantium saepe cumque unde
-                    excepturi nulla provident labore quia, pariatur impedit,
-                    numquam ab veniam debitis perferendis corrupti! Quis minima,
-                    quas eaque quibusdam perferendis dolorem non adipisci
-                    molestiae corrupti a earum, doloremque, aperiam culpa
-                    provident hic. Illum officia deserunt non ea corporis
-                    temporibus dolore repellat aliquid nesciunt dignissimos?
-                    Quas nisi pariatur necessitatibus sunt sit vitae dicta at
-                    quaerat impedit officia illum nam et, dolores qui commodi
-                    ipsam, sequi, minima eius totam veritatis soluta! Libero
-                    placeat blanditiis porro cumque animi tempora soluta sunt,
-                    minus eum?
                   </div>
                 </div>
               )}

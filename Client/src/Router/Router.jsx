@@ -19,6 +19,7 @@ import ShowProduct from "../Pages/Dashboard/Admin/ShowProduct";
 import AdminRoute from "./AdminRoute";
 import Wishlist from "../Pages/Wishlist/Wishlist";
 import EditProduct from "../Pages/Dashboard/Admin/EditProduct";
+import ManageCategories from "../Pages/Dashboard/Admin/ManageCategories";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/products",
+        element: <Products />,
       },
       {
         path: "/products/:Name",
@@ -91,6 +96,10 @@ const router = createBrowserRouter([
       {
         path: "coupon",
         element: <AddCoupon />,
+      },
+      {
+        path: "categories",
+        element: <ManageCategories />,
       },
       {
         path: "manage_users",

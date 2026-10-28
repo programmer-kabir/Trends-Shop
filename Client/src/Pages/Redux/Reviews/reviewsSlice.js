@@ -4,9 +4,8 @@ export const fetchReviews = createAsyncThunk(
   "reviews/fetchReviews",
   async () => {
     try {
-      const response = await axios.get(
-        "https://tendsserver.vercel.app/reviews"
-      );
+      const apiBase = import.meta.env.VITE_LOCALHOST_KEY || "http://localhost:5000";
+      const response = await axios.get(`${apiBase}/reviews`);
       return response.data;
     } catch (error) {
       throw error;

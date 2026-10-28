@@ -4,8 +4,9 @@ export const fetchRequestPayment = createAsyncThunk(
   "requestPayments/fetchRequestPayment",
   async () => {
     try {
+      const apiBase = import.meta.env.VITE_LOCALHOST_KEY || "http://localhost:5000";
       const response = await axios.get(
-        "https://tendsserver.vercel.app/requestPayment"
+        `${apiBase}/requestPayment`
       );
       return response.data;
     } catch (error) {

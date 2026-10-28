@@ -39,8 +39,9 @@ const SubscribeInput = () => {
           top: 0, 
           right: 0, 
           height: '100%', 
-          background: 'red', // Change button color to red
-          border: 'none' // Remove button border if needed
+          background: '#f59e0b', // Amber-500 brand color
+          color: '#0f172a',
+          border: 'none'
         }}
       />
     </div>

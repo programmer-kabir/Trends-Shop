@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { FiArrowUpRight } from "react-icons/fi";
+import { useSelector } from "react-redux";
 import Content from "../../Content/Content";
 
-const categories = [
+const defaultCategories = [
   {
     title: "Men's Formal Shoes",
     subtitle: "Oxfords, Derbies & Monk Straps",
@@ -23,7 +24,7 @@ const categories = [
   {
     title: "Women's Collection",
     subtitle: "Elegance, Comfort & Artisanal Finish",
-    link: "/products/WOMEN'S-FORMAL",
+    link: "/products/WOMEN'S",
     image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=800&auto=format&fit=crop",
     badge: "New Season",
     colSpan: "lg:col-span-4",
@@ -39,7 +40,7 @@ const categories = [
   {
     title: "Kid's Heritage Footwear",
     subtitle: "Durable & Flexible Growing Comfort",
-    link: "/products/KID'S-FORMAL",
+    link: "/products/KID'S",
     image: "https://images.unsplash.com/photo-1514989940723-e8e51635b782?q=80&w=800&auto=format&fit=crop",
     badge: "Junior Line",
     colSpan: "lg:col-span-4",
@@ -47,6 +48,46 @@ const categories = [
 ];
 
 const FeaturedCategories = () => {
+  const { Categories = [] } = useSelector((state) => state.Categories || {});
+
+  const categories = useMemo(() => {
+    if (!Categories || Categories.length === 0) return defaultCategories;
+    return Categories.map((cat, idx) => {
+      const colSpan =
+        Categories.length <= 2
+          ? "lg:col-span-6"
+          : idx < 2
+          ? "lg:col-span-6"
+          : "lg:col-span-4";
+
+      const firstSubRaw = (cat.subcategories || [])[0];
+      const firstSub =
+        typeof firstSubRaw === "object" && firstSubRaw !== null
+          ? firstSubRaw.name || firstSubRaw.title || ""
+          : String(firstSubRaw || "");
+
+      const link = firstSub
+        ? `/products/${encodeURIComponent(firstSub.replace(/\s+/g, "-"))}`
+        : `/products/${encodeURIComponent(cat.department || cat.gender || "ALL")}`;
+
+      const subListStr = (cat.subcategories || [])
+        .map((s) => (typeof s === "object" && s !== null ? s.name || "" : String(s || "")))
+        .filter(Boolean)
+        .slice(0, 3)
+        .join(" • ");
+
+      return {
+        title: cat.name,
+        subtitle: cat.description || subListStr || "Artisanal Footwear",
+        link,
+        image:
+          cat.image ||
+          "https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=800&auto=format&fit=crop",
+        badge: cat.department || cat.gender || "Collection",
+        colSpan,
+      };
+    });
+  }, [Categories]);
   return (
     <section className="py-12 bg-slate-50 dark:bg-[#0B0F19] transition-colors">
       <Content>

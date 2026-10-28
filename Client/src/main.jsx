@@ -5,6 +5,7 @@ import { RouterProvider } from "react-router-dom";
 import router from "./Router/Router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import store from "./Pages/Redux/store";
+import { fetchCategories } from "./Pages/Redux/Categories/categoriesSlice";
 import { Provider } from "react-redux";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "./Provider/AuthProvider";
@@ -13,6 +14,9 @@ import FavoritesProvider from "./Provider/FavoritesContext";
 import ThemeProvider from "./Provider/ThemeContext";
 
 const queryClient = new QueryClient();
+
+// Immediately fetch categories from database on initial load
+store.dispatch(fetchCategories());
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

@@ -5,15 +5,17 @@ import couponSlice from "./Coupons/couponsSlice";
 import bookedSlice from "./Booked/bookedSlice";
 import requestPaymentSlice from "./RequestPayment/requestPaymentSlice";
 import reviewsSlice from "./Reviews/reviewsSlice";
+import categoriesSlice from "./Categories/categoriesSlice";
 
 const store = configureStore({
   reducer: {
     Shoes: shoesSlice,
     Users: userSlice,
     Coupons: couponSlice,
-    Booked:bookedSlice,
-    RequestPayment:requestPaymentSlice,
-    Reviews:reviewsSlice
+    Booked: bookedSlice,
+    RequestPayment: requestPaymentSlice,
+    Reviews: reviewsSlice,
+    Categories: categoriesSlice,
   },
 });
 export default store;

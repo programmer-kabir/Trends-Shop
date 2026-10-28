@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchShoes } from "../../Redux/Shoes/shoesSlice";
+import { fetchCategories } from "../../Redux/Categories/categoriesSlice";
 import { useForm } from "react-hook-form";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import axios from "axios";
@@ -10,9 +11,11 @@ const EditProduct = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { isLoading, Shoes } = useSelector((state) => state.Shoes);
+  const { Categories = [] } = useSelector((state) => state.Categories || {});
 
   useEffect(() => {
     dispatch(fetchShoes());
+    dispatch(fetchCategories());
   }, [dispatch]);
 
   const currentItems = Shoes.find((shoe) => shoe._id === id);
@@ -60,8 +63,8 @@ const EditProduct = () => {
     setIsCategoryOpen(false);
   };
 
-  // Category Options
-  const categories = [
+  // Category Options from Database
+  const defaultCategories = [
     { id: 1, label: "MAN'S CASUAL" },
     { id: 2, label: "MAN'S FORMAL" },
     { id: 3, label: "MAN'S SPORT" },
@@ -72,6 +75,23 @@ const EditProduct = () => {
     { id: 8, label: "KID'S FORMAL" },
     { id: 9, label: "KID'S SPORT" },
   ];
+
+  const categories = React.useMemo(() => {
+    if (!Categories || Categories.length === 0) return defaultCategories;
+    const list = [];
+    Categories.forEach((cat, cIdx) => {
+      (cat.subcategories || []).forEach((sub, sIdx) => {
+        const subName =
+          typeof sub === "object" && sub !== null
+            ? sub.name || sub.title || ""
+            : String(sub || "");
+        if (subName) {
+          list.push({ id: `${cIdx}-${sIdx}`, label: subName });
+        }
+      });
+    });
+    return list.length > 0 ? list : defaultCategories;
+  }, [Categories]);
 
   // State for Size Dropdown
   const [isSizeOpen, setIsSizeOpen] = useState(false);

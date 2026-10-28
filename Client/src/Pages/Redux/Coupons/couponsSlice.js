@@ -4,9 +4,8 @@ export const fetchCoupons = createAsyncThunk(
   "coupons/fetchCoupons",
   async () => {
     try {
-      const response = await axios.get(
-        "https://tendsserver.vercel.app/couponCode"
-      );
+      const apiBase = import.meta.env.VITE_LOCALHOST_KEY || "http://localhost:5000";
+      const response = await axios.get(`${apiBase}/couponCode`);
       return response.data;
     } catch (error) {
       throw error;

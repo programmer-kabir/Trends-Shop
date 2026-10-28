@@ -1,493 +1,450 @@
 import React, { useEffect, useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiTag, FiCopy, FiTrash2, FiPlus, FiCalendar, FiPercent } from "react-icons/fi";
+import { RxCross2 } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCoupons } from "../../Redux/Coupons/couponsSlice";
-import { MdDeleteForever, MdEdit } from "react-icons/md";
-import { RxCross2 } from "react-icons/rx";
 import toast from "react-hot-toast";
-import { VscCloudUpload } from "react-icons/vsc";
 import { useForm } from "react-hook-form";
-import PropagateLoader from "react-spinners/PropagateLoader";
 import axios from "axios";
 import Swal from "sweetalert2";
 
 const AddCoupon = () => {
-  const { isLoading, Coupons, error } = useSelector((state) => state.Coupons);
   const dispatch = useDispatch();
+  const { Coupons = [], isLoading } = useSelector((state) => state.Coupons || {});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
     dispatch(fetchCoupons());
-  }, [Coupons]);
+  }, [dispatch]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false); // Tracks if modal should be open
-  const [modalContentVisible, setModalContentVisible] = useState(false); // Controls the content visibility for smooth animation
-
-  const openModal = () => {
-    setModalContentVisible(true);
-    setTimeout(() => {
-      setIsModalOpen(true);
-    }, 10); // Slight delay for smooth opening animation
-  };
-
+  const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
-    setTimeout(() => {
-      setModalContentVisible(false);
-    }, 300); // Matches the transition duration for smooth closing
-  };
-  // Image
-  const url =
-    "https://api.imgbb.com/1/upload?key=f1e08dc7c44c396aa409d50dfcc797da";
-  const [file, setFile] = useState(null);
-  const [errors, setError] = useState("");
-  const [imageLoading, setImageLoading] = useState(false);
-  const handleFileChange = (event) => {
-    const image = event.target.files[0];
-    if (!image) return;
-
-    const formData = new FormData();
-    formData.append("image", image);
-    setImageLoading(true);
-
-    fetch(url, {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((image) => {
-        const photo = image?.data?.display_url;
-        setFile(photo);
-        setError("");
-        setImageLoading(false);
-      })
-      .catch((error) => {
-        setError("Error uploading the image. Please try again.");
-        toast.error(error);
-
-        setImageLoading(false); // Corrected from setLoading to setImageLoading
-      });
+    reset();
+    setImageUrl("");
   };
 
-  const handleRemoveImage = () => {
-    setFile(null);
-    setError("");
-
-    toast.success("image Remove SuccessFul");
+  const copyCode = (code) => {
+    navigator.clipboard.writeText(code);
+    toast.success(`Coupon code "${code}" copied!`, { duration: 1500 });
   };
 
-  //
   const {
     handleSubmit,
     register,
-    setValue,
+    reset,
     formState: { errors: formError },
   } = useForm();
-  const onSubmit = (data) => {
-    console.log(data);
-    const { name, amount, start, end, code } = data;
-    const endDate = new Date(end).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-    const startDate = new Date(start).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-    const numericAmount = Number(amount);
-    const mainData = {
-      name,
-      amount: numericAmount,
-      star: startDate,
-      end: endDate,
-      code,
-      image: file,
-    };
-    axios
-      .post(`${import.meta.env.VITE_LOCALHOST_KEY}/couponCode`, mainData)
-      .then((data) => {
-        if (data.data.insertedId) {
-          toast.success("Your Coupon is Post");
-          closeModal();
-        }
-      })
-      .catch((error) => {
-        // Axios throws error for 4xx and 5xx status codes
-        console.log(error);
-        if (error.response && error.status === 400) {
-          toast.error("Your Coupon already exists");
-        } else {
-          toast.error("An unexpected error occurred");
-        }
+
+  const onSubmit = async (data) => {
+    try {
+      const { name, amount, start, end, code } = data;
+      const endDate = new Date(end).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
       });
+      const startDate = new Date(start).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+
+      const mainData = {
+        name,
+        amount: Number(amount),
+        star: startDate,
+        end: endDate,
+        code: code.trim().toUpperCase(),
+        image:
+          imageUrl ||
+          "https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?q=80&w=600&auto=format&fit=crop",
+      };
+
+      const res = await axios.post(
+        `${import.meta.env.VITE_LOCALHOST_KEY}/couponCode`,
+        mainData
+      );
+
+      if (res?.data?.insertedId) {
+        toast.success(`Coupon code "${mainData.code}" created successfully!`);
+        closeModal();
+        dispatch(fetchCoupons());
+      }
+    } catch (error) {
+      if (error?.response?.status === 400) {
+        toast.error("This coupon code already exists!");
+      } else {
+        toast.error("An unexpected error occurred while saving the coupon.");
+      }
+    }
   };
 
-  //
   const getCouponStatus = (coupon) => {
     const currentDate = new Date();
-    const startDate = new Date(coupon.star); // Start date of the coupon
-    const endDate = new Date(coupon.end); // End date of the coupon
+    const startDate = new Date(coupon.star);
+    const endDate = new Date(coupon.end);
 
-    // Calculate the difference in days
-    const oneDay = 24 * 60 * 60 * 1000; // Hours * minutes * seconds * milliseconds
+    const oneDay = 24 * 60 * 60 * 1000;
     const daysRemaining = Math.round((endDate - currentDate) / oneDay);
 
-    // Check the status based on the current date
     if (currentDate >= startDate && currentDate <= endDate) {
-      return { status: "Active", availableDays: daysRemaining }; // Active with available days
+      return { status: "Active", availableDays: Math.max(0, daysRemaining) };
     } else if (currentDate > endDate) {
-      return { status: "Expired", availableDays: 0 }; // Expired with no days left
+      return { status: "Expired", availableDays: 0 };
     }
     return {
-      status: "Not Active",
+      status: "Upcoming",
       availableDays: Math.round((startDate - currentDate) / oneDay),
-    }; // Coupon hasn't started yet
+    };
   };
-  const handleDelete = (id) => {
+
+  const handleDelete = (coupon) => {
     Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: "Delete Coupon?",
+      text: `Are you sure you want to delete promo code "${coupon.code}"?`,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
+      confirmButtonColor: "#f59e0b",
+      cancelButtonColor: "#ef4444",
+      confirmButtonText: "Yes, delete",
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        axios
-          .delete(`${import.meta.env.VITE_LOCALHOST_KEY}/couponCode/${id}`)
-          .then((data) => {
-            console.log(data.data);
-          });
-        Swal.fire({
-          title: "Deleted!",
-          text: "Your Code has been deleted.",
-          icon: "success",
-        });
+        try {
+          await axios.delete(
+            `${import.meta.env.VITE_LOCALHOST_KEY}/couponCode/${coupon._id}`
+          );
+          toast.success("Coupon code deleted.");
+          dispatch(fetchCoupons());
+        } catch (error) {
+          toast.error("Failed to delete coupon.");
+        }
       }
     });
   };
+
+  const filteredCoupons = (Coupons || []).filter((c) => {
+    const q = searchTerm.toLowerCase();
+    return (
+      c?.name?.toLowerCase().includes(q) ||
+      c?.code?.toLowerCase().includes(q)
+    );
+  });
+
   return (
-    <div>
-      <section
-        className="mx-5 px-5 py-7 my-2 bg-white"
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset",
-        }}
-      >
-        <div className="flex items-center justify-between pt-5">
-          <div className="w-64 py-2 hidden md:flex items-center gap-3 bg-gray-200 rounded-md">
-            <div className="pl-4">
-              <FiSearch className="primaryColor" size={23} />
-            </div>
-            <input
-              type="search"
-              placeholder="Search"
-              className="outline-none primaryColor bg-transparent"
-            />
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-slate-800">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+              <FiTag className="w-3.5 h-3.5" />
+              Campaign Management
+            </span>
+            <span className="text-xs text-slate-400">
+              {Coupons?.length || 0} Promotional Codes Active
+            </span>
           </div>
-          <div>
-            <button
-              onClick={openModal}
-              className="bg-[#f50963] px-5 py-2 rounded-md text-white font-semibold"
-            >
-              Add Coupon
-            </button>
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Promotional Coupons & Vouchers
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            Configure seasonal percentage discounts, validity windows, and special checkout voucher codes.
+          </p>
         </div>
 
-        {/* Coupons Table */}
-        <div className="pt-10 overflow-hidden">
-          <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
-            <thead className="text-left">
-              <tr>
-                <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
-                  Name
-                </th>
-                <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
-                  Code
-                </th>
-                <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
-                  Amount
-                </th>
-                <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
-                  Status
-                </th>
-                <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
-                  Start
-                </th>
-                <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
-                  End
-                </th>
-                <th className="whitespace-nowrap px-4 py-2 text-[#a5a5a5] font-bold">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {Coupons?.map((coupon) => {
-                const { status, availableDays } = getCouponStatus(coupon);
+        <button
+          onClick={openModal}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 shadow-md shadow-amber-600/20 transition self-start md:self-auto"
+        >
+          <FiPlus className="w-4 h-4" />
+          <span>Create New Coupon</span>
+        </button>
+      </div>
 
-                return (
-                  <tr key={coupon?._id}>
-                    <td className="whitespace-nowrap flex items-center gap-2 px-4 py-2 text-gray-700 font-bold">
-                      <img
-                        className="w-[60px] h-[60px] rounded-md"
-                        src={coupon.image}
-                        alt={coupon.name}
-                      />
-                      {coupon?.name}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                      <button className="bg-gray-200 px-2 py-1 rounded-md">
-                        {coupon?.code}
-                      </button>
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                      {coupon?.amount}%
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                      {/* Display status and available days */}
-                      <button
-                        className={`px-2 py-1 rounded-md text-sm font-semibold ${
-                          status === "Active"
-                            ? "bg-[#50cd901a] text-[#50cd89]"
-                            : "bg-[#f1cd901a] text-[#f1416c]"
-                        }`}
-                      >
-                        {status} ({availableDays} days left)
-                      </button>
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                      {coupon?.star}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                      {coupon?.end}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2">
-                      <div className="flex gap-2">
-                        <span
-                          onClick={() => handleDelete(coupon._id)}
-                          className="border rounded-md border-[#50cd89] px-3 py-2"
-                        >
-                          <MdDeleteForever size={20} />
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      {/* Search Input */}
+      <div className="bg-white dark:bg-[#111622] p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+        <div className="relative w-full max-w-md">
+          <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+          <input
+            type="text"
+            className="w-full pl-10 pr-4 py-2 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+            placeholder="Search coupon name or promo code..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-      </section>
+      </div>
 
-      {/* Modal with Transition */}
-      {modalContentVisible && (
-        <>
-          {/* Overlay */}
-          <div
-            className={`fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ${
-              isModalOpen ? "opacity-100" : "opacity-0"
-            }`}
-            onClick={closeModal}
-          ></div>
-
-          {/* Modal Content */}
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className={`fixed top-0 right-0 h-full w-[30%] bg-white shadow-lg z-50 transition-transform duration-300 flex flex-col ${
-              isModalOpen ? "translate-x-0" : "translate-x-full"
-            }`}
-          >
-            {/* Modal Header */}
-            <div
-              style={{
-                boxShadow:
-                  "rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px",
-              }}
-              className="flex-shrink-0 w-full flex items-center py-2 gap-3 px-5 bg-white z-50"
-            >
-              <button onClick={closeModal}>
-                <RxCross2 size={20} />
-              </button>
-              <h2 className="text-xl font-semibold">Enter Coupon Details</h2>
-            </div>
-
-            {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="space-y-4">
-                {/* Image Upload */}
-                <div>
-                  <p className="mb-2">Upload Image</p>
-                  <div className="flex justify-center items-center bg-gray-100">
-                    <div className="bg-white rounded-lg w-full max-w-lg">
-                      <label className="flex flex-col items-center cursor-pointer">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          {...register("image", { required: true })}
-                          onChange={handleFileChange}
-                        />
-                        {/* <div className="flex flex-col items-center justify-center w-full border-2 border-dashed border-[#dd0d5d] rounded-lg p-6 hover:border-[#f50963] transition">
-                          {file ? (
-                            <div className="relative flex flex-col items-center justify-center">
-                              <div className="border p-2 rounded-md">
-                                <img
-                                  src={file}
-                                  alt="Preview"
-                                  className="w-28 flex object-contain rounded-md"
-                                />
-                              </div>
-                              <button
-                                onClick={handleRemoveImage}
-                                className="bg-white"
-                              >
-                                <RxCross2
-                                  className="absolute -top-2 right-12 border border-red-500 rounded-full"
-                                  color="red"
-                                />
-                              </button>
-                              <p className="text-[12px] text-stone-700 pt-2">
-                                (Only png* jpg* jpeg* webp/ will be accepted)
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="text-center flex flex-col items-center justify-center text-gray-500">
-                              <VscCloudUpload size={35} />{" "}
-                              <span>Select a file or drag here</span>
-                              <p className="text-[12px] text-stone-700">
-                                (Only png* jpg* jpeg* webp/ will be accepted)
-                              </p>
-                            </div>
-                          )}
-                        </div> */}
-                        <div className="flex flex-col items-center justify-center w-full border-2 border-dashed border-[#dd0d5d] rounded-lg p-6 hover:border-[#f50963] transition">
-                          {imageLoading ? (
-                            // Show loading spinner or message
-                            <div className="text-center flex flex-col items-center justify-center text-gray-500">
-                              <PropagateLoader />
-                            </div>
-                          ) : file ? (
-                            // Show the image preview once it's uploaded
-                            <div className="relative flex flex-col items-center justify-center">
-                              <div className="border p-2 rounded-md">
-                                <img
-                                  src={file}
-                                  alt="Preview"
-                                  className="w-28 h-20 flex object-contain rounded-md"
-                                />
-                              </div>
-                              <button
-                                onClick={handleRemoveImage}
-                                className="bg-white"
-                              >
-                                <RxCross2
-                                  className="absolute -top-2 right-12 border border-red-500 rounded-full"
-                                  color="red"
-                                />
-                              </button>
-                              <p className="text-[12px] text-stone-700 pt-2">
-                                (Only png* jpg* jpeg* webp/ will be accepted)
-                              </p>
-                            </div>
-                          ) : (
-                            // Default file selection prompt
-                            <div className="text-center flex flex-col items-center justify-center text-gray-500">
-                              <VscCloudUpload size={35} />
-                              <span>Select a file or drag here</span>
-                              <p className="text-[12px] text-stone-700">
-                                (Only png* jpg* jpeg* webp/ will be accepted)
-                              </p>
-                            </div>
-                          )}
+      {/* Coupons Table */}
+      <div className="bg-white dark:bg-[#111622] rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+        {filteredCoupons.length === 0 ? (
+          <div className="py-16 text-center">
+            <FiTag className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+            <h4 className="text-base font-semibold text-slate-800 dark:text-slate-200">
+              No matching coupons found
+            </h4>
+            <p className="text-xs text-slate-400 mt-1">
+              Click "Create New Coupon" to publish a seasonal discount code.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead className="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px] font-semibold border-b border-slate-200/80 dark:border-slate-800">
+                <tr>
+                  <th className="py-3 px-4">Campaign Title</th>
+                  <th className="py-3 px-4">Promo Code</th>
+                  <th className="py-3 px-4">Discount</th>
+                  <th className="py-3 px-4">Campaign Status</th>
+                  <th className="py-3 px-4">Valid Duration</th>
+                  <th className="py-3 px-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-200">
+                {filteredCoupons.map((coupon) => {
+                  const { status, availableDays } = getCouponStatus(coupon);
+                  return (
+                    <tr
+                      key={coupon?._id}
+                      className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                    >
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-3">
+                          <img
+                            className="w-11 h-11 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shadow-sm shrink-0"
+                            src={coupon.image}
+                            alt={coupon.name}
+                          />
+                          <div>
+                            <p className="font-bold text-slate-900 dark:text-white">
+                              {coupon?.name}
+                            </p>
+                            <span className="text-[10px] text-slate-400">
+                              Campaign ID: {coupon?._id?.slice(-6)}
+                            </span>
+                          </div>
                         </div>
-                      </label>
-                    </div>
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        <button
+                          onClick={() => copyCode(coupon?.code)}
+                          className="font-mono font-bold text-xs bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 px-2.5 py-1 rounded-lg hover:bg-amber-100 transition inline-flex items-center gap-1.5"
+                          title="Click to copy code"
+                        >
+                          <FiCopy className="w-3 h-3 text-amber-600" />
+                          <span>{coupon?.code}</span>
+                        </button>
+                      </td>
+
+                      <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white text-sm">
+                        <span className="inline-flex items-center gap-0.5 text-amber-600 dark:text-amber-400">
+                          {coupon?.amount}% OFF
+                        </span>
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
+                            status === "Active"
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
+                              : "bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300"
+                          }`}
+                        >
+                          {status} ({availableDays}d remaining)
+                        </span>
+                      </td>
+
+                      <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400">
+                        <div className="flex items-center gap-1">
+                          <FiCalendar className="w-3 h-3 text-slate-400" />
+                          <span>{coupon?.star} – {coupon?.end}</span>
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 px-4 text-right">
+                        <button
+                          onClick={() => handleDelete(coupon)}
+                          className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
+                          title="Delete coupon"
+                        >
+                          <FiTrash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Slide-over Drawer Modal */}
+      {isModalOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity"
+            onClick={closeModal}
+          />
+          <div className="fixed inset-y-0 right-0 max-w-full flex z-50">
+            <div className="w-screen max-w-md bg-white dark:bg-[#111622] text-slate-800 dark:text-slate-100 shadow-2xl flex flex-col justify-between">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    Publish New Coupon
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Add promo code & discount percentages for checkout.
+                  </p>
+                </div>
+                <button
+                  onClick={closeModal}
+                  className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                >
+                  <RxCross2 size={20} />
+                </button>
+              </div>
+
+              {/* Form Body */}
+              <form
+                id="coupon-form"
+                onSubmit={handleSubmit(onSubmit)}
+                className="flex-1 overflow-y-auto p-6 space-y-4"
+              >
+                {/* Campaign Name */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Campaign Name *
+                  </label>
+                  <input
+                    type="text"
+                    {...register("name", { required: "Name is required" })}
+                    placeholder="e.g. Winter Luxury Gala 15% Off"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                  />
+                  {formError.name && (
+                    <span className="text-rose-500 text-[11px] mt-0.5 block">
+                      {formError.name.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Promo Code */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Voucher Code *
+                  </label>
+                  <input
+                    type="text"
+                    {...register("code", { required: "Code is required" })}
+                    placeholder="e.g. LUXURY15"
+                    className="w-full font-mono uppercase px-3.5 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                  />
+                  {formError.code && (
+                    <span className="text-rose-500 text-[11px] mt-0.5 block">
+                      {formError.code.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Discount Amount */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Discount Percentage (%) *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="1"
+                      max="90"
+                      {...register("amount", { required: "Discount is required" })}
+                      placeholder="e.g. 15"
+                      className="w-full pl-3.5 pr-8 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                    />
+                    <FiPercent className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
+                  </div>
+                  {formError.amount && (
+                    <span className="text-rose-500 text-[11px] mt-0.5 block">
+                      {formError.amount.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Dates */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Start Date *
+                    </label>
+                    <input
+                      type="date"
+                      {...register("start", { required: true })}
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      End Date *
+                    </label>
+                    <input
+                      type="date"
+                      {...register("end", { required: true })}
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                    />
                   </div>
                 </div>
-                {/* Name */}
+
+                {/* Banner / Graphic Image URL */}
                 <div>
-                  <label className="block text-xs text-gray-700">Name</label>
-                  <input
-                    type="text"
-                    {...register("name", { required: true })}
-                    placeholder="name"
-                    className="mt-1 px-3 py-2 w-full text-gray-700 font-normal rounded-md border border-gray-500 focus:border-[#f50963] focus:outline-none"
-                  />
-                </div>
-                {/* Code */}
-                <div>
-                  <label className="block text-xs text-gray-700">Code</label>
-                  <input
-                    type="text"
-                    {...register("code", { required: true })}
-                    placeholder="code"
-                    className="mt-1 px-3 py-2 w-full text-gray-700 font-normal rounded-md border border-gray-500 focus:border-[#f50963] focus:outline-none"
-                  />
-                </div>
-                {/* Amount */}
-                <div>
-                  <label className="block text-xs text-gray-700">Amount</label>
-                  <input
-                    type="number"
-                    {...register("amount", { required: true })}
-                    placeholder="amount"
-                    className="mt-1 px-3 py-2 w-full text-gray-700 font-normal rounded-md border border-gray-500 focus:border-[#f50963] focus:outline-none"
-                  />
-                </div>
-                {/* Start Date */}
-                <div>
-                  <label className="block text-xs text-gray-700">
-                    Start Date
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Banner Graphic Image URL (Optional)
                   </label>
                   <input
-                    type="date"
-                    {...register("start", { required: true })}
-                    placeholder="startDate"
-                    className="mt-1 px-3 py-2 w-full text-gray-700 font-normal rounded-md border border-gray-500 focus:border-[#f50963] focus:outline-none"
+                    type="url"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="https://images.unsplash.com/photo-..."
+                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
                   />
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Paste a shoe image or luxury banner URL. A curated photo is used if blank.
+                  </p>
+                  {imageUrl && (
+                    <div className="mt-2 w-20 h-20 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+                      <img
+                        src={imageUrl}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                 </div>
-                {/* End Date */}
-                <div>
-                  <label className="block text-xs text-gray-700">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    {...register("end", { required: true })}
-                    placeholder="endDate"
-                    className="mt-1 px-3 py-2 w-full text-gray-700 font-normal rounded-md border border-gray-500 focus:border-[#f50963] focus:outline-none"
-                  />
-                </div>
+              </form>
+
+              {/* Footer */}
+              <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3 bg-slate-50/50 dark:bg-slate-900/30">
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  form="coupon-form"
+                  className="px-5 py-2 text-xs font-semibold text-white bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 rounded-xl shadow-md shadow-amber-600/20 transition"
+                >
+                  Publish Coupon
+                </button>
               </div>
             </div>
-
-            {/* Modal Footer */}
-            <div
-              className="flex-shrink-0 gap-5 w-full flex  bg-white py-3 px-5"
-              style={{
-                boxShadow:
-                  "rgba(0, 0, 0, 0.1) 0px -1px 3px 0px, rgba(0, 0, 0, 0.06) 0px -1px 2px 0px",
-              }}
-            >
-              <button
-                type="submit"
-                className="px-5 py-2 w-full bg-[#f50963] text-white rounded-md"
-              >
-                Add Coupon
-              </button>
-              <button
-                onClick={closeModal}
-                className="px-5 py-2 w-full border border-[#f50963] text-[#f50963] rounded-md"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+          </div>
         </>
       )}
     </div>

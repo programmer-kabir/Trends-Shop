@@ -1,80 +1,80 @@
-import React from 'react'
-import SocialIcons from './SocialIcons'
-import { Link } from 'react-router-dom'
-import SubscribeInput from './SubscripeInput'
-import toast from 'react-hot-toast'
+import React from "react";
+import SocialIcons from "./SocialIcons";
+import { Link } from "react-router-dom";
+import SubscribeInput from "./SubscripeInput";
+
 const Footer = () => {
   return (
-    <div>
-       <div className="w-full bg-slate-800 mt-10 pt-12">
-      <div className=" mx-auto md:flex justify-between items-start p-10 space-y-5 md:space-y-0 gap-5 ">
-        <div className="leading-7 flex-shrink-0 w-full md:w-1/3">
-          <div className="flex flex-col justify-start items-start " > 
-
-          <div> <h5 className=" font-semibold text-gray-200 tracking-wide border-b-2 border-[#bb6e6e]">
-            ABOUT US
+    <footer className="w-full bg-slate-100 dark:bg-[#070b12] text-slate-700 dark:text-slate-300 border-t border-slate-200 dark:border-white/5 transition-colors">
+      <div className="max-w-7xl mx-auto px-6 py-12 md:py-16 grid grid-cols-1 md:grid-cols-3 gap-10">
+        {/* Column 1: Brand Info */}
+        <div className="space-y-4">
+          <h5 className="font-bold text-slate-900 dark:text-white text-sm tracking-wider uppercase pb-2 border-b-2 border-amber-500 inline-block">
+            About Trends Shop
           </h5>
-          <p className="text-balance text-sm mt-3 text-gray-200">
-            Trendy is premium leather shoes and fashion accessories kingdom. We
-            provide the best quality shoes and accessories for ladies and gents.
-          </p></div>
-          <div> <SubscribeInput /></div>
-
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            Trends Shop is Bangladesh's premier destination for 100% handcrafted full-grain leather footwear. Built with heritage Goodyear welt craftsmanship for enduring elegance and bespoke comfort.
+          </p>
+          <div className="pt-2">
+            <SubscribeInput />
           </div>
         </div>
-        <div className="leading-7 flex-shrink-0 w-full md:w-1/3">
-         <div>  
-          
 
-         <div>  <h5 className="text-gray-200 font-semibold tracking-wide border-b-2 border-[#bb6e6e]">
-            POLICY
+        {/* Column 2: Policies */}
+        <div className="space-y-4">
+          <h5 className="font-bold text-slate-900 dark:text-white text-sm tracking-wider uppercase pb-2 border-b-2 border-amber-500 inline-block">
+            Customer Care & Policies
           </h5>
-          <div className="mt-3 space-y-2">
+          <div className="flex flex-col space-y-2.5 text-sm">
             <Link
               to="/complain"
-              className="inline-block focus:outline-none text-sm hover:text-[#b35c5c] text-balance text-gray-200"
+              className="text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
             >
-              Exchange & Complaint
+              Exchange & 30-Day Fit Guarantee
             </Link>
             <Link
               to="/"
-              className="inline-block focus:outline-none ms-3 text-sm hover:text-[#b35c5c] text-balance text-gray-200"
+              className="text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
             >
-              Privacy Policy
+              Privacy & Data Policy
             </Link>
             <Link
               to="/"
-              className="inline-block focus:outline-none text-sm hover:text-[#b35c5c] text-balance text-gray-200"
+              className="text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
             >
-              Terms and Conditions
+              Terms & Conditions
             </Link>
-          </div> </div>
-         <div>  <img src="https://voguesultana.com/images/payments.png" height={100}  width={400} alt="logo" /> </div>
-          
-             </div>
-         
-        </div>
-        <div className="leading-7 flex-shrink-0 w-full md:w-1/3">
-        <div className="flex flex-col justify-start items-start">  <div className="mb-8">
-          <h5 className="text-gray-200 font-semibold tracking-wide border-b-2 border-[#bb6e6e]">
-            CONNECT WITH US
-          </h5>
-          <p className="text-balance text-gray-200 text-sm mt-3">
-            Join Our Facebook Group Richkid <br /> Offer and Review and Like Our Page.
-          </p>
           </div>
-         <div> <SocialIcons /></div></div>
+          <div className="pt-3">
+            <img
+              src="https://voguesultana.com/images/payments.png"
+              height={45}
+              width={320}
+              alt="Supported Payment Methods"
+              className="opacity-90 hover:opacity-100 transition-opacity"
+            />
+          </div>
+        </div>
+
+        {/* Column 3: Connect & Social */}
+        <div className="space-y-4">
+          <h5 className="font-bold text-slate-900 dark:text-white text-sm tracking-wider uppercase pb-2 border-b-2 border-amber-500 inline-block">
+            Connect With Us
+          </h5>
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            Join our VIP Club for private sales, artisan previews, and member-only leather care guides.
+          </p>
+          <div className="pt-1">
+            <SocialIcons />
+          </div>
         </div>
       </div>
-     
-      <div className="bg-gray-700 text-white text-sm">
-        <p className="text-center text-balance pt-2 pb-2">
-          Copyright © 2024 | Trends Shop Lifestyle
-        </p>
-      </div>
-    </div>
-    </div>
-  )
-}
 
-export default Footer
+      <div className="bg-slate-200/90 dark:bg-[#03060a] border-t border-slate-300/80 dark:border-white/5 py-5 text-center text-xs text-slate-600 dark:text-slate-500">
+        <p>Copyright © {new Date().getFullYear()} Trends Shop Lifestyle. All Rights Reserved.</p>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;

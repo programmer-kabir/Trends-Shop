@@ -29,7 +29,7 @@ const FlashDeal = () => {
   }, []);
 
   return (
-    <section className="py-12 bg-gradient-to-r from-amber-950/20 via-slate-900 to-amber-950/30 border-y border-amber-500/20 my-6 relative overflow-hidden">
+    <section className="py-12 bg-gradient-to-r from-amber-100/60 via-amber-50/70 to-orange-100/50 dark:from-amber-950/20 dark:via-slate-900 dark:to-amber-950/30 border-y border-amber-500/20 my-6 relative overflow-hidden transition-colors">
       {/* Background Decorative Blur */}
       <div className="absolute -top-20 -left-20 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -52,28 +52,28 @@ const FlashDeal = () => {
 
           {/* Right Details & Timer */}
           <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-500 bg-amber-500/10 border border-amber-500/30 px-3.5 py-1 rounded-full">
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 bg-amber-500/15 border border-amber-500/30 px-3.5 py-1 rounded-full">
               <FiClock />
               Offer Ends In
             </div>
 
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Artisan Monk Strap <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-500">Edition</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              Artisan Monk Strap <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-yellow-600 dark:from-amber-400 dark:to-yellow-500">Edition</span>
             </h2>
 
-            <p className="text-sm text-slate-300 max-w-lg leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 max-w-lg leading-relaxed">
               Meticulously burnished full-grain Italian calfskin with double-buckle brass hardware. Unrivaled luxury at an exclusive weekly promotional price.
             </p>
 
             {/* Price Highlight */}
             <div className="flex items-baseline justify-center lg:justify-start gap-3">
-              <span className="text-3xl sm:text-4xl font-extrabold text-amber-400">
+              <span className="text-3xl sm:text-4xl font-extrabold text-amber-600 dark:text-amber-400">
                 ৳ 3,250
               </span>
-              <span className="text-lg line-through text-slate-500">
+              <span className="text-lg line-through text-slate-400 dark:text-slate-500">
                 ৳ 5,500
               </span>
-              <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded-md border border-emerald-500/30">
                 Save 41%
               </span>
             </div>
@@ -81,34 +81,34 @@ const FlashDeal = () => {
             {/* Countdown Flip Cards */}
             <div className="flex items-center justify-center lg:justify-start gap-3 pt-1">
               <div className="flex flex-col items-center">
-                <div className="w-16 h-16 rounded-xl bg-slate-900 border border-amber-500/30 flex items-center justify-center text-2xl font-mono font-extrabold text-white shadow-inner">
+                <div className="w-16 h-16 rounded-xl bg-white dark:bg-slate-900 border border-amber-500/30 flex items-center justify-center text-2xl font-mono font-extrabold text-slate-900 dark:text-white shadow-md">
                   {String(timeLeft.hours).padStart(2, "0")}
                 </div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 mt-1">Hours</span>
+                <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mt-1">Hours</span>
               </div>
-              <span className="text-2xl font-bold text-amber-500 -mt-4">:</span>
+              <span className="text-2xl font-bold text-amber-600 dark:text-amber-500 -mt-4">:</span>
               <div className="flex flex-col items-center">
-                <div className="w-16 h-16 rounded-xl bg-slate-900 border border-amber-500/30 flex items-center justify-center text-2xl font-mono font-extrabold text-white shadow-inner">
+                <div className="w-16 h-16 rounded-xl bg-white dark:bg-slate-900 border border-amber-500/30 flex items-center justify-center text-2xl font-mono font-extrabold text-slate-900 dark:text-white shadow-md">
                   {String(timeLeft.minutes).padStart(2, "0")}
                 </div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 mt-1">Minutes</span>
+                <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mt-1">Minutes</span>
               </div>
-              <span className="text-2xl font-bold text-amber-500 -mt-4">:</span>
+              <span className="text-2xl font-bold text-amber-600 dark:text-amber-500 -mt-4">:</span>
               <div className="flex flex-col items-center">
-                <div className="w-16 h-16 rounded-xl bg-slate-900 border border-amber-500/30 flex items-center justify-center text-2xl font-mono font-extrabold text-amber-400 shadow-inner animate-pulse">
+                <div className="w-16 h-16 rounded-xl bg-white dark:bg-slate-900 border border-amber-500/30 flex items-center justify-center text-2xl font-mono font-extrabold text-amber-600 dark:text-amber-400 shadow-md animate-pulse">
                   {String(timeLeft.seconds).padStart(2, "0")}
                 </div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 mt-1">Seconds</span>
+                <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mt-1">Seconds</span>
               </div>
             </div>
 
             {/* Stock Progress Bar */}
             <div className="max-w-md mx-auto lg:mx-0 space-y-1.5 pt-1">
-              <div className="flex justify-between text-xs text-slate-400">
+              <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
                 <span>Stock Status</span>
-                <span className="font-bold text-amber-400">Only 7 Pairs Left</span>
+                <span className="font-bold text-amber-600 dark:text-amber-400">Only 7 Pairs Left</span>
               </div>
-              <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+              <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-amber-500 to-orange-500 w-[78%] rounded-full"></div>
               </div>
             </div>

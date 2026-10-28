@@ -1,48 +1,52 @@
 import React from "react";
-import { IoIosArrowForward } from "react-icons/io";
+import { FiChevronDown, FiHelpCircle } from "react-icons/fi";
 
 const Faqs = () => {
   const data = [
     {
-      question: "আপনারা কি পণ্যের গুণগত মান নিশ্চিত করার জন্য কোন পদক্ষেপ গ্রহণ করেন?",
-      answer: "আমরা পণ্যের গুণগত মানের ওপর অত্যল্প গুরুত্ব দিয়ে চলেছি। প্রতিটি পণ্যই আমাদের কাছে উন্নত গুণগত মান এবং দৈনিক ব্যবহারের জন্য উপযোগী হওয়ার আশ্বাস দিয়ে তৈরি হয়। আমরা প্রতিটি সরবরাহকারী এবং উৎপাদকের যাচাই করি যে তারা আমাদের মান মান এবং বাস্তবায়িত প্রত্যাশায় অনুযায়ী তৈরি করেছেন। এছাড়াও, আমাদের ইনহাউস গুণমান নিয়ন্ত্রণ দল প্রতিটি পণ্যের উপর যত্নশীলভাবে পরিক্ষা করে যে তা আপনার হাতে পৌঁছানোর আগে সর্বোত্তম মানের অবস্থায় আছে।",
+      question: "ঢাকা এবং ঢাকার বাইরে ডেলিভারি কত দ্রুত পাওয়া যাবে?",
+      answer: "আমরা ঢাকা সিটির ভেতরে ২ থেকে ৩ কার্যদিবসের মধ্যে এক্সপ্রেস হোম ডেলিভারি দিয়ে থাকি। আর ঢাকার বাইরে বা দেশের যেকোনো জেলায় ৩ থেকে ৫ কার্যদিবসের মধ্যে পণ্য আপনার ঠিকানায় পৌঁছে দেওয়া হয়।",
     },
     {
-      question: "আপনারা ডেলিভারি পদ্ধতি সম্পর্কে জানতে কী করবেন?",
-      answer: "আমরা আমাদের গ্রাহকদের জন্য সুবিধাজনক এবং দ্রুত ডেলিভারি পদ্ধতি উপলব্ধ করে থাকি। আপনি সহজেই আমাদের ওয়েবসাইট থেকে পণ্য অর্ডার করতে পারেন এবং আমরা নির্ধারিত সময়ে আপনার ঠিকানায় পণ্য পৌঁছে দেব। আমাদের দক্ষ ফুলফিলমেন্ট দল দ্রুততম উপায়ে আপনার অর্ডার প্রস্তুত করে এবং এটি সুরক্ষিতভাবে প্যাকেজ করে আপনার পণ্য প্রেরণ করে।",
+      question: "পেমেন্ট কোন কোন মাধ্যমে করা যাবে?",
+      answer: "আপনি বিকাশ (bKash), নগদ (Nagad), রকেট (Rocket), উপায় (Upay) এবং পণ্য হাতে পেয়ে ক্যাশ অন ডেলিভারি (Cash on Delivery)-এর মাধ্যমে পেমেন্ট করতে পারবেন।",
     },
     {
-      question: "আপনাদের ওয়েবসাইট থেকে কিভাবে অর্ডার করতে পারি?",
-      answer: "আমাদের ওয়েবসাইট থেকে অর্ডার করা সহজ এবং সরল। প্রথমে, আপনি আমাদের ওয়েবসাইটে লগইন করে লগ ইন করতে পারেন বা নতুন একটি অ্যাকাউন্ট তৈরি করতে পারেন। তারপরে, আপনি আমাদের সম্পূর্ণ রেঞ্জে ব্রাউজ করতে পারেন এবং আপনার পছন্দের পণ্যটি নির্বাচন করতে পারেন। পণ্যের বিবরণ ও মূল্য পরীক্ষা করে নিশ্চিত হলে, অর্ডার করার জন্য 'অর্ডার করুন' বা সমতুল্য বোতামে ক্লিক করুন।",
+      question: "ডেলিভারি নেওয়ার সময় কি জুতো খুলে চেক করা যাবে?",
+      answer: "হ্যাঁ, ট্রেন্ডস শপে সম্পূর্ণ ওপেন বক্স চেক সুবিধা রয়েছে। ডেলিভারি ম্যানের উপস্থিতিতে বক্স খুলে জুতোর সাইজ, ফিনিশ ও কোয়ালিটি নিশ্চিত করে আপনি ক্যাশ অন ডেলিভারি পরিশোধ করতে পারবেন।",
     },
     {
-      question: "আমি পণ্যে অসন্তোষজনক হলে কি করতে পারি?",
-      answer: "আমাদের গ্রাহকের সন্তুষ্টিই আমাদের সর্বোচ্চ লক্ষ্য। যদি আপনি আমাদের পণ্যে কোনও অসন্তোষ অনুভব করেন, অনুগ্রহ করে তা আমাদেরকে জানান। আমাদের গ্রাহক সেবা দল আপনার সমস্যার সমাধানে সাহায্য করতে সততা অভিনব করা হবে।",
+      question: "সাইজ ছোট বা বড় হলে কি এক্সচেঞ্জ করা যাবে?",
+      answer: "অবশ্যই! আমাদের ৭ দিনের সহজ সাইজ এক্সচেঞ্জ পলিসি রয়েছে। জুতো অক্ষত ও অব্যবহৃত অবস্থায় থাকলে আমাদের হেল্পলাইন (+880 1800-TRENDS)-এ জানালে দ্রুত নতুন সাইজ পাঠানো হবে।",
     },
     {
-      question: "কীভাবে প্রোডাক্টের আপডেট বা নতুনত্বের তথ্য জানতে পারি?",
-      answer: "আপনি আমাদের ওয়েবসাইটে সাবস্ক্রাইব করতে পারেন যাতে আপনি নতুন পণ্য এবং বিশেষ অফারের তথ্য ইমেইলের মাধ্যমে পেতে পারেন।",
+      question: "লেদার ও মেটেরিয়ালের কোয়ালিটি কেমন?",
+      answer: "আমাদের প্রতিটি জুতো ১০০% সার্টিফাইড ফুল-গ্রেইন ইতালিয়ান ও প্রিমিয়াম বাফেলো লেদার দিয়ে হস্তনির্মিত। ভেতরে রয়েছে আরামদায়ক মেমোরি ফোম ফুটবেড এবং দীর্ঘস্থায়ী গুডইয়ার-ওয়েল্টেড টেকসই সোল।",
     },
-    {
-      question: "পণ্যের গ্যারান্টি সম্পর্কিত তথ্য কি পেতে পারি?",
-      answer: "আমাদের বেশিরভাগ পণ্যগুলিতে নির্দিষ্ট সময়ের জন্য গ্যারান্টি দেওয়া হয়। অনুগ্রহ করে প্রতিটি পণ্যের গ্যারান্টির জন্য আলাদা শর্তাবলী দেখুন বা আমাদের কাস্টমার সার্ভিসের সাথে যোগাযোগ করুন।",
-    },
-    {
-  question: "আপনারা কি অনলাইনে ক্রয়কৃত পণ্যের বিনিময় বা ফেরতের সুযোগ প্রদান করেন?",
-  answer: "আমরা অনলাইনে ক্রয়কৃত পণ্যের ফেরত এবং বিনিময়ের সুযোগ প্রদান করি। পণ্য গ্রহণের ৭ দিনের মধ্যে আপনি পণ্যটি ফেরত দিতে পারেন। তবে, ফেরত দেওয়ার আগে আমাদের গ্রাহক সেবা দলের সাথে যোগাযোগ করে প্রক্রিয়া নিশ্চিত করুন।",
-}
   ];
 
   return (
-    <div>
-      <div className="border rounded-lg">
+    <div className="py-4 space-y-4 text-left">
+      <div className="flex items-center gap-2 mb-4">
+        <FiHelpCircle className="text-amber-500 text-lg" />
+        <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-900 dark:text-white">
+          প্রয়োজনীয় তথ্যাবলী ও সাধারণ প্রশ্নোত্তর
+        </h3>
+      </div>
+
+      <div className="space-y-3">
         {data.map((item, index) => (
-          <details key={index} className="group [&_summary::-webkit-details-marker]:hidden border-b">
-            <summary className="flex cursor-pointer justify-start items-start gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900">
-              <IoIosArrowForward className="size-5 shrink-0 transition duration-300 group-open:rotate-90" />
-              <h2 className="font-medium">{item.question}</h2>
+          <details
+            key={index}
+            className="group rounded-2xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 overflow-hidden shadow-xs transition-all [&_summary::-webkit-details-marker]:hidden"
+          >
+            <summary className="flex cursor-pointer items-center justify-between p-4 sm:p-5 text-slate-900 dark:text-white font-bold text-xs sm:text-sm select-none hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
+              <span className="pr-4">{item.question}</span>
+              <FiChevronDown className="text-amber-500 text-base shrink-0 transition-transform duration-300 group-open:rotate-180" />
             </summary>
-            <p className="mt-2 px-4 leading-relaxed text-gray-700">{item.answer}</p>
+            <div className="px-5 pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-white/5 pt-3">
+              {item.answer}
+            </div>
           </details>
         ))}
       </div>

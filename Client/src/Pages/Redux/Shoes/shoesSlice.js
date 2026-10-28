@@ -2,9 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 export const fetchShoes = createAsyncThunk("shoes/fetchShoes", async () => {
   try {
-    const response = await axios.get(
-      "https://tendsserver.vercel.app/shoes"
-    );
+    const apiBase = import.meta.env.VITE_LOCALHOST_KEY || "http://localhost:5000";
+    const response = await axios.get(`${apiBase}/shoes`);
     return response.data;
   } catch (error) {
     throw error;

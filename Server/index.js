@@ -60,6 +60,7 @@ async function run() {
       .db("TrendsShop")
       .collection("requestPayment");
     const reviewsCollection = client.db("TrendsShop").collection("reviews");
+    const categoriesCollection = client.db("TrendsShop").collection("categories");
 
     // JWT
     app.post("/jwt", (req, res) => {
@@ -80,17 +81,19 @@ async function run() {
       const data = req.body;
       // console.log(data);
 
-      // Check if the Item_code already exists in the database
-      const existingItem = await shoesCollection.findOne({
-        "formattedDescription.Item_code": data.Description.Item_code,
-      });
+      if (data?.Description?.Item_code) {
+        const existingItem = await shoesCollection.findOne({
+          $or: [
+            { "Description.Item_code": data.Description.Item_code },
+            { "formattedDescription.Item_code": data.Description.Item_code },
+          ],
+        });
 
-      // If the item with the same Item_code exists, do not insert and return a message
-      if (existingItem) {
-        return res.status(400).send({ message: "Item already exists." });
+        if (existingItem) {
+          return res.status(400).send({ message: "Footwear Item Code already exists." });
+        }
       }
 
-      // If the Item_code is unique, insert the new data
       const result = await shoesCollection.insertOne(data);
       res.send(result);
     });
@@ -135,6 +138,102 @@ console.log(id);
       const result = await shoesCollection.deleteOne(query);
 
       res.send(result);
+    });
+
+    // ================= CATEGORY & SUBCATEGORY MANAGEMENT =================
+    // GET all categories
+    app.get("/categories", async (req, res) => {
+      try {
+        const categories = await categoriesCollection.find().toArray();
+        res.send(categories);
+      } catch (error) {
+        res.status(500).send({ message: "Failed to fetch categories", error });
+      }
+    });
+
+    // CREATE category
+    app.post("/categories", async (req, res) => {
+      try {
+        const { name, department, image, description, subcategories } = req.body;
+        if (!name) {
+          return res.status(400).send({ message: "Category name is required" });
+        }
+        const newCategory = {
+          name: name.trim(),
+          department: department || "MEN'S",
+          image: image || "https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=800&auto=format&fit=crop",
+          description: description || "",
+          subcategories: Array.isArray(subcategories)
+            ? subcategories.map((s) => s.trim()).filter(Boolean)
+            : [],
+          createdAt: new Date(),
+        };
+        const result = await categoriesCollection.insertOne(newCategory);
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Failed to create category", error });
+      }
+    });
+
+    // UPDATE category
+    app.patch("/categories/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const updateDoc = { ...req.body };
+        delete updateDoc._id; // prevent immutable _id update error
+        const result = await categoriesCollection.updateOne(filter, {
+          $set: updateDoc,
+        });
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Failed to update category", error });
+      }
+    });
+
+    // DELETE category
+    app.delete("/categories/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const result = await categoriesCollection.deleteOne(filter);
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Failed to delete category", error });
+      }
+    });
+
+    // ADD Subcategory to a Category
+    app.post("/categories/:id/subcategory", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const { subcategory } = req.body;
+        if (!subcategory || !subcategory.trim()) {
+          return res.status(400).send({ message: "Subcategory name is required" });
+        }
+        const filter = { _id: new ObjectId(id) };
+        const result = await categoriesCollection.updateOne(filter, {
+          $addToSet: { subcategories: subcategory.trim() },
+        });
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Failed to add subcategory", error });
+      }
+    });
+
+    // DELETE Subcategory from a Category
+    app.delete("/categories/:id/subcategory/:subName", async (req, res) => {
+      try {
+        const { id, subName } = req.params;
+        const decodedSubName = decodeURIComponent(subName);
+        const filter = { _id: new ObjectId(id) };
+        const result = await categoriesCollection.updateOne(filter, {
+          $pull: { subcategories: decodedSubName },
+        });
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Failed to delete subcategory", error });
+      }
     });
 
     // User
@@ -457,53 +556,50 @@ console.log(id);
         };
         await requestPaymentCollection.updateOne(paymentFilter, paymentUpdate);
 
-        // Step 5: Check for an existing booking entry in bookedCollection
-        const bookingFilter = { _id: new ObjectId(bookedId) };
-        const existingBooking = await bookedCollection.findOne(bookingFilter);
+        // Step 5: Check for an existing booking entry in bookedCollection if bookedId provided
+        let updatedBooking = null;
+        if (bookedId && ObjectId.isValid(bookedId)) {
+          const bookingFilter = { _id: new ObjectId(bookedId) };
+          const existingBooking = await bookedCollection.findOne(bookingFilter);
 
-        if (!existingBooking) {
-          return res.status(404).json({
-            message: "No matching booking found for the provided bookedId",
-          });
+          if (existingBooking) {
+            const bookingInvoiceId = existingBooking.invoiceId;
+            const bookingUpdate = {
+              $set: {
+                status: newStatus,
+                invoiceId: bookingInvoiceId || newInvoiceId,
+              },
+            };
+
+            if (
+              existingBooking.invoiceId &&
+              existingBooking.invoiceId === newInvoiceId
+            ) {
+              const bookingLastInvoice = await bookedCollection
+                .find({})
+                .sort({ invoiceId: -1 })
+                .limit(1)
+                .toArray();
+              const lastBookingInvoiceId = bookingLastInvoice.length
+                ? bookingLastInvoice[0].invoiceId
+                : null;
+              const bookingInvoiceNumber = lastBookingInvoiceId
+                ? parseInt(lastBookingInvoiceId.slice(2)) + 1
+                : 1;
+              const uniqueBookingInvoiceId =
+                "tr" + bookingInvoiceNumber.toString().padStart(5, "0");
+              bookingUpdate.$set.invoiceId = uniqueBookingInvoiceId;
+            }
+
+            await bookedCollection.updateOne(bookingFilter, bookingUpdate);
+            updatedBooking = await bookedCollection.findOne(bookingFilter);
+          }
         }
 
-        // Ensure a unique invoice ID for the booking in case of a duplicate
-        const bookingInvoiceId = existingBooking.invoiceId;
-        const bookingUpdate = {
-          $set: {
-            status: newStatus,
-            invoiceId: bookingInvoiceId || newInvoiceId, // Use booking's invoice ID if it exists, otherwise use the new one
-          },
-        };
-
-        if (
-          existingBooking.invoiceId &&
-          existingBooking.invoiceId === newInvoiceId
-        ) {
-          // Generate a new unique ID for the booking if it's a duplicate
-          const bookingLastInvoice = await bookedCollection
-            .find({})
-            .sort({ invoiceId: -1 })
-            .limit(1)
-            .toArray();
-          const lastBookingInvoiceId = bookingLastInvoice.length
-            ? bookingLastInvoice[0].invoiceId
-            : null;
-          const bookingInvoiceNumber = lastBookingInvoiceId
-            ? parseInt(lastBookingInvoiceId.slice(2)) + 1
-            : 1;
-          const uniqueBookingInvoiceId =
-            "tr" + bookingInvoiceNumber.toString().padStart(5, "0");
-          bookingUpdate.$set.invoiceId = uniqueBookingInvoiceId;
-        }
-
-        await bookedCollection.updateOne(bookingFilter, bookingUpdate);
-
-        // Fetch the updated records
+        // Fetch the updated payment record
         const updatedPayment = await requestPaymentCollection.findOne(
           paymentFilter
         );
-        const updatedBooking = await bookedCollection.findOne(bookingFilter);
 
         if (newStatus === "Delivery" && productId) {
           const productFilter = { _id: productId }; // No ObjectId conversion

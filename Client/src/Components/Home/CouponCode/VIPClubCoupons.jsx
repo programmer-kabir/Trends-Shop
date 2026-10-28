@@ -113,17 +113,17 @@ const VIPClubCoupons = () => {
         </div>
 
         {/* VIP Circle Subscription Banner */}
-        <div className="rounded-3xl bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 border border-amber-500/30 p-8 md:p-12 text-white relative overflow-hidden shadow-2xl">
+        <div className="rounded-3xl bg-gradient-to-r from-amber-100/80 via-white to-amber-100/70 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 border border-amber-500/30 p-8 md:p-12 text-slate-900 dark:text-white relative overflow-hidden shadow-xl transition-colors">
           <div className="absolute right-0 top-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
           <div className="relative z-10 max-w-2xl mx-auto text-center space-y-4">
-            <span className="px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 rounded-full border border-amber-500/20">
+            <span className="px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400 bg-amber-500/15 rounded-full border border-amber-500/30">
               Trends Shop VIP Club
             </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Unlock Private Seasonal Drops & First Access
             </h3>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               Join 15,000+ members and receive a 15% discount code directly to your inbox, plus invitations to limited-edition leather batch releases.
             </p>
 
@@ -136,7 +136,7 @@ const VIPClubCoupons = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address..."
                   required
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-800/90 border border-white/10 text-white placeholder:text-slate-400 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-amber-500 shadow-sm transition-all"
                 />
               </div>
               <button

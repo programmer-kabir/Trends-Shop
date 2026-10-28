@@ -22,7 +22,7 @@ const DropDown = ({ name, items }) => {
               onMouseLeave={() => setHoveredItem(null)}
             >
               <NavLink
-                to={item.link}
+                to={item.link.startsWith("/") ? item.link : `/${item.link}`}
                 className={`flex items-center hover:text-amber-500 dark:hover:text-amber-400 gap-1 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 transition-all duration-300 ${
                   hoveredItem === index ? "hover:transform translate-x-2" : ""
                 }`}

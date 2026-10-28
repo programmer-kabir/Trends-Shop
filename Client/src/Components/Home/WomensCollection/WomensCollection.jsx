@@ -36,7 +36,7 @@ const WomensCollection = () => {
             </h2>
           </div>
           <Link
-            to="/products/WOMEN'S-FORMAL"
+            to="/products/WOMEN'S"
             className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-500 transition-colors uppercase tracking-wider group"
           >
             <span>Explore All Women's</span>
