@@ -2,12 +2,13 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 export const fetchRequestPayment = createAsyncThunk(
   "requestPayments/fetchRequestPayment",
-  async () => {
+  async (email) => {
     try {
       const apiBase = import.meta.env.VITE_LOCALHOST_KEY || "http://localhost:5000";
-      const response = await axios.get(
-        `${apiBase}/requestPayment`
-      );
+      const url = email
+        ? `${apiBase}/requestPayment?email=${encodeURIComponent(email)}`
+        : `${apiBase}/requestPayment`;
+      const response = await axios.get(url);
       return response.data;
     } catch (error) {
       throw error;

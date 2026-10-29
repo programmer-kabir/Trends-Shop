@@ -13,6 +13,17 @@ import WishlistData from "./Components/Context/WishlistData";
 import FavoritesProvider from "./Provider/FavoritesContext";
 import ThemeProvider from "./Provider/ThemeContext";
 
+import axios from "axios";
+
+// Attach JWT access-token to all outgoing requests automatically if available
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access-token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 const queryClient = new QueryClient();
 
 // Immediately fetch categories from database on initial load

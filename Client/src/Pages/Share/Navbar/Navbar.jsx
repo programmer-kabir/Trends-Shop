@@ -18,9 +18,9 @@ import { LuUser2 } from "react-icons/lu";
 import Content from "../../../Components/Content/Content";
 import { TbCurrencyTaka } from "react-icons/tb";
 import useAuth from "../../../Components/Hooks/useAuth";
+import useAdmin from "../../../Components/Hooks/useAdmin";
 import LoadingSpinner from "../../../Components/Design/LoadingSpinner/LoadingSpinner";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUser } from "../../Redux/Users/userSlice";
 import { fetchCategories } from "../../Redux/Categories/categoriesSlice";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import { fetchBooked } from "../../Redux/Booked/bookedSlice";
@@ -30,6 +30,7 @@ import AnnouncementBar from "../../../Components/Home/Announcement/AnnouncementB
 
 const Navbar = () => {
   const { user, logOut, loading } = useAuth();
+  const [isAdmin] = useAdmin();
   const [letter, setLetter] = useState("");
   const [nav, setNav] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -37,20 +38,15 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isLoading, Users, error } = useSelector((state) => state.Users);
   const { Categories = [] } = useSelector((state) => state.Categories || {});
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchUser());
-    dispatch(fetchBooked(user?.email));
+    if (user?.email) {
+      dispatch(fetchBooked(user.email));
+    }
     dispatch(fetchCategories());
-  }, [dispatch]);
-  
-  const currentUser =
-    !isLoading && Users && user
-      ? Users.filter((users) => users.email === user.email)
-      : [];
+  }, [dispatch, user?.email]);
 
   const handleNav = () => {
     setNav(!nav);
@@ -243,7 +239,7 @@ const Navbar = () => {
                   {user ? (
                     <>
                       <Link
-                        to={currentUser[0]?.role === "admin" ? "/admin/dashboard" : "/user/dashboard"}
+                        to={isAdmin ? "/admin/dashboard" : "/user/dashboard"}
                         className="p-2 text-slate-700 dark:text-slate-200 hover:text-amber-500 transition-colors"
                         title="Dashboard"
                       >

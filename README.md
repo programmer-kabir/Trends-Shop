@@ -87,8 +87,4 @@ License
 
 ## Contact
 
-For any inquiries or feedback, please contact us at [programmerkabirr@gmail.com ].
-
-TRENDSSHOP
-z2ao1PhZy0lVdpfh
-ccc08a4363d2a62154e1f1dee275dd4ac6abd756b6cc0e0c657b603a3b42acf7a63c11ddb43fb30d5fd832224f602ed60adc0dd63411b3523b292d5ecece0321
+For any inquiries or feedback, please contact us at [programmerkabirr@gmail.com].

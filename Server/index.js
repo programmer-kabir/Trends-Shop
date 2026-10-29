@@ -62,11 +62,29 @@ async function run() {
     const reviewsCollection = client.db("TrendsShop").collection("reviews");
     const categoriesCollection = client.db("TrendsShop").collection("categories");
 
+    // verifyAdmin middleware
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded?.email;
+      if (!email) {
+        return res
+          .status(401)
+          .send({ error: true, message: "unauthorized token" });
+      }
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      if (user?.role !== "admin") {
+        return res
+          .status(403)
+          .send({ error: true, message: "forbidden access" });
+      }
+      next();
+    };
+
     // JWT
     app.post("/jwt", (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
-        expiresIn: "1h",
+        expiresIn: "24h",
       });
       res.send({ token });
     });
@@ -77,9 +95,8 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/shoes", async (req, res) => {
+    app.post("/shoes", verifyJWT, verifyAdmin, async (req, res) => {
       const data = req.body;
-      // console.log(data);
 
       if (data?.Description?.Item_code) {
         const existingItem = await shoesCollection.findOne({
@@ -98,45 +115,42 @@ async function run() {
       res.send(result);
     });
 
-    app.patch("/shoes", async (req, res) => {
+    app.patch("/shoes", verifyJWT, verifyAdmin, async (req, res) => {
       const { id, updatedData } = req.body;
-      const query = { _id: id };
-      // Check if the Item_code exists in the database
+      if (!id) {
+        return res.status(400).send({ message: "Shoe ID required." });
+      }
+      const query = { _id: ObjectId.isValid(id) ? new ObjectId(id) : id };
       const existingItem = await shoesCollection.findOne(query);
-      // console.log(existingItem);
-      // If no item with the given Item_code exists, return a 404 error
       if (!existingItem) {
         return res.status(404).send({ message: "Item not found." });
       }
 
-      // Update the item with the new data
-      const result = await shoesCollection.updateOne(
-        query, // Correctly pass the query object here
-        { $set: updatedData }
-      );
-      // console.log(result);
-      // Check if any documents were updated
-      if (result.modifiedCount === 0) {
-        return res.status(400).send({ message: "No changes made." });
-      }
+      const cleanUpdate = { ...updatedData };
+      delete cleanUpdate._id;
 
-      // Send success response
+      const result = await shoesCollection.updateOne(query, {
+        $set: cleanUpdate,
+      });
+
       res.send({ message: "Item updated successfully.", result });
     });
 
     // shoe get
     app.get("/shoe/:id", async (req, res) => {
-      const { id } = req.body;
-      console.log(id);
+      const { id } = req.params;
+      const query = { _id: ObjectId.isValid(id) ? new ObjectId(id) : id };
+      const result = await shoesCollection.findOne(query);
+      if (!result) {
+        return res.status(404).send({ message: "Shoe not found" });
+      }
+      res.send(result);
     });
 
-    app.delete("/shoe/:id", async (req, res) => {
-      const id = req.params; // Get the id from the URL params
-console.log(id);
-      const query = { _id: new ObjectId(id) };
-
+    app.delete("/shoe/:id", verifyJWT, verifyAdmin, async (req, res) => {
+      const { id } = req.params;
+      const query = { _id: ObjectId.isValid(id) ? new ObjectId(id) : id };
       const result = await shoesCollection.deleteOne(query);
-
       res.send(result);
     });
 
@@ -152,7 +166,7 @@ console.log(id);
     });
 
     // CREATE category
-    app.post("/categories", async (req, res) => {
+    app.post("/categories", verifyJWT, verifyAdmin, async (req, res) => {
       try {
         const { name, department, image, description, subcategories } = req.body;
         if (!name) {
@@ -176,10 +190,10 @@ console.log(id);
     });
 
     // UPDATE category
-    app.patch("/categories/:id", async (req, res) => {
+    app.patch("/categories/:id", verifyJWT, verifyAdmin, async (req, res) => {
       try {
         const id = req.params.id;
-        const filter = { _id: new ObjectId(id) };
+        const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : id };
         const updateDoc = { ...req.body };
         delete updateDoc._id; // prevent immutable _id update error
         const result = await categoriesCollection.updateOne(filter, {
@@ -192,10 +206,10 @@ console.log(id);
     });
 
     // DELETE category
-    app.delete("/categories/:id", async (req, res) => {
+    app.delete("/categories/:id", verifyJWT, verifyAdmin, async (req, res) => {
       try {
         const id = req.params.id;
-        const filter = { _id: new ObjectId(id) };
+        const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : id };
         const result = await categoriesCollection.deleteOne(filter);
         res.send(result);
       } catch (error) {
@@ -204,14 +218,14 @@ console.log(id);
     });
 
     // ADD Subcategory to a Category
-    app.post("/categories/:id/subcategory", async (req, res) => {
+    app.post("/categories/:id/subcategory", verifyJWT, verifyAdmin, async (req, res) => {
       try {
         const id = req.params.id;
         const { subcategory } = req.body;
         if (!subcategory || !subcategory.trim()) {
           return res.status(400).send({ message: "Subcategory name is required" });
         }
-        const filter = { _id: new ObjectId(id) };
+        const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : id };
         const result = await categoriesCollection.updateOne(filter, {
           $addToSet: { subcategories: subcategory.trim() },
         });
@@ -222,11 +236,11 @@ console.log(id);
     });
 
     // DELETE Subcategory from a Category
-    app.delete("/categories/:id/subcategory/:subName", async (req, res) => {
+    app.delete("/categories/:id/subcategory/:subName", verifyJWT, verifyAdmin, async (req, res) => {
       try {
         const { id, subName } = req.params;
         const decodedSubName = decodeURIComponent(subName);
-        const filter = { _id: new ObjectId(id) };
+        const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : id };
         const result = await categoriesCollection.updateOne(filter, {
           $pull: { subcategories: decodedSubName },
         });
@@ -263,28 +277,27 @@ console.log(id);
       });
       res.send(result);
     });
-    // Get all user
-    app.get("/users", async (req, res) => {
+    // Get all users (Admin only)
+    app.get("/users", verifyJWT, verifyAdmin, async (req, res) => {
       const user = await usersCollection.find().toArray();
       res.send(user);
     });
 
-    const verifyAdmin = async (req, res, next) => {
-      const email = req.decoded.email;
+    // Get single user profile by email
+    app.get("/userProfile", async (req, res) => {
+      const email = req.query.email;
+      if (!email) {
+        return res.status(400).send({ message: "Email parameter required" });
+      }
       const query = { email: email };
       const user = await usersCollection.findOne(query);
-      if (user?.role !== "admin") {
-        return res
-          .status(403)
-          .send({ error: true, message: "forbidden access" });
-      }
-      next();
-    };
-    // Update user to admin
-    app.patch("/users/admin/:id", async (req, res) => {
+      res.send(user || {});
+    });
+
+    // Update user to admin (Admin only)
+    app.patch("/users/admin/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
-      const filter = { _id: new ObjectId(id) };
-      // console.log(filter);
+      const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : id };
       const updatedDoc = {
         $set: {
           role: "admin",
@@ -294,17 +307,17 @@ console.log(id);
       res.send(result);
     });
 
-    // Get admin
+    // Get admin status
     app.get("/users/admin/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
 
-      if (req.decoded.email !== email) {
-        res.send({ admin: false });
+      if (req.decoded?.email !== email) {
+        return res.send({ admin: false });
       }
       const query = { email: email };
       const user = await usersCollection.findOne(query);
       const result = { admin: user?.role === "admin" };
-      res.send(result);
+      return res.send(result);
     });
 
     app.post("/booked", async (req, res) => {
@@ -359,9 +372,8 @@ console.log(id);
 
     app.get("/booked", async (req, res) => {
       const email = req.query.email;
-      // console.log(email);
       if (!email) {
-        res.send([]);
+        return res.send([]);
       }
       const query = { email: email };
       const data = await bookedCollection.find(query).toArray();
@@ -369,17 +381,11 @@ console.log(id);
     });
 
     app.delete('/book/:id', async (req, res) => {
-      const { id } = req.params; // Access the id from the URL
-      const query = {_id:new ObjectId(id)}
-      // console.log(query);
+      const { id } = req.params;
+      const query = { _id: ObjectId.isValid(id) ? new ObjectId(id) : id };
       const result = await bookedCollection.deleteOne(query);
       res.send(result);
-      // Perform your deletion logic here, e.g., using a database query
-      // const result = await yourDatabase.deleteOne({ _id: id });
-    
-      // res.send({ message: "Book deleted successfully", id });
     });
-    
 
     app.get("/userBookedData", async (req, res) => {
       const data = await bookedCollection.find().toArray();
@@ -391,11 +397,10 @@ console.log(id);
       const data = await couponCollection.find().toArray();
       res.send(data);
     });
-    app.post("/couponCode", async (req, res) => {
+    app.post("/couponCode", verifyJWT, verifyAdmin, async (req, res) => {
       const body = req.body;
       const { code } = req.body;
       const existingCoupon = await couponCollection.findOne({ code });
-      // If name already exists, send an error response
       if (existingCoupon) {
         return res.status(400).json({ message: "Coupon name already exists." });
       }
@@ -404,14 +409,12 @@ console.log(id);
       res.send(data);
     });
 
-    app.delete("/couponCode/:id", async (req, res) => {
+    app.delete("/couponCode/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const { id } = req.params;
       try {
         const query = {
-          _id: new ObjectId(id),
+          _id: ObjectId.isValid(id) ? new ObjectId(id) : id,
         };
-        console.log(query);
-        // Assuming you have a function to delete the coupon by ID
         const result = await couponCollection.deleteOne(query);
         res.send(result);
       } catch (error) {
@@ -602,7 +605,9 @@ console.log(id);
         );
 
         if (newStatus === "Delivery" && productId) {
-          const productFilter = { _id: productId }; // No ObjectId conversion
+          const productFilter = {
+            _id: ObjectId.isValid(productId) ? new ObjectId(productId) : productId,
+          };
           const productUpdateResult = await shoesCollection.updateOne(
             productFilter,
             { $inc: { selling: 1 } }
@@ -632,7 +637,9 @@ console.log(id);
     });
 
     app.get("/requestPayment", async (req, res) => {
-      const result = await requestPaymentCollection.find().toArray();
+      const email = req.query.email;
+      const query = email ? { email: email } : {};
+      const result = await requestPaymentCollection.find(query).toArray();
       res.send(result);
     });
 

@@ -29,8 +29,10 @@ const MyOrder = () => {
 
   useEffect(() => {
     dispatch(fetchShoes());
-    dispatch(fetchRequestPayment());
-    dispatch(fetchBooked(user?.email));
+    if (user?.email) {
+      dispatch(fetchRequestPayment(user.email));
+      dispatch(fetchBooked(user.email));
+    }
   }, [dispatch, user?.email]);
 
   // Combined loading state

@@ -11,6 +11,8 @@ import {
   FiUserX,
 } from "react-icons/fi";
 
+import axios from "axios";
+
 const ManagerUsers = () => {
   const { Users = [], isLoading } = useSelector((state) => state.Users || {});
   const dispatch = useDispatch();
@@ -20,18 +22,18 @@ const ManagerUsers = () => {
     dispatch(fetchUser());
   }, [dispatch]);
 
-  const handleMakeAdmin = (targetUser) => {
-    fetch(`${import.meta.env.VITE_LOCALHOST_KEY}/users/admin/${targetUser?._id}`, {
-      method: "PATCH",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.modifiedCount) {
-          toast.success(`${targetUser?.name} is now an Admin!`);
-          dispatch(fetchUser());
-        }
-      })
-      .catch(() => toast.error("Failed to update user role"));
+  const handleMakeAdmin = async (targetUser) => {
+    try {
+      const res = await axios.patch(
+        `${import.meta.env.VITE_LOCALHOST_KEY}/users/admin/${targetUser?._id}`
+      );
+      if (res.data.modifiedCount) {
+        toast.success(`${targetUser?.name} is now an Admin!`);
+        dispatch(fetchUser());
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to update user role");
+    }
   };
 
   const filteredUsers = (Users || []).filter((u) => {

@@ -44,7 +44,7 @@ const initialCategories = [
 ];
 
 async function seedCategories() {
-  const uri = process.env.MONGODB_URI || 'mongodb+srv://TRENDSSHOP:z2ao1PhZy0lVdpfh@cluster0.0i3pjbq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+  const uri = process.env.MONGODB_URI || (process.env.DB_USER && process.env.DB_PASS ? `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.0i3pjbq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0` : '');
   const client = new MongoClient(uri);
   try {
     await client.connect();

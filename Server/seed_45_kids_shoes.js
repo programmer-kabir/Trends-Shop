@@ -5,7 +5,7 @@ try {
 } catch (e) {}
 require('dotenv').config();
 
-const uri = process.env.MONGODB_URI || `mongodb+srv://${process.env.DB_USER || 'TRENDSSHOP'}:${process.env.DB_PASS || 'z2ao1PhZy0lVdpfh'}@cluster0.0i3pjbq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = process.env.MONGODB_URI || (process.env.DB_USER && process.env.DB_PASS ? `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.0i3pjbq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0` : '');
 
 // Real Unsplash Kids & Children Footwear Photography Pool
 const KIDS_IMG = {

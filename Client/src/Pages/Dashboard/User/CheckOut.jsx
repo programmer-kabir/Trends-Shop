@@ -47,7 +47,9 @@ const {user} = useAuth()
   const [number, setNumber] = useState(0);
   const [address, setAddress] = useState();
   const [discount, setDiscount] = useState(0);
-  const matchingUsers = Users ? Users.filter((userData) => userData.email === user?.email) : [];
+  const matchingUsers = React.useMemo(() => {
+    return Users ? Users.filter((userData) => userData.email === user?.email) : [];
+  }, [Users, user?.email]);
 
   useEffect(() => {
     if (matchingUsers.length > 0) {
@@ -55,11 +57,11 @@ const {user} = useAuth()
       setNumber(matchingUsers[0]?.number || "");
       setAddress(
         matchingUsers[0]?.village
-          ? `${matchingUsers[0]?.village}, ${matchingUsers[0]?.upZillah}, ${matchingUsers[0]?.district}, ${matchingUsers[0]?.divison} ${matchingUsers[0]?.postCode}`
+          ? `${matchingUsers[0]?.village}, ${matchingUsers[0]?.upZillah || ""}, ${matchingUsers[0]?.district || ""}, ${matchingUsers[0]?.divison || ""} ${matchingUsers[0]?.postCode || ""}`
           : ""
       );
     }
-  }, [matchingUsers]);
+  }, [matchingUsers[0]?._id, matchingUsers[0]?.village, matchingUsers[0]?.name, matchingUsers[0]?.number]);
 
   const totalCostBeforeDiscount = (CurrentProduct?.price * CurrentProduct?.quantity) + shippingCost;
 

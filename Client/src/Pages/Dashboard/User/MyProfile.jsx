@@ -198,7 +198,7 @@ const MyProfile = () => {
                   <input
                     type="text"
                     id="name"
-                    Value={matchingUsers[0]?.name}
+                    defaultValue={matchingUsers[0]?.name}
                     {...register("name")}
                     placeholder="First Name"
                     className="peer h-8 w-full border-none bg-transparent p-0 placeholder-transparent focus:border-transparent  focus:outline-none focus:ring-0 sm:text-sm"
@@ -272,16 +272,15 @@ const MyProfile = () => {
                       <select
                         id="division"
                         {...register("divison", { required: true })}
-                        defaultValue={matchingUsers[0]?.divison}
-                        Value={matchingUsers[0]?.divison}
+                        defaultValue={matchingUsers[0]?.divison || ""}
                         onChange={(e) => setSelectedDivision(e.target.value)}
                         className=" rounded-xl h-8 w-full border-none bg-transparent p-0 placeholder-transparent text-lg outline-none"
                       >
-                        <option Value="" disabled>
+                        <option value="" disabled>
                           Select Division
                         </option>
                         {division.map((divisions) => (
-                          <option key={divisions.id} Value={divisions.name}>
+                          <option key={divisions.id} value={divisions.name}>
                             {divisions.name}
                           </option>
                         ))}
