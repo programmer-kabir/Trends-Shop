@@ -4,7 +4,7 @@ import { fetchShoes } from "../../Redux/Shoes/shoesSlice";
 import { fetchCategories } from "../../Redux/Categories/categoriesSlice";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import toast from "react-hot-toast";
+import toast from "../../../Components/Toast/LuxuryToast";
 import Swal from "sweetalert2";
 import {
   FiSearch,
@@ -77,13 +77,20 @@ const ShowProduct = () => {
             `${import.meta.env.VITE_LOCALHOST_KEY}/shoe/${shoe._id}`
           );
           if (res.data.deletedCount === 1) {
-            toast.success(`"${shoe.name}" deleted from store.`);
+            toast.success(`"${shoe.name}" has been removed from the catalog.`, {
+              title: "Product Deleted 🗑️",
+              badge: shoe.category || "Footwear",
+            });
             dispatch(fetchShoes());
           } else {
-            toast.error("Failed to delete shoe.");
+            toast.error("Failed to delete shoe.", {
+              title: "Delete Failed ✕",
+            });
           }
         } catch (error) {
-          toast.error("Error deleting shoe.");
+          toast.error("An unexpected error occurred while deleting shoe.", {
+            title: "Delete Error ✕",
+          });
         }
       }
     });

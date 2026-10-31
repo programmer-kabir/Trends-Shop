@@ -3,8 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiHeart, FiShoppingBag, FiStar } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa6";
 import { Modal } from "antd";
-import toast from "react-hot-toast";
-import { FavoritesContext } from "../../Provider/FavoritesContext";
+import toast from "../Toast/LuxuryToast";
+import {
+  FavoritesContext,
+  getStoredFavorites,
+  setStoredFavorites,
+} from "../../Provider/FavoritesContext";
 
 const LuxuryProductCard = ({ shoe }) => {
   const [openModal, setOpenModal] = useState(false);
@@ -18,8 +22,7 @@ const LuxuryProductCard = ({ shoe }) => {
     : mainPrice;
 
   // Check wishlist
-  const rawFavs = localStorage.getItem("favoriteTShirt");
-  const favList = rawFavs ? JSON.parse(rawFavs) : [];
+  const favList = getStoredFavorites();
   const isFavorite = favList.includes(shoe._id);
 
   const toggleWishlist = (e) => {
@@ -28,12 +31,19 @@ const LuxuryProductCard = ({ shoe }) => {
     let updated;
     if (isFavorite) {
       updated = favList.filter((id) => id !== shoe._id);
-      toast.success("Removed from wishlist");
+      toast.success(`${shoe.name || "Item"} has been removed from your wishlist.`, {
+        title: "Wishlist Updated ✨",
+        badge: shoe.category || "Footwear",
+      });
     } else {
       updated = [...favList, shoe._id];
-      toast.success("Added to wishlist ❤️");
+      toast.success(`${shoe.name || "Item"} saved to your personal collection.`, {
+        title: "Added to Wishlist ❤️",
+        badge: shoe.category || "Luxury Footwear",
+        amount: `৳ ${discountedPrice.toLocaleString()}`,
+      });
     }
-    localStorage.setItem("favoriteTShirt", JSON.stringify(updated));
+    setStoredFavorites(updated);
     updateFavoriteCount();
   };
 

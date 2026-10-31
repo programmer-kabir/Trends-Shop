@@ -8,7 +8,13 @@ import Loader from '../Components/Design/LoadingSpinner/LoadingSpinner'
 const MainLayout = () => {
   const {user, loading} = useAuth()
   if(loading){
-    return <Loader />
+    return (
+      <Loader
+        fullScreen={true}
+        message="Authenticating Atelier Session..."
+        subMessage="Trends Shop • Handcrafted Leather Footwear"
+      />
+    );
   }
   return (
     <div className="bg-slate-50 dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-300">

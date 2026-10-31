@@ -11,7 +11,13 @@ const AdminRoute = ({ children }) => {
     const location = useLocation();
 
     if(loading || isAdminLoading){
-        return <Loader progress={45} />
+        return (
+          <Loader
+            fullScreen={true}
+            message="Verifying Executive Credentials..."
+            subMessage="Trends Shop • Atelier Management Portal"
+          />
+        );
     }
 
     if (user && isAdmin) {

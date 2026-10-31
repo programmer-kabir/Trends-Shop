@@ -11,6 +11,13 @@ const cors = require("cors");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
+process.on("uncaughtException", (err) => {
+  console.error("Server uncaught exception (handled):", err.message);
+});
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Server unhandled rejection (handled):", reason);
+});
+
 //Middleware
 app.use(cors());
 app.use(express.json());
@@ -61,6 +68,7 @@ async function run() {
       .collection("requestPayment");
     const reviewsCollection = client.db("TrendsShop").collection("reviews");
     const categoriesCollection = client.db("TrendsShop").collection("categories");
+    const cartOffersCollection = client.db("TrendsShop").collection("cartOffers");
 
     // verifyAdmin middleware
     const verifyAdmin = async (req, res, next) => {
@@ -80,10 +88,22 @@ async function run() {
       next();
     };
 
-    // JWT
-    app.post("/jwt", (req, res) => {
+    // JWT - Secure Token Generation with Verified Roles from Database
+    app.post("/jwt", async (req, res) => {
       const user = req.body;
-      const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
+      const email = user?.email?.trim().toLowerCase();
+      if (!email) {
+        return res.status(400).send({ error: true, message: "Valid email is required" });
+      }
+
+      // Query true role from database to prevent clients from injecting 'admin' role
+      const userRecord = await usersCollection.findOne({ email });
+      const payload = {
+        email,
+        role: userRecord?.role || "user",
+      };
+
+      const token = jwt.sign(payload, process.env.ACCESS_TOKEN, {
         expiresIn: "24h",
       });
       res.send({ token });
@@ -251,29 +271,60 @@ async function run() {
     });
 
     // User
-    // Post all User
+    // Post all User (Registration)
     app.post("/users", async (req, res) => {
-      const user = req.body;
-      const query = { email: user.email };
+      const { name, email, photoURL } = req.body;
+      if (!email) {
+        return res.status(400).send({ message: "Email is required" });
+      }
+      const normalizedEmail = email.trim().toLowerCase();
+      const query = { email: normalizedEmail };
       const existingUser = await usersCollection.findOne(query);
       if (existingUser) {
         return res.send({ message: "user already exist" });
       }
-      const result = await usersCollection.insertOne(user);
+
+      // Enforce strict payload sanitization: role is always 'user' on creation
+      const newUser = {
+        name: name ? String(name).trim() : "Member",
+        email: normalizedEmail,
+        ...(photoURL && { photoURL: String(photoURL) }),
+        role: "user", // Prevent client-side admin privilege escalation
+        createdAt: new Date(),
+      };
+      const result = await usersCollection.insertOne(newUser);
       res.send(result);
     });
 
-    // Update User Data
-    app.put("/users", async (req, res) => {
+    // Update User Data (Protected: users can only update their own profile, cannot change role)
+    app.put("/users", verifyJWT, async (req, res) => {
       const updatedUserData = req.body;
-      // console.log(updatedUserData);
-      const query = { email: updatedUserData.email };
+      const email = updatedUserData?.email?.trim().toLowerCase();
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      // Security Check: Decoded token email must match target email
+      if (req.decoded?.email?.toLowerCase() !== email) {
+        return res
+          .status(403)
+          .json({ error: true, message: "Forbidden: You cannot modify other user profiles" });
+      }
+
+      const query = { email: email };
       const existingUser = await usersCollection.findOne(query);
       if (!existingUser) {
         return res.status(404).json({ message: "User not found" });
       }
+
+      // Whitelist updateable fields, explicitly strip role, _id, email to prevent privilege escalation
+      const cleanUpdate = { ...updatedUserData };
+      delete cleanUpdate._id;
+      delete cleanUpdate.role;
+      delete cleanUpdate.email;
+
       const result = await usersCollection.updateOne(query, {
-        $set: updatedUserData,
+        $set: cleanUpdate,
       });
       res.send(result);
     });
@@ -283,12 +334,23 @@ async function run() {
       res.send(user);
     });
 
-    // Get single user profile by email
-    app.get("/userProfile", async (req, res) => {
-      const email = req.query.email;
+    // Get single user profile by email (Protected: user can view their own profile, or admin can view)
+    app.get("/userProfile", verifyJWT, async (req, res) => {
+      const email = req.query.email?.trim().toLowerCase();
       if (!email) {
         return res.status(400).send({ message: "Email parameter required" });
       }
+
+      const callerEmail = req.decoded?.email?.trim().toLowerCase();
+      const caller = await usersCollection.findOne({ email: callerEmail });
+      const isAdmin = caller?.role === "admin";
+
+      if (callerEmail !== email && !isAdmin) {
+        return res
+          .status(403)
+          .send({ error: true, message: "Forbidden: Cannot view another user's profile" });
+      }
+
       const query = { email: email };
       const user = await usersCollection.findOne(query);
       res.send(user || {});
@@ -320,18 +382,22 @@ async function run() {
       return res.send(result);
     });
 
-    app.post("/booked", async (req, res) => {
+    app.post("/booked", verifyJWT, async (req, res) => {
       const body = req.body;
       const id = body.productId;
       const email = body.email;
       const incomingSize = body.size;
       const incomingQuantity = body.quantity || 1;
 
+      if (!email || req.decoded?.email?.toLowerCase() !== email.toLowerCase()) {
+        return res
+          .status(403)
+          .send({ error: true, message: "Forbidden: Cannot add items to another user's cart" });
+      }
+
       const filter = { productId: id, email };
 
       try {
-        // Genarate Invoice Number
-
         // Find if the item already exists in the bookedCollection
         const existingData = await bookedCollection.findOne(filter);
 
@@ -370,24 +436,51 @@ async function run() {
       }
     });
 
-    app.get("/booked", async (req, res) => {
+    app.get("/booked", verifyJWT, async (req, res) => {
       const email = req.query.email;
       if (!email) {
         return res.send([]);
       }
+
+      const callerEmail = req.decoded?.email;
+      const user = await usersCollection.findOne({ email: callerEmail });
+      const isAdmin = user?.role === "admin";
+      if (email.toLowerCase() !== callerEmail?.toLowerCase() && !isAdmin) {
+        return res
+          .status(403)
+          .send({ error: true, message: "Forbidden: Cannot view another customer's cart" });
+      }
+
       const query = { email: email };
       const data = await bookedCollection.find(query).toArray();
       res.send(data);
     });
 
-    app.delete('/book/:id', async (req, res) => {
+    app.delete("/book/:id", verifyJWT, async (req, res) => {
       const { id } = req.params;
+      const callerEmail = req.decoded?.email;
       const query = { _id: ObjectId.isValid(id) ? new ObjectId(id) : id };
+
+      const existingItem = await bookedCollection.findOne(query);
+      if (!existingItem) {
+        return res.status(404).send({ message: "Item not found" });
+      }
+
+      // Check if user is owner of the booking or an admin
+      const user = await usersCollection.findOne({ email: callerEmail });
+      const isAdmin = user?.role === "admin";
+      if (existingItem.email?.toLowerCase() !== callerEmail?.toLowerCase() && !isAdmin) {
+        return res
+          .status(403)
+          .send({ error: true, message: "Forbidden: You cannot delete another customer's cart item" });
+      }
+
       const result = await bookedCollection.deleteOne(query);
       res.send(result);
     });
 
-    app.get("/userBookedData", async (req, res) => {
+    // Get all users' cart data (Admin only for Abandoned Carts management)
+    app.get("/userBookedData", verifyJWT, verifyAdmin, async (req, res) => {
       const data = await bookedCollection.find().toArray();
       res.send(data);
     });
@@ -423,6 +516,27 @@ async function run() {
       }
     });
 
+    // Cart Offers (Targeted Offers for Cart Abandoners)
+    app.post("/cartOffers", verifyJWT, verifyAdmin, async (req, res) => {
+      try {
+        const offerData = req.body;
+        offerData.createdAt = new Date();
+        const result = await cartOffersCollection.insertOne(offerData);
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Failed to record cart offer", error });
+      }
+    });
+
+    app.get("/cartOffers", verifyJWT, verifyAdmin, async (req, res) => {
+      try {
+        const result = await cartOffersCollection.find().sort({ createdAt: -1 }).toArray();
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Failed to fetch cart offers", error });
+      }
+    });
+
     // Address
     app.get("/districts", async (req, res) => {
       const district = await districtCollection.find().toArray();
@@ -439,61 +553,158 @@ async function run() {
       res.send(upZillahs);
     });
 
-    // Payment
-    app.post("/requestPayment", async (req, res) => {
+    // Robust Invoice ID Generator (matches TR-YYMMDD-NN standard format)
+    const generateUniqueInvoiceId = async (collection) => {
+      const now = new Date();
+      const yy = String(now.getFullYear()).slice(-2);
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const dd = String(now.getDate()).padStart(2, "0");
+      const prefix = `TR-${yy}${mm}${dd}`;
+
+      const count = await collection.countDocuments({
+        invoiceId: { $regex: `^${prefix}` },
+      });
+
+      let nextNum = count + 1;
+      let candidate = `${prefix}-${String(nextNum).padStart(2, "0")}`;
+      while (await collection.findOne({ invoiceId: candidate })) {
+        nextNum++;
+        candidate = `${prefix}-${String(nextNum).padStart(2, "0")}`;
+      }
+      return candidate;
+    };
+
+    // Payment / Order Placement
+    app.post("/requestPayment", verifyJWT, async (req, res) => {
       const data = req.body;
-      console.log(data);
+      const callerEmail = req.decoded?.email;
+      if (!callerEmail || callerEmail.toLowerCase() !== data?.email?.toLowerCase()) {
+        return res
+          .status(403)
+          .send({ error: true, message: "Forbidden: Cannot submit payment on behalf of another user" });
+      }
+
       try {
-        // Step 1: Insert payment data into requestPaymentCollection
+        const invoiceId = await generateUniqueInvoiceId(requestPaymentCollection);
+        data.invoiceId = invoiceId;
+        data.status = data.status || "Awaiting Check Payment";
+        data.orderDate = data.orderDate || new Date().toISOString().split("T")[0];
+        data.createdAt = new Date();
+
+        // CASE 1: Multi-Item Unified Order (e.g. 4 products with 1 delivery charge)
+        if (Array.isArray(data.items) && data.items.length > 0) {
+          const verifiedItems = [];
+          let computedSubTotal = 0;
+
+          for (const item of data.items) {
+            let itemPrice = Number(item.price) || 0;
+            let itemQty = Number(item.quantity) || 1;
+
+            if (item.bookedId && ObjectId.isValid(item.bookedId)) {
+              const b = await bookedCollection.findOne({
+                _id: new ObjectId(item.bookedId),
+                email: callerEmail,
+              });
+              if (b && b.price) {
+                itemPrice = Number(b.price);
+              }
+            }
+
+            computedSubTotal += itemPrice * itemQty;
+            verifiedItems.push({
+              productId: item.productId,
+              productName: item.productName || item.name || "Footwear Article",
+              size: item.size || "Standard",
+              quantity: itemQty,
+              price: itemPrice,
+              image: item.image || "",
+              bookedId: item.bookedId || null,
+            });
+          }
+
+          const shippingCost = Number(data.shippingCost) || 0;
+          const discount = Number(data.discount) || 0;
+          const totalAmount = Math.max(0, computedSubTotal + shippingCost - discount);
+
+          data.items = verifiedItems;
+          data.subTotal = computedSubTotal;
+          data.price = computedSubTotal; // backward compatibility for admin revenue calculations
+          data.shippingCost = shippingCost;
+          data.discount = discount;
+          data.totalAmount = totalAmount;
+
+          const paymentResult = await requestPaymentCollection.insertOne(data);
+
+          // Update matching bookings status and attach invoiceId
+          const bookedIds = verifiedItems
+            .map((it) => it.bookedId)
+            .filter((id) => id && ObjectId.isValid(id))
+            .map((id) => new ObjectId(id));
+
+          let bookedUpdateResult = { matchedCount: 0 };
+          if (bookedIds.length > 0) {
+            bookedUpdateResult = await bookedCollection.updateMany(
+              { _id: { $in: bookedIds }, email: callerEmail },
+              { $set: { status: "Awaiting Check Payment", invoiceId } }
+            );
+          } else {
+            bookedUpdateResult = await bookedCollection.updateMany(
+              { email: callerEmail, status: { $in: ["Pending", "In Bag", undefined, null] } },
+              { $set: { status: "Awaiting Check Payment", invoiceId } }
+            );
+          }
+
+          return res.send({
+            message: "Multi-item order placed successfully",
+            paymentResult,
+            bookedUpdateResult,
+            invoiceId,
+          });
+        }
+
+        // CASE 2: Legacy Single-Item Order
+        const { bookedId } = data;
+        if (!bookedId || !ObjectId.isValid(bookedId)) {
+          return res.status(400).send({ message: "Valid bookedId or items array is required" });
+        }
+
+        const filter = { _id: new ObjectId(bookedId), email: callerEmail };
+        const existingBooking = await bookedCollection.findOne(filter);
+        if (!existingBooking) {
+          return res.status(404).send({
+            message: "No matching booking found for this account",
+          });
+        }
+
+        if (existingBooking.price) {
+          data.price = Number(existingBooking.price);
+        }
+
         const paymentResult = await requestPaymentCollection.insertOne(data);
 
         if (paymentResult.insertedId) {
-          // Step 2: Extract productId and email from payment data
-          const { bookedId, email } = data;
-          // Step 3: Find the matching booking record in bookedCollection where productId matches the id
-          const filter = { _id: new ObjectId(bookedId), email }; // Convert 'products' to an ObjectId
-          // Step 4: Update the status only if the booking exists
-          const update = { $set: { status: "Awaiting Check Payment" } }; // Set the status to 'Awaiting Check Payment'
+          const update = { $set: { status: "Awaiting Check Payment", invoiceId } };
+          const bookedUpdateResult = await bookedCollection.updateMany(
+            filter,
+            update
+          );
 
-          // Check if a matching booking exists in bookedCollection
-          const existingBooking = await bookedCollection.findOne(filter);
-          // console.log(existingBooking);
-          if (existingBooking) {
-            // Proceed to update status in the booked collection
-            const bookedUpdateResult = await bookedCollection.updateMany(
-              filter,
-              update
-            );
-
-            if (bookedUpdateResult.matchedCount > 0) {
-              res.send({
-                message:
-                  "Payment recorded and booking status updated successfully",
-                paymentResult,
-                bookedUpdateResult,
-              });
-            } else {
-              res.status(404).send({
-                message: "No matching booking found to update status",
-              });
-            }
-          } else {
-            // If no matching booking exists, do not proceed with updating status
-            res.status(404).send({
-              message:
-                "No matching booking found with the given productId and email",
-            });
-          }
+          return res.send({
+            message: "Payment recorded and booking status updated successfully",
+            paymentResult,
+            bookedUpdateResult,
+            invoiceId,
+          });
         } else {
-          res.status(500).send({ message: "Failed to insert payment data" });
+          return res.status(500).send({ message: "Failed to insert payment data" });
         }
       } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: "Server error" });
+        console.error("requestPayment error:", error);
+        return res.status(500).send({ message: "Server error" });
       }
     });
 
-    app.patch("/requestPayment", async (req, res) => {
+    app.patch("/requestPayment", verifyJWT, verifyAdmin, async (req, res) => {
       const { paymentId, newStatus, bookedId, productId, deliveryDate } =
         req.body;
 
@@ -533,20 +744,7 @@ async function run() {
         let newInvoiceId = existingPayment.invoiceId;
 
         if (!existingPayment.invoiceId) {
-          // Find the last invoice ID across all entries in requestPaymentCollection
-          const lastPayment = await requestPaymentCollection
-            .find({})
-            .sort({ invoiceId: -1 })
-            .limit(1)
-            .toArray();
-
-          if (lastPayment.length === 0 || !lastPayment[0].invoiceId) {
-            newInvoiceId = "tr00001"; // Start with tr00001 if no payments exist
-          } else {
-            const lastInvoiceId = lastPayment[0].invoiceId;
-            const invoiceNumber = parseInt(lastInvoiceId.slice(2)) + 1;
-            newInvoiceId = "tr" + invoiceNumber.toString().padStart(5, "0");
-          }
+          newInvoiceId = await generateUniqueInvoiceId(requestPaymentCollection);
         }
 
         // Update the payment status and new invoiceId only if the invoiceId was newly generated
@@ -574,26 +772,6 @@ async function run() {
               },
             };
 
-            if (
-              existingBooking.invoiceId &&
-              existingBooking.invoiceId === newInvoiceId
-            ) {
-              const bookingLastInvoice = await bookedCollection
-                .find({})
-                .sort({ invoiceId: -1 })
-                .limit(1)
-                .toArray();
-              const lastBookingInvoiceId = bookingLastInvoice.length
-                ? bookingLastInvoice[0].invoiceId
-                : null;
-              const bookingInvoiceNumber = lastBookingInvoiceId
-                ? parseInt(lastBookingInvoiceId.slice(2)) + 1
-                : 1;
-              const uniqueBookingInvoiceId =
-                "tr" + bookingInvoiceNumber.toString().padStart(5, "0");
-              bookingUpdate.$set.invoiceId = uniqueBookingInvoiceId;
-            }
-
             await bookedCollection.updateOne(bookingFilter, bookingUpdate);
             updatedBooking = await bookedCollection.findOne(bookingFilter);
           }
@@ -604,23 +782,23 @@ async function run() {
           paymentFilter
         );
 
-        if (newStatus === "Delivery" && productId) {
-          const productFilter = {
-            _id: ObjectId.isValid(productId) ? new ObjectId(productId) : productId,
-          };
-          const productUpdateResult = await shoesCollection.updateOne(
-            productFilter,
-            { $inc: { selling: 1 } }
-          );
-
-          if (productUpdateResult.modifiedCount === 1) {
-            console.log(
-              `Product with ID ${productId} selling count incremented by 1`
-            );
-          } else {
-            console.log(
-              `Failed to increment selling count for product with ID ${productId}`
-            );
+        if (newStatus === "Delivery") {
+          if (Array.isArray(existingPayment.items) && existingPayment.items.length > 0) {
+            for (const item of existingPayment.items) {
+              if (item.productId) {
+                const pFilter = {
+                  _id: ObjectId.isValid(item.productId) ? new ObjectId(item.productId) : item.productId,
+                };
+                await shoesCollection.updateOne(pFilter, {
+                  $inc: { selling: Number(item.quantity) || 1 },
+                });
+              }
+            }
+          } else if (productId) {
+            const productFilter = {
+              _id: ObjectId.isValid(productId) ? new ObjectId(productId) : productId,
+            };
+            await shoesCollection.updateOne(productFilter, { $inc: { selling: 1 } });
           }
         }
 
@@ -636,10 +814,31 @@ async function run() {
       }
     });
 
-    app.get("/requestPayment", async (req, res) => {
+    app.get("/requestPayment", verifyJWT, async (req, res) => {
       const email = req.query.email;
-      const query = email ? { email: email } : {};
-      const result = await requestPaymentCollection.find(query).toArray();
+      const callerEmail = req.decoded?.email;
+      const user = await usersCollection.findOne({ email: callerEmail });
+      const isAdmin = user?.role === "admin";
+
+      if (email) {
+        if (email.toLowerCase() !== callerEmail?.toLowerCase() && !isAdmin) {
+          return res
+            .status(403)
+            .send({ error: true, message: "Forbidden: Cannot view other customers' payment records" });
+        }
+        const query = { email: email };
+        const result = await requestPaymentCollection.find(query).toArray();
+        return res.send(result);
+      }
+
+      // If no email query is provided (viewing all orders) -> Admin only!
+      if (!isAdmin) {
+        return res
+          .status(403)
+          .send({ error: true, message: "Forbidden: Admin privileges required to view all payment records" });
+      }
+
+      const result = await requestPaymentCollection.find({}).toArray();
       res.send(result);
     });
 

@@ -4,53 +4,55 @@ import { Badge, Card, Space } from "antd";
 import { FaCartPlus, FaRegHeart } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa6";
 import { FiPlus } from "react-icons/fi";
-import toast from "react-hot-toast";
+import toast from "../Toast/LuxuryToast";
 import { Tooltip } from "react-tooltip";
 import useAuth from "../Hooks/useAuth";
+import useAdmin from "../Hooks/useAdmin";
 import axios from "axios";
-import { WishListDataContext } from "../Context/WishlistData";
-import { FavoritesContext } from "../../Provider/FavoritesContext";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchUser } from "../../Pages/Redux/Users/userSlice";
-// import { WishListDataContext } from "../Context/WishlistData";
+import { useDispatch } from "react-redux";
+import { fetchBooked } from "../../Pages/Redux/Booked/bookedSlice";
+import {
+  FavoritesContext,
+  getStoredFavorites,
+  setStoredFavorites,
+} from "../../Provider/FavoritesContext";
+
 const ProductCard = ({ shoes }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isLoading, Users, error } = useSelector((state) => state?.Users);
-
   const { user } = useAuth();
+  const [isAdmin] = useAdmin();
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeSize, setActiveSize] = useState(null);
-  const { favoriteTShirtCount, setFavoriteTShirtCount } =
-    useContext(WishListDataContext);
+
   useEffect(() => {
-    // Check if the current product is in favorites when component mounts
-    const storedIdsString = localStorage.getItem("favoriteTShirt");
-    const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
+    const storedIds = getStoredFavorites();
     setIsFavorite(storedIds.includes(shoes._id));
-dispatch(fetchUser());
   }, [shoes._id]);
-const currentUser = Users?.find((u) => u?.email === user?.email);
-console.log(currentUser);
-  const [storedIds, setId] = useState("");
 
   const { updateFavoriteCount } = useContext(FavoritesContext);
 
   const handleAddToFavorite = (id) => {
-    const storedIdsString = localStorage.getItem("favoriteTShirt");
-    const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
+    const storedIds = getStoredFavorites();
 
     if (!storedIds.includes(id)) {
       storedIds.push(id);
-      localStorage.setItem("favoriteTShirt", JSON.stringify(storedIds));
+      setStoredFavorites(storedIds);
+      setIsFavorite(true);
 
       // Update the favorite count using context function
-      updateFavoriteCount(storedIds.length);
+      updateFavoriteCount();
 
-      toast.success("Item added to favorites");
+      toast.success(`${shoes.name} added to your favorites.`, {
+        title: "Added to Favorites ❤️",
+        badge: shoes.category || "Footwear",
+        amount: `৳ ${updatePrice}`,
+      });
     } else {
-      toast.error("Item is already a favorite");
+      toast.warning(`${shoes.name} is already in your favorites.`, {
+        title: "Already Favorited ⭐",
+      });
     }
   };
   const [isHoveredHeart, setIsHoveredHeart] = useState(false);
@@ -72,11 +74,16 @@ console.log(currentUser);
   // Add to Cart
   const handleAddToCart = (id) => {
     if (shoes?.stock === shoes?.selling) {
-      toast.error("Stock Out! This item is no longer available.");
+      toast.error("This item is currently sold out.", {
+        title: "Out of Stock 📦",
+        badge: shoes.name,
+      });
       return; // Prevent adding to the cart if stock is out
     }
     if (!activeSize) {
-      toast.error("Please Select Your size");
+      toast.warning("Please choose a shoe size before adding to cart.", {
+        title: "Size Required ⚠️",
+      });
     } else {
       const data = {
         productId: id,
@@ -89,12 +96,22 @@ console.log(currentUser);
       };
       axios
         .post(`${import.meta.env.VITE_LOCALHOST_KEY}/booked`, data)
-        .then((data) => {
-          // console.log(data.data);
-          if (data.data?.updateResult?.acknowledged) {
-            toast.success(`${shoes.name} quantity updated in the cart`);
-          } else if (data.data?.insertedId) {
-            toast.success(`${shoes.name} added to the cart`);
+        .then((res) => {
+          if (user?.email) {
+            dispatch(fetchBooked(user.email));
+          }
+          if (res.data?.updateResult?.acknowledged) {
+            toast.success(`${shoes.name} quantity increased in your bag.`, {
+              title: "Bag Updated 🛍️",
+              badge: `Size ${activeSize}`,
+              amount: `৳ ${updatePrice}`,
+            });
+          } else if (res.data?.insertedId) {
+            toast.success(`${shoes.name} has been added to your shopping bag.`, {
+              title: "Added to Bag 🛍️",
+              badge: `Size ${activeSize}`,
+              amount: `৳ ${updatePrice}`,
+            });
           } else {
             toast.error("Failed to add to cart");
           }
@@ -138,9 +155,9 @@ console.log(currentUser);
                 <button
                   onClick={() => handleAddToCart(shoes._id)}
                   className={`primaryButton hidden md:flex items-center justify-center w-full uppercase font-black ${
-                    currentUser?.role ? "opacity-50 cursor-not-allowed" : ""
+                    isAdmin ? "opacity-50 cursor-not-allowed" : ""
                   }`}
-                  disabled={currentUser?.role==="admin"}
+                  disabled={isAdmin}
                 >
                   <FiPlus />
                   order
@@ -153,9 +170,9 @@ console.log(currentUser);
                 <button
                   onClick={() => handleAddToCart(shoes._id)}
                   className={`primaryButton hidden md:flex items-center justify-center w-full uppercase font-black ${
-                    currentUser?.role ? "opacity-50 cursor-not-allowed" : ""
+                    isAdmin ? "opacity-50 cursor-not-allowed" : ""
                   }`}
-                   disabled={currentUser?.role==="admin"}
+                  disabled={isAdmin}
                 >
                   <FiPlus />
                   order
@@ -175,7 +192,7 @@ console.log(currentUser);
 
                   <div
                     onClick={() => {
-                      if (!currentUser?.role==="admin") {
+                      if (!isAdmin) {
                         handleAddToFavorite(shoes._id);
                       }
                     }}
@@ -186,8 +203,7 @@ console.log(currentUser);
                       boxShadow:
                         "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px",
                       transition: "background-color 0.3s",
-                      cursor:
-                        currentUser?.role==="admin" ? "not-allowed" : "pointer",
+                      cursor: isAdmin ? "not-allowed" : "pointer",
                     }}
                     onMouseEnter={() => setIsHoveredHeart(true)}
                     onMouseLeave={() => setIsHoveredHeart(false)}
@@ -201,7 +217,7 @@ console.log(currentUser);
 
                 <button
                   onClick={() => {
-                    if (!currentUser?.role === "admin") {
+                    if (!isAdmin) {
                       handleAddToCart(shoes._id);
                     }
                   }}
@@ -209,7 +225,7 @@ console.log(currentUser);
                   data-tooltip-content="Add To Cart"
                   data-tooltip-place="left"
                   className={`bg-white hover:bg-[#f50400] p-2 shadow-lg ${
-                    currentUser?.role === "admin" ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                    isAdmin ? "cursor-not-allowed opacity-50" : "cursor-pointer"
                   }`}
                   style={{
                     boxShadow:
@@ -218,7 +234,7 @@ console.log(currentUser);
                   }}
                   onMouseEnter={() => setIsHoveredCompare(true)}
                   onMouseLeave={() => setIsHoveredCompare(false)}
-                  disabled={currentUser?.role === "admin"} // You can still disable the button if needed
+                  disabled={isAdmin} // You can still disable the button if needed
                 >
                   <Tooltip id="favorite" />
                   <FaCartPlus

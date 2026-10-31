@@ -3,7 +3,7 @@ import Content from "../../Content/Content";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCoupons } from "../../../Pages/Redux/Coupons/couponsSlice";
 import Title from "../../Design/Title";
-import {toast} from 'react-hot-toast';
+import toast from "../../Toast/LuxuryToast";
 
 const CouponCode = () => {
   const { isLoading, Coupons, error } = useSelector((state) => state.Coupons);
@@ -59,15 +59,18 @@ const CouponCode = () => {
   // 
   const copyToClipboard = (code) => {
     if (code) {
-      navigator.clipboard.writeText(code)
-        .then(() => {
-          toast.success("Coupon code Copy!");
-        })
-        .catch(err => {
-          toast.error("Failed to copy the coupon code");
-        });
+      try {
+        if (navigator?.clipboard?.writeText) {
+          navigator.clipboard.writeText(code).catch(() => {});
+        }
+      } catch (_err) {
+        /* ignore clipboard write errors */
+      }
+      toast.success(`Coupon code "${code}" is saved to clipboard.`, {
+        title: "Coupon Copied 🎉",
+        badge: code,
+      });
     }
-;
   };
   const getCouponStatus = (endDate) => {
     return new Date(endDate) > new Date() ? "Active" : "Expired";

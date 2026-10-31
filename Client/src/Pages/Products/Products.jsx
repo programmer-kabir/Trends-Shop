@@ -1099,13 +1099,11 @@ const Products = () => {
 
           {/* ================= RIGHT PRODUCTS CATALOG GRID ================= */}
           <main className="lg:col-span-9">
-            {isLoading ? (
-              <div className="py-24 flex flex-col items-center justify-center">
-                <LoadingSpinner />
-                <p className="text-xs text-slate-400 mt-4 tracking-wider uppercase font-semibold">
-                  Loading Luxury Footwear Catalog...
-                </p>
-              </div>
+            {isLoading && Shoes.length === 0 ? (
+              <LoadingSpinner
+                message="Loading Luxury Catalog..."
+                subMessage="Presenting bespoke leather footwear collections"
+              />
             ) : error ? (
               <div className="p-10 text-center rounded-3xl bg-white dark:bg-[#111827] border border-red-500/20 text-red-500">
                 <p className="font-bold">Error loading footwear catalog</p>

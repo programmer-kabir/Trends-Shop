@@ -19,7 +19,6 @@ import Content from "../../../Components/Content/Content";
 import { TbCurrencyTaka } from "react-icons/tb";
 import useAuth from "../../../Components/Hooks/useAuth";
 import useAdmin from "../../../Components/Hooks/useAdmin";
-import LoadingSpinner from "../../../Components/Design/LoadingSpinner/LoadingSpinner";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../../Redux/Categories/categoriesSlice";
 import { AiOutlineShoppingCart } from "react-icons/ai";
@@ -39,6 +38,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { Categories = [] } = useSelector((state) => state.Categories || {});
+  const { Booked = [] } = useSelector((state) => state.Booked || {});
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -170,7 +170,7 @@ const Navbar = () => {
     logOut();
   };
 
-  const { favoriteTShirtCount } = useContext(FavoritesContext);
+  const { favoritesCount } = useContext(FavoritesContext);
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -225,11 +225,25 @@ const Navbar = () => {
                 </button>
 
                 {/* Wishlist */}
-                <Link to="/wishlist" className="relative p-2 text-slate-700 dark:text-slate-200 hover:text-amber-500 dark:hover:text-amber-400 transition-colors">
+                <Link to="/wishlist" className="relative p-2 text-slate-700 dark:text-slate-200 hover:text-amber-500 dark:hover:text-amber-400 transition-colors" title="Wishlist">
                   <FaRegHeart size={21} />
-                  {favoriteTShirtCount > 0 && (
+                  {favoritesCount > 0 && (
                     <span className="absolute -top-1 -right-1 text-[11px] font-bold text-white bg-amber-500 rounded-full h-5 w-5 flex items-center justify-center shadow-md animate-pulse">
-                      {favoriteTShirtCount}
+                      {favoritesCount}
+                    </span>
+                  )}
+                </Link>
+
+                {/* Shopping Bag / Cart */}
+                <Link
+                  to="/user/my_orders"
+                  className="relative p-2 text-slate-700 dark:text-slate-200 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"
+                  title="Shopping Bag"
+                >
+                  <FiShoppingCart size={21} />
+                  {Booked?.length > 0 && (
+                    <span className="absolute -top-1 -right-1 text-[11px] font-bold text-slate-950 bg-amber-400 rounded-full h-5 w-5 flex items-center justify-center shadow-md animate-pulse">
+                      {Booked.length}
                     </span>
                   )}
                 </Link>

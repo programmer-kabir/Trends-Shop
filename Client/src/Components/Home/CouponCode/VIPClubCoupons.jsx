@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCoupons } from "../../../Pages/Redux/Coupons/couponsSlice";
 import { FiCopy, FiCheck, FiMail, FiGift, FiTag } from "react-icons/fi";
-import toast from "react-hot-toast";
+import toast from "../../Toast/LuxuryToast";
 import Content from "../../Content/Content";
 
 const defaultCoupons = [
@@ -23,17 +23,31 @@ const VIPClubCoupons = () => {
 
   const activeCoupons = (Coupons && Coupons.length > 0) ? Coupons : defaultCoupons;
 
-  const handleCopy = (code) => {
-    navigator.clipboard.writeText(code);
+  const handleCopy = (code, discount = 10) => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(code).catch(() => {});
+      }
+    } catch (_err) {
+      /* ignore clipboard error */
+    }
     setCopiedCode(code);
-    toast.success(`Coupon "${code}" copied to clipboard! 🎉`);
+    toast.success(`Coupon code "${code}" is copied and ready to apply at checkout.`, {
+      title: "Voucher Copied 🎉",
+      badge: "VIP Club Reward",
+      amount: `${discount}% OFF`,
+    });
     setTimeout(() => setCopiedCode(""), 3000);
   };
 
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (!email) return;
-    toast.success("Welcome to the Trends Shop VIP Circle! Check your email for your private discount.");
+    toast.success("Welcome to the Trends Shop VIP Circle! Check your inbox for your private voucher.", {
+      title: "VIP Circle Joined ✨",
+      badge: "VIP Welcome",
+      amount: "15% OFF",
+    });
     setEmail("");
   };
 
@@ -87,7 +101,7 @@ const VIPClubCoupons = () => {
                     {item.code}
                   </div>
                   <button
-                    onClick={() => handleCopy(item.code)}
+                    onClick={() => handleCopy(item.code, item.isShipping ? "FREE SHIP" : `${item.discount}% OFF`)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                       isCopied
                         ? "bg-emerald-500 text-white"

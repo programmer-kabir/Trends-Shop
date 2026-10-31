@@ -57,7 +57,9 @@ const AdminBoard = () => {
   const monthRevenue = calcRevenue(monthOrders);
 
   // Status breakdown
-  const pendingOrders = RequestPayment.filter((o) => o?.status === "Pending");
+  const pendingOrders = RequestPayment.filter(
+    (o) => o?.status === "Pending" || o?.status === "Awaiting Check Payment"
+  );
   const receivedOrders = RequestPayment.filter((o) => o?.status === "Receive Payment");
   const deliveryOrders = RequestPayment.filter((o) => o?.status === "Delivery");
   const completedOrders = RequestPayment.filter((o) => o?.status === "Completed Order");

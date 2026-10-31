@@ -1,8 +1,6 @@
-// District.js
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
 
-const upZillah = () => {
+const useUpZillah = () => {
   const {
     refetch,
     data: upZillahs = [],
@@ -20,4 +18,4 @@ const upZillah = () => {
   return [upZillahs, refetch, loading];
 };
 
-export default upZillah;
+export default useUpZillah;

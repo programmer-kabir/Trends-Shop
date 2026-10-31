@@ -4,8 +4,9 @@ import { fetchRequestPayment } from "../../Redux/RequestPayment/requestPaymentSl
 import { fetchShoes } from "../../Redux/Shoes/shoesSlice";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import toast from "react-hot-toast";
+import toast from "../../../Components/Toast/LuxuryToast";
 import useAuth from "../../../Components/Hooks/useAuth";
+import InvoiceModal from "../../../Components/Invoice/InvoiceModal";
 import {
   FiSearch,
   FiClock,
@@ -21,6 +22,7 @@ import {
   FiShoppingBag,
   FiDollarSign,
   FiFilter,
+  FiPrinter,
 } from "react-icons/fi";
 
 const RequestPayment = () => {
@@ -36,6 +38,7 @@ const RequestPayment = () => {
   const [editingDateId, setEditingDateId] = useState(null);
   const [tempDate, setTempDate] = useState("");
   const [statusUpdatingId, setStatusUpdatingId] = useState(null);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
 
   useEffect(() => {
     dispatch(fetchRequestPayment());
@@ -44,7 +47,11 @@ const RequestPayment = () => {
 
   const copyToClipboard = (text, label) => {
     navigator.clipboard.writeText(text);
-    toast.success(`${label} copied!`, { duration: 1500 });
+    toast.success(`${label} copied to clipboard!`, {
+      title: "Copied 📋",
+      badge: label,
+      duration: 2500,
+    });
   };
 
   const handleStatusChange = async (payment, newStatus) => {
@@ -62,10 +69,15 @@ const RequestPayment = () => {
         `${import.meta.env.VITE_LOCALHOST_KEY}/requestPayment`,
         data
       );
-      toast.success(res?.data?.message || `Order status updated to ${newStatus}`);
+      toast.success(res?.data?.message || `Order status updated to "${newStatus}"`, {
+        title: "Order Status Updated 📦",
+        badge: newStatus,
+      });
       dispatch(fetchRequestPayment());
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Failed to update status");
+      toast.error(err?.response?.data?.message || "Failed to update status", {
+        title: "Update Failed ✕",
+      });
     } finally {
       setStatusUpdatingId(null);
     }
@@ -89,11 +101,16 @@ const RequestPayment = () => {
         `${import.meta.env.VITE_LOCALHOST_KEY}/requestPayment`,
         data
       );
-      toast.success(`Delivery date scheduled: ${tempDate}`);
+      toast.success(`Delivery scheduled for ${tempDate}`, {
+        title: "Schedule Confirmed 🚚",
+        badge: "Delivery Date",
+      });
       setEditingDateId(null);
       dispatch(fetchRequestPayment());
     } catch (err) {
-      toast.error("Failed to update delivery date");
+      toast.error("Failed to update delivery date", {
+        title: "Update Failed ✕",
+      });
     }
   };
 
@@ -109,7 +126,8 @@ const RequestPayment = () => {
     if (!matchesSearch) return false;
 
     if (selectedStatusTab === "ALL") return true;
-    if (selectedStatusTab === "PENDING") return payment.status === "Pending";
+    if (selectedStatusTab === "PENDING")
+      return payment.status === "Pending" || payment.status === "Awaiting Check Payment";
     if (selectedStatusTab === "RECEIVED") return payment.status === "Receive Payment";
     if (selectedStatusTab === "DELIVERY") return payment.status === "Delivery";
     if (selectedStatusTab === "COMPLETED") return payment.status === "Completed Order";
@@ -121,7 +139,9 @@ const RequestPayment = () => {
     (acc, curr) => acc + (Number(curr?.price) || 0) + (Number(curr?.shippingCost) || 0),
     0
   );
-  const pendingCount = RequestPayment.filter((o) => o?.status === "Pending").length;
+  const pendingCount = RequestPayment.filter(
+    (o) => o?.status === "Pending" || o?.status === "Awaiting Check Payment"
+  ).length;
   const transitCount = RequestPayment.filter((o) => o?.status === "Delivery").length;
   const completedCount = RequestPayment.filter((o) => o?.status === "Completed Order").length;
 
@@ -336,38 +356,73 @@ const RequestPayment = () => {
                         </div>
                       </td>
 
-                      {/* Ordered Shoe */}
+                      {/* Ordered Shoe(s) */}
                       <td className="py-4 px-4 align-top">
-                        <div className="flex items-start gap-2.5">
-                          {shoe?.mainImage ? (
-                            <img
-                              src={shoe.mainImage}
-                              alt={shoe.name}
-                              className="w-10 h-10 rounded-lg object-cover border border-slate-200 dark:border-slate-700 shrink-0"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                              <FiShoppingBag className="w-4 h-4 text-slate-400" />
+                        {Array.isArray(payment?.items) && payment.items.length > 0 ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                                {payment.items.length} Articles Unified
+                              </span>
                             </div>
-                          )}
-                          <div>
-                            <Link
-                              to={shoe ? `/product-details/${shoe._id}` : "#"}
-                              className="font-medium text-slate-900 dark:text-white hover:text-amber-600 transition line-clamp-1 max-w-[170px]"
-                              title={shoe?.name}
-                            >
-                              {shoe?.name || "Footwear Article"}
-                            </Link>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
-                                Size {payment?.size || 42}
-                              </span>
-                              <span className="text-[10px] text-slate-400 uppercase">
-                                {shoe?.category || "Men's Formal"}
-                              </span>
+                            <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                              {payment.items.map((item, itIdx) => (
+                                <div key={itIdx} className="flex items-center gap-2 text-xs">
+                                  {item.image ? (
+                                    <img
+                                      src={item.image}
+                                      alt={item.name}
+                                      className="w-7 h-7 rounded-md object-cover border border-slate-200 dark:border-slate-700 shrink-0"
+                                    />
+                                  ) : (
+                                    <div className="w-7 h-7 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                                      <FiShoppingBag className="w-3 h-3 text-slate-400" />
+                                    </div>
+                                  )}
+                                  <div className="min-w-0">
+                                    <p className="font-medium text-slate-900 dark:text-white line-clamp-1 text-[11px]" title={item.name}>
+                                      {item.name}
+                                    </p>
+                                    <p className="text-[10px] text-slate-400">
+                                      Size {item.size} • Qty {item.quantity} • ৳{item.price}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="flex items-start gap-2.5">
+                            {shoe?.mainImage ? (
+                              <img
+                                src={shoe.mainImage}
+                                alt={shoe.name}
+                                className="w-10 h-10 rounded-lg object-cover border border-slate-200 dark:border-slate-700 shrink-0"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                                <FiShoppingBag className="w-4 h-4 text-slate-400" />
+                              </div>
+                            )}
+                            <div>
+                              <Link
+                                to={shoe ? `/product-details/${shoe._id}` : "#"}
+                                className="font-medium text-slate-900 dark:text-white hover:text-amber-600 transition line-clamp-1 max-w-[170px]"
+                                title={shoe?.name}
+                              >
+                                {shoe?.name || "Footwear Article"}
+                              </Link>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                                  Size {payment?.size || 42}
+                                </span>
+                                <span className="text-[10px] text-slate-400 uppercase">
+                                  {shoe?.category || "Men's Formal"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </td>
 
                       {/* Channel & Trx */}
@@ -447,7 +502,7 @@ const RequestPayment = () => {
                       {/* Status Dropdown */}
                       <td className="py-4 px-4 align-top">
                         <select
-                          value={payment?.status || "Pending"}
+                          value={payment?.status || "Awaiting Check Payment"}
                           disabled={statusUpdatingId === payment._id}
                           onChange={(e) =>
                             handleStatusChange(payment, e.target.value)
@@ -464,12 +519,21 @@ const RequestPayment = () => {
                               : "bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800"
                           }`}
                         >
+                          <option value="Awaiting Check Payment">Awaiting Verification</option>
                           <option value="Pending">Pending</option>
                           <option value="Receive Payment">Receive Payment</option>
                           <option value="Delivery">Out for Delivery</option>
                           <option value="Completed Order">Completed Order</option>
                           <option value="Transition ID Error">Transition ID Error</option>
                         </select>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedInvoice(payment)}
+                          className="mt-2 w-full px-2 py-1 rounded-lg text-[11px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 transition flex items-center justify-center gap-1.5 shadow-sm"
+                        >
+                          <FiPrinter className="w-3 h-3" />
+                          <span>Invoice 🧾</span>
+                        </button>
                       </td>
                     </tr>
                   );
@@ -479,6 +543,14 @@ const RequestPayment = () => {
           </div>
         )}
       </div>
+
+      {/* Luxury Printable Invoice Modal */}
+      <InvoiceModal
+        isOpen={!!selectedInvoice}
+        onClose={() => setSelectedInvoice(null)}
+        order={selectedInvoice}
+        shoes={Shoes}
+      />
     </div>
   );
 };

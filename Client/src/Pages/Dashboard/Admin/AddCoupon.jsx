@@ -3,7 +3,7 @@ import { FiSearch, FiTag, FiCopy, FiTrash2, FiPlus, FiCalendar, FiPercent } from
 import { RxCross2 } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCoupons } from "../../Redux/Coupons/couponsSlice";
-import toast from "react-hot-toast";
+import toast from "../../../Components/Toast/LuxuryToast";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -28,7 +28,11 @@ const AddCoupon = () => {
 
   const copyCode = (code) => {
     navigator.clipboard.writeText(code);
-    toast.success(`Coupon code "${code}" copied!`, { duration: 1500 });
+    toast.success(`Coupon code "${code}" copied to clipboard!`, {
+      title: "Voucher Copied 📋",
+      badge: code,
+      duration: 2500,
+    });
   };
 
   const {
@@ -55,7 +59,8 @@ const AddCoupon = () => {
       const mainData = {
         name,
         amount: Number(amount),
-        star: startDate,
+        start: startDate,
+        star: startDate, // backward compatibility with legacy coupon objects
         end: endDate,
         code: code.trim().toUpperCase(),
         image:
@@ -69,22 +74,30 @@ const AddCoupon = () => {
       );
 
       if (res?.data?.insertedId) {
-        toast.success(`Coupon code "${mainData.code}" created successfully!`);
+        toast.success(`Coupon code "${mainData.code}" created and activated!`, {
+          title: "Coupon Created 🎉",
+          badge: mainData.code,
+          amount: `${mainData.amount}% OFF`,
+        });
         closeModal();
         dispatch(fetchCoupons());
       }
     } catch (error) {
       if (error?.response?.status === 400) {
-        toast.error("This coupon code already exists!");
+        toast.error("This coupon code already exists!", {
+          title: "Duplicate Code ⚠️",
+        });
       } else {
-        toast.error("An unexpected error occurred while saving the coupon.");
+        toast.error("An unexpected error occurred while saving the coupon.", {
+          title: "Save Failed ✕",
+        });
       }
     }
   };
 
   const getCouponStatus = (coupon) => {
     const currentDate = new Date();
-    const startDate = new Date(coupon.star);
+    const startDate = new Date(coupon.start || coupon.star);
     const endDate = new Date(coupon.end);
 
     const oneDay = 24 * 60 * 60 * 1000;
@@ -116,10 +129,15 @@ const AddCoupon = () => {
           await axios.delete(
             `${import.meta.env.VITE_LOCALHOST_KEY}/couponCode/${coupon._id}`
           );
-          toast.success("Coupon code deleted.");
+          toast.success(`Coupon code "${coupon.code}" deleted.`, {
+            title: "Coupon Removed 🗑️",
+            badge: coupon.code,
+          });
           dispatch(fetchCoupons());
         } catch (error) {
-          toast.error("Failed to delete coupon.");
+          toast.error("Failed to delete coupon.", {
+            title: "Delete Error ✕",
+          });
         }
       }
     });
@@ -261,7 +279,7 @@ const AddCoupon = () => {
                       <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400">
                         <div className="flex items-center gap-1">
                           <FiCalendar className="w-3 h-3 text-slate-400" />
-                          <span>{coupon?.star} – {coupon?.end}</span>
+                          <span>{coupon?.start || coupon?.star} – {coupon?.end}</span>
                         </div>
                       </td>
 

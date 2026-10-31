@@ -7,9 +7,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import store from "./Pages/Redux/store";
 import { fetchCategories } from "./Pages/Redux/Categories/categoriesSlice";
 import { Provider } from "react-redux";
-import { Toaster } from "react-hot-toast";
+import { LuxuryToaster } from "./Components/Toast/LuxuryToast";
 import AuthProvider from "./Provider/AuthProvider";
-import WishlistData from "./Components/Context/WishlistData";
 import FavoritesProvider from "./Provider/FavoritesContext";
 import ThemeProvider from "./Provider/ThemeContext";
 
@@ -34,14 +33,12 @@ createRoot(document.getElementById("root")).render(
     <ThemeProvider>
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
-          <Toaster />
-          <WishlistData>
-            <FavoritesProvider>
-              <Provider store={store}>
-                <RouterProvider router={router} />
-              </Provider>
-            </FavoritesProvider>
-          </WishlistData>
+          <LuxuryToaster />
+          <FavoritesProvider>
+            <Provider store={store}>
+              <RouterProvider router={router} />
+            </Provider>
+          </FavoritesProvider>
         </QueryClientProvider>
       </AuthProvider>
     </ThemeProvider>

@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../../Redux/Categories/categoriesSlice";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import toast from "../../../Components/Toast/LuxuryToast";
 import axios from "axios";
 import {
   FiPackage,
@@ -80,7 +80,10 @@ const AddProduct = () => {
       setSelectedSizes(["40", "41", "42", "43", "44"]);
       setMainImageUrl("https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?q=80&w=800&auto=format&fit=crop");
       setHoverImageUrl("https://images.unsplash.com/photo-1533867617858-e7b97e060509?q=80&w=800&auto=format&fit=crop");
-      toast.success("Loaded Classic Executive Oxford preset");
+      toast.success("Loaded Classic Executive Oxford preset.", {
+        title: "Preset Applied ✨",
+        badge: "Executive Oxford",
+      });
     } else if (type === "chelsea") {
       setValue("name", "Artisan Chelsea Boot Waxed Camel Suede");
       setValue("price", 4200);
@@ -92,7 +95,10 @@ const AddProduct = () => {
       setSelectedSizes(["41", "42", "43", "44"]);
       setMainImageUrl("https://images.unsplash.com/photo-1608256246200-53e635b5b65f?q=80&w=800&auto=format&fit=crop");
       setHoverImageUrl("https://images.unsplash.com/photo-1582588678413-dbf45f4823e9?q=80&w=800&auto=format&fit=crop");
-      toast.success("Loaded Waxed Suede Chelsea Boot preset");
+      toast.success("Loaded Waxed Suede Chelsea Boot preset.", {
+        title: "Preset Applied ✨",
+        badge: "Chelsea Boot",
+      });
     } else if (type === "pump") {
       setValue("name", "Elegance Stiletto Leather Pump Crimson Red");
       setValue("price", 3400);
@@ -104,7 +110,10 @@ const AddProduct = () => {
       setSelectedSizes(["36", "37", "38", "39", "40"]);
       setMainImageUrl("https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=800&auto=format&fit=crop");
       setHoverImageUrl("https://images.unsplash.com/photo-1535043934128-cf0b28d52f95?q=80&w=800&auto=format&fit=crop");
-      toast.success("Loaded Women's Luxury Pump preset");
+      toast.success("Loaded Women's Luxury Pump preset.", {
+        title: "Preset Applied ✨",
+        badge: "Luxury Pump",
+      });
     }
   };
 
@@ -202,7 +211,9 @@ const AddProduct = () => {
   // Submit
   const onSubmit = async (data) => {
     if (!mainImageUrl) {
-      toast.error("Please provide at least a Main Showcase Image URL.");
+      toast.warning("Please provide at least a Main Showcase Image URL.", {
+        title: "Image Required 📸",
+      });
       return;
     }
 
@@ -244,11 +255,17 @@ const AddProduct = () => {
       );
 
       if (res?.data?.insertedId) {
-        toast.success(`"${mainData.name}" published to catalog!`);
+        toast.success(`"${mainData.name}" has been published to the catalog!`, {
+          title: "Footwear Published 🎉",
+          badge: mainData.category,
+          amount: `৳ ${mainData.price.toLocaleString()}`,
+        });
         navigate("/admin/show-product");
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to publish footwear.");
+      toast.error(error?.response?.data?.message || "Failed to publish footwear.", {
+        title: "Publish Failed ✕",
+      });
     } finally {
       setSubmitting(false);
     }

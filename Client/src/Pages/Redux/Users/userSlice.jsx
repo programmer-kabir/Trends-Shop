@@ -1,8 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-export const fetchUser = createAsyncThunk("users/fetchUser", async () => {
+export const fetchUser = createAsyncThunk("users/fetchUser", async (email) => {
   try {
     const apiBase = import.meta.env.VITE_LOCALHOST_KEY || "http://localhost:5000";
+    if (email) {
+      const response = await axios.get(
+        `${apiBase}/userProfile?email=${encodeURIComponent(email)}`
+      );
+      return response.data && response.data.email ? [response.data] : [];
+    }
     const response = await axios.get(`${apiBase}/users`);
     return response.data;
   } catch (error) {

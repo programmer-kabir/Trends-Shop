@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import toast from "react-hot-toast";
+import toast from "../../../Components/Toast/LuxuryToast";
 import { fetchUser } from "../../Redux/Users/userSlice";
 import {
   FiUsers,
@@ -28,11 +28,16 @@ const ManagerUsers = () => {
         `${import.meta.env.VITE_LOCALHOST_KEY}/users/admin/${targetUser?._id}`
       );
       if (res.data.modifiedCount) {
-        toast.success(`${targetUser?.name} is now an Admin!`);
+        toast.success(`${targetUser?.name || "User"} has been granted Administrator privileges.`, {
+          title: "Role Updated 🛡️",
+          badge: "Admin Granted",
+        });
         dispatch(fetchUser());
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Failed to update user role");
+      toast.error(err?.response?.data?.message || "Failed to update user role", {
+        title: "Role Update Failed ✕",
+      });
     }
   };
 

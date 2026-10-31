@@ -5,6 +5,7 @@ import useAuth from "../Hooks/useAuth";
 import useAdmin from "../Hooks/useAdmin";
 import LoadingSpinner from "../Design/LoadingSpinner/LoadingSpinner";
 import { useSelector } from "react-redux";
+import { getStoredFavorites } from "../../Provider/FavoritesContext";
 import {
   FiGrid,
   FiShoppingBag,
@@ -21,6 +22,10 @@ import {
   FiLayers,
   FiChevronRight,
   FiActivity,
+  FiUser,
+  FiHeart,
+  FiClock,
+  FiShoppingCart,
 } from "react-icons/fi";
 
 const Sidebar = () => {
@@ -34,11 +39,19 @@ const Sidebar = () => {
   const { Shoes } = useSelector((state) => state.Shoes || { Shoes: [] });
   const { categories } = useSelector((state) => state.Categories || { categories: [] });
   const { Coupons } = useSelector((state) => state.Coupons || { Coupons: [] });
+  const { Booked = [] } = useSelector((state) => state.Booked || { Booked: [] });
 
-  // Count active orders
+  // Count active orders (admin)
   const activeOrdersCount = RequestPayment?.filter(
     (o) => o?.status === "Pending" || o?.status === "Receive Payment" || o?.status === "Delivery"
   )?.length || 0;
+
+  // Customer order metrics
+  const userActiveCount = (Booked?.filter((b) => b?.status !== "Completed Order")?.length || 0);
+  const userCompletedCount = (Booked?.filter((b) => b?.status === "Completed Order")?.length || 0);
+
+  // Customer wishlist count from localStorage
+  const wishlistCount = getStoredFavorites().length;
 
   const totalShoesCount = Shoes?.length || 0;
   const totalCategoriesCount = categories?.length || 0;
@@ -58,8 +71,8 @@ const Sidebar = () => {
     logOut();
   };
 
-  if (isAdminLoading || loading) {
-    return <LoadingSpinner />;
+  if (!user && loading) {
+    return <LoadingSpinner fullScreen={true} message="Loading Atelier Portal..." />;
   }
 
   // Admin Navigation Sections
@@ -79,6 +92,13 @@ const Sidebar = () => {
           icon: <FiShoppingBag className="w-5 h-5" />,
           badge: activeOrdersCount > 0 ? `${activeOrdersCount} Active` : null,
           badgeColor: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30",
+        },
+        {
+          to: "/admin/customer-carts",
+          label: "Customer Carts & Offers",
+          icon: <FiShoppingCart className="w-5 h-5" />,
+          badge: "Cart Intel",
+          badgeColor: "bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20",
         },
       ],
     },
@@ -130,19 +150,34 @@ const Sidebar = () => {
   // Customer Navigation Sections
   const userSections = [
     {
-      title: "My Account",
+      title: "Client Portal",
       items: [
         {
           to: "/user/dashboard",
-          label: "My Profile",
-          icon: <FiGrid className="w-5 h-5" />,
+          label: "Account Overview & Profile",
+          icon: <FiUser className="w-5 h-5" />,
           badge: null,
         },
         {
           to: "/user/my_orders",
-          label: "My Order History",
-          icon: <FiShoppingBag className="w-5 h-5" />,
-          badge: null,
+          label: "Active Shipments",
+          icon: <FiPackage className="w-5 h-5" />,
+          badge: userActiveCount > 0 ? `${userActiveCount} Active` : null,
+          badgeColor: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30",
+        },
+        {
+          to: "/user/completed_orders",
+          label: "Purchase History",
+          icon: <FiCheckCircle className="w-5 h-5" />,
+          badge: userCompletedCount > 0 ? `${userCompletedCount} Delivered` : null,
+          badgeColor: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20",
+        },
+        {
+          to: "/user/wishlist",
+          label: "Saved Wishlist",
+          icon: <FiHeart className="w-5 h-5" />,
+          badge: wishlistCount > 0 ? `${wishlistCount} Saved` : null,
+          badgeColor: "bg-pink-500/10 text-pink-700 dark:text-pink-300 border border-pink-500/20",
         },
       ],
     },
@@ -167,7 +202,7 @@ const Sidebar = () => {
           {/* Brand Logo & Portal Tag */}
           <Link to="/" className="flex items-center gap-3 group">
             <img
-              className="h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-9 w-auto object-contain dark:invert dark:hue-rotate-180 transition-transform duration-300 group-hover:scale-105"
               src={logo}
               alt="Trends Shop"
             />

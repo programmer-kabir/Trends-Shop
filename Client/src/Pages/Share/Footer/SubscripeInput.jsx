@@ -1,6 +1,6 @@
 import { Input, Button } from 'antd';
 import { ArrowRightOutlined } from '@ant-design/icons';
-import toast from 'react-hot-toast';
+import toast from "../../../Components/Toast/LuxuryToast";
 import { useState } from 'react';
 
 const SubscribeInput = () => {
@@ -12,13 +12,22 @@ const SubscribeInput = () => {
   const handleSubscription = () => {
     // Check if the email is not empty, has a valid format, and correct domain
     if (!email) {
-      toast.error("Please enter an email address.");
+      toast.warning("Please enter your email address to subscribe.", {
+        title: "Email Required ✉️",
+      });
     } else if (!emailRegex.test(email)) {
-      toast.error("Please enter a valid email address.");
+      toast.error("Please enter a valid email address.", {
+        title: "Invalid Email ✉️",
+      });
     } else if (email.includes('@gamil.com')) { // Check for common typo
-      toast.error("Did you mean '@gmail.com'?");
+      toast.warning("Did you mean '@gmail.com'?", {
+        title: "Typo Detected 💡",
+      });
     } else {
-      toast.success("Please wait, it's working. We will be back soon.");
+      toast.success("Thank you for subscribing to Trends Shop updates!", {
+        title: "Subscribed Successfully 🎉",
+        badge: "Newsletter VIP",
+      });
     }
   };
   return (

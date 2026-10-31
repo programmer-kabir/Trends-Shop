@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchReviews } from "../Redux/Reviews/reviewsSlice";
 import { useParams } from "react-router-dom";
 import useAuth from "../../Components/Hooks/useAuth";
-import toast from "react-hot-toast";
+import toast from "../../Components/Toast/LuxuryToast";
 
 const defaultSampleReviews = [
   {
@@ -60,7 +60,9 @@ const Reviews = ({ onFinish, setRating }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!reviewText.trim()) {
-      return toast.error("Please write a short review before submitting");
+      return toast.warning("Please share a few words about your shoe experience.", {
+        title: "Review Required ✍️",
+      });
     }
     setIsSubmitting(true);
     if (onFinish) {

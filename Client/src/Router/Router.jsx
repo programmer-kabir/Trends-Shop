@@ -7,6 +7,7 @@ import Register from "../Pages/Authenction/Register/Register";
 import Dashboard from "../Layouts/Dashboard";
 import MyProfile from "../Pages/Dashboard/User/MyProfile";
 import MyOrders from "../Pages/Dashboard/User/MyOrders";
+import CompletedOrders from "../Pages/Dashboard/User/CompletedOrders";
 import ProductDetails from "../Pages/Products/ProductDetails";
 import CheckOut from "../Pages/Dashboard/User/CheckOut";
 import PrivateRoute from "./PrivetRouter";
@@ -20,12 +21,14 @@ import AdminRoute from "./AdminRoute";
 import Wishlist from "../Pages/Wishlist/Wishlist";
 import EditProduct from "../Pages/Dashboard/Admin/EditProduct";
 import ManageCategories from "../Pages/Dashboard/Admin/ManageCategories";
+import AbandonedCarts from "../Pages/Dashboard/Admin/AbandonedCarts";
+import NotFound from "../Pages/Error/NotFound";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
-    // errorElement: <Error />,
+    errorElement: <NotFound />,
     children: [
       {
         path: "/",
@@ -56,8 +59,24 @@ const router = createBrowserRouter([
         element: <CheckOut />,
       },
       {
+        path: "/checkout",
+        element: <CheckOut />,
+      },
+      {
+        path: "/CheckOut",
+        element: <CheckOut />,
+      },
+      {
         path: "/wishlist",
         element: <Wishlist />,
+      },
+      {
+        path: "/shoes",
+        element: <Products />,
+      },
+      {
+        path: "/shop",
+        element: <Products />,
       },
     ],
   },
@@ -76,6 +95,14 @@ const router = createBrowserRouter([
       {
         path: "my_orders",
         element: <MyOrders />,
+      },
+      {
+        path: "completed_orders",
+        element: <CompletedOrders />,
+      },
+      {
+        path: "wishlist",
+        element: <Wishlist />,
       },
     ],
   },
@@ -121,7 +148,15 @@ const router = createBrowserRouter([
         path: "show-product/Edit-product/:id",
         element: <EditProduct />,
       },
+      {
+        path: "customer-carts",
+        element: <AbandonedCarts />,
+      },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
 

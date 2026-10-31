@@ -1,221 +1,288 @@
-import React, { useState } from "react";
-import { Button, Divider, Form, Input, Modal } from "antd";
-import { GiCheckMark } from "react-icons/gi";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../../assets/LOGO/LOGO.png";
-import { IoMdCopy } from "react-icons/io";
-import toast from 'react-hot-toast'
+import toast from "../../../Components/Toast/LuxuryToast";
 import useAuth from "../../../Components/Hooks/useAuth";
+import {
+  FiMail,
+  FiLock,
+  FiCheck,
+  FiArrowRight,
+  FiShield,
+  FiStar,
+  FiEye,
+  FiEyeOff,
+  FiCopy,
+} from "react-icons/fi";
+import { RiSparklingFill } from "react-icons/ri";
+
 const Login = () => {
-  const {SingInUser,setLoading} = useAuth()
-  const [open, setOpen] = useState(false);
-  const showModal = () => {
-    setOpen(true);
-  };
-  const handleCancel = () => {
-    setOpen(false);
-  };
+  const { SingInUser, user, loading } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
+  const destination = from === "/login" ? "/" : from;
 
-  const onFinish = (values) =>{
-    SingInUser(values.email, values.password)
-    .then((result) => {
-      const loggedUser = result.user;
-      setLoading(false);
-      toast.success('login successful')
-      navigate(from , {replace:true})
-    })
-    .catch(error=>{
-      toast.error(error.message)
-      setLoading(false)
-    })
+  // Auto-redirect if user is already logged in
+  useEffect(() => {
+    if (user && !loading) {
+      navigate(destination, { replace: true });
+    }
+  }, [user, loading, navigate, destination]);
 
-  };
-  
-  // Email
-  const email1 = "admin@gmail.com";
-  const email2 = "user@gmail.com";
-
-  const handleEmailCopy = (email) => {
-    navigator.clipboard.writeText(email)
-      .then(() => {
-        toast.success(`Email copied to clipboard!`);
-      })
-      .catch((err) => {
-        console.error("Failed to copy: ", err);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      toast.warning("Please fill in both email and password.", {
+        title: "Required Fields ⚠️",
       });
-  };
-  // Password
-  const password1 = "admin123@#";
-  const password2 = "user123@#";
+      return;
+    }
 
-  const handlePasswordCopy = (password) => {
-    navigator.clipboard.writeText(password)
-      .then(() => {
-        toast.success(`Password copied to clipboard!`);
-      })
-      .catch((err) => {
-        console.error("Failed to copy: ", err);
+    setIsSubmitting(true);
+    try {
+      const result = await SingInUser(email, password);
+      const loggedUser = result?.user;
+      toast.success("Welcome back to Trends Shop Luxury Atelier!", {
+        title: "Welcome Back 👋",
+        badge: loggedUser?.email || "VIP Member",
       });
+      navigate(destination, { replace: true });
+    } catch (error) {
+      toast.error(error.message || "Invalid credentials provided.", {
+        title: "Authentication Failed 🔒",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
+  // 1-Click Quick Fill Demo Accounts
+  const fillDemo = (demoEmail, demoPassword, roleName) => {
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+    toast.success(`${roleName} credentials loaded into form!`, {
+      title: "Demo Auto-Filled ✨",
+      badge: roleName,
+      duration: 2500,
+    });
+  };
 
-    return (
-    <section className="mt-2 md:mt-12 md:lg:mt-20 md:px-20">
-      <div className=" px-4 sm:px-2 w-full flex flex-col sm:flex-row justify-around gap-5 items-center">
-        <div className="md:w-1/2">
-          <h2 className="text-2xl uppercase">
-            Discover all the
-            <br />
-            benefits
-          </h2>
-          <p className=" text-sm pt-8">
-            Create an account to enhance your shopping experience whit the help
-            of our customized services:
-          </p>
-          <div className="pt-6 ps-5 text-sm grid grid-flow-row gap-3">
-            <p className="flex gap-2 items-center">
-              <GiCheckMark className="text-[10px]"></GiCheckMark>Seep up to date
-              with the latest news{" "}
-            </p>
-            <p className="flex gap-2 items-center">
-              <GiCheckMark className="text-[10px]"></GiCheckMark>Buy faster
-            </p>
-            <p className="flex gap-2 items-center">
-              <GiCheckMark className="text-[10px]"></GiCheckMark>Save your
-              favorite products
-            </p>
-          </div>
-          <div className=" mt-8">
-            <p className="text-lg">DON'T HAVE AN ACCOUNT?</p>
-            <p className="text-sm mt-5">
-              Create an account and Register yourself as Club member! Only club
-              members can enjoy exclusive benefits.
-            </p>
-          </div>
-          <Link to="/register">
-            <Button className="w-full border bg-[#f50400] font-semibold text-white rounded-md px-2 py-1.5  mt-5">
-              Register Now
-            </Button>
-          </Link>
-        </div>
+  return (
+    <div className="min-h-[calc(100vh-80px)] py-10 md:py-16 px-4 flex items-center justify-center bg-slate-50 dark:bg-[#0B0F19] transition-colors relative overflow-hidden">
+      {/* Ambient background glows */}
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
 
-        <Divider className="h-96 hidden md:flex" type="vertical" />
+      <div className="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-white/10 shadow-[0_20px_60px_rgba(15,23,42,0.08)] dark:shadow-[0_24px_70px_rgba(0,0,0,0.7)] bg-white/90 dark:bg-[#111827]/90 backdrop-blur-2xl relative z-10">
+        
+        {/* Left Column: Brand & Atelier Showcase */}
+        <div className="lg:col-span-5 bg-gradient-to-br from-slate-900 via-[#0E1526] to-[#0B0F19] p-8 sm:p-12 text-white flex flex-col justify-between relative overflow-hidden border-b lg:border-b-0 lg:border-r border-slate-800">
+          {/* Subtle pattern overlay */}
+          <div className="absolute inset-0 opacity-5 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px]" />
 
-        <div className="md:w-1/2 pt-5 md:flex">
-          <div>
-            <img className="w-1/4 mx-auto" src={logo} alt="" />
-            <h1 className="text-2xl text-center text-[#f50400] font-semibold">
-              Login Trands Shop
-            </h1>
-            <Form
-              name="register"
-              layout="vertical"
-              labelCol={{ span: 5 }}
-              wrapperCol={{ span: 35 }}
-              className="space-y-4 px-5"
-              onFinish={onFinish}
-            >
-              <Form.Item
-                label="Email"
-                name="email"
-                rules={[
-                  { required: true, message: "Please input your email" },
-                  {
-                    type: "email",
-                    message: "Please enter a valid email address",
-                  },
-                ]}
-              >
-                <Input placeholder="Enter your email" />
-              </Form.Item>
-              <Form.Item
-                label="Password"
-                name="password"
-                rules={[
-                  { required: true, message: "Please input your password" },
-                  {
-                    min: 6,
-                    message: "Password must be at least 6 characters long",
-                  },
-                ]}
-              >
-                <Input.Password placeholder="Enter your password" />
-              </Form.Item>
-                <Link to="/forget-password">
-                  <p className="text-end underline py-1">Forget Password?</p>
-                </Link>
+          <div className="relative z-10 space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-widest">
+              <RiSparklingFill className="text-sm" />
+              <span>Trends Atelier Member</span>
+            </div>
 
-              <Form.Item>
-                <Button
-                  className="bg-[#f50400] text-white font-semibold uppercase"
-                  htmlType="submit"
-                  block
-                >
-                  Login now
-                </Button>
-                <div className="text-center mt-4 ">
-                  New user?
-                  <span className="text-blue-300">
-                    <Link to="/register"> Register Here</Link>
-                  </span>
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-serif-luxury text-slate-100">
+                Crafted For <br />
+                <span className="bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500 bg-clip-text text-transparent">
+                  Timeless Distinction.
+                </span>
+              </h2>
+              <p className="mt-3 text-sm text-slate-400 leading-relaxed">
+                Sign in to your private atelier account to access personalized curations, tailored size recommendations, and real-time delivery concierge.
+              </p>
+            </div>
+
+            {/* Privilege points */}
+            <div className="space-y-3.5 pt-2">
+              <div className="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
+                <div className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                  <FiCheck className="stroke-[3]" />
                 </div>
-              </Form.Item>
-            </Form>
+                <span>Private Access to VIP Seasonal Vault</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
+                <div className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                  <FiCheck className="stroke-[3]" />
+                </div>
+                <span>Swift 1-Click Checkout & Saved Addresses</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs sm:text-sm text-slate-300">
+                <div className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                  <FiCheck className="stroke-[3]" />
+                </div>
+                <span>Complimentary 30-Day Hassle-Free Exchange</span>
+              </div>
+            </div>
           </div>
-          <div>
-            <Button
-              onClick={showModal}
-              className="text-emerald-500"
-              type="dashed"
-            >
-              Show Login Credentials
-            </Button>
-            <Modal
-              title="Login Credentials"
-              open={open}
-              onCancel={handleCancel}
-            >
-             {/* Admin */}
-             <h2 className="text-xl font-medium pt-1">Admin Credentials</h2>
-              <div className="text-base pt-5 flex items-center justify-between">
-                <p>Email: {email1}</p>
-                <Button onClick={() => handleEmailCopy(email1)} type="text" className="text-[#1677ff]">
-                  <IoMdCopy size={20} className="rotate-180" />
-                  <p>Copy Email</p>
-                </Button>
-              </div>
-              <div className="text-base pt-5 flex items-center justify-between">
-                <p>Password: {password1}</p>
-                <Button onClick={() => handlePasswordCopy(password1)} type="text" className="text-[#1677ff]">
-                  <IoMdCopy size={20} className="rotate-180" />
-                  <p>Copy Password</p>
-                </Button>
-              </div>
 
-              {/* User */}
-              <h2 className="text-xl font-medium pt-1">User Credentials</h2>
-              <div className="text-base pt-5 flex items-center justify-between">
-                <p>Email: {email2}</p>
-                <Button onClick={() => handleEmailCopy(email2)} type="text" className="text-[#1677ff]">
-                  <IoMdCopy size={20} className="rotate-180" />
-                  <p>Copy Email</p>
-                </Button>
-              </div>
-              <div className="text-base pt-5 flex items-center justify-between">
-                <p>Password: {password2}</p>
-                <Button onClick={() => handlePasswordCopy(password2)} type="text" className="text-[#1677ff]">
-                  <IoMdCopy size={20} className="rotate-180" />
-                  <p>Copy Password</p>
-                </Button>
-              </div>
-            </Modal>
+          {/* Bottom Callout */}
+          <div className="relative z-10 pt-8 mt-8 border-t border-slate-800/80">
+            <p className="text-xs text-slate-400">
+              Not yet registered with Trends Shop?
+            </p>
+            <Link
+              to="/register"
+              className="mt-2 inline-flex items-center gap-2 text-sm font-bold text-amber-400 hover:text-amber-300 transition-colors group"
+            >
+              <span>Create Your Atelier Account</span>
+              <FiArrowRight className="transition-transform group-hover:translate-x-1" />
+            </Link>
           </div>
         </div>
+
+        {/* Right Column: Luxury Login Form */}
+        <div className="lg:col-span-7 p-8 sm:p-12 flex flex-col justify-center">
+          <div className="max-w-md w-full mx-auto space-y-6">
+            
+            {/* Form Header */}
+            <div className="text-center sm:text-left">
+              <img
+                src={logo}
+                alt="Trends Shop Logo"
+                className="h-10 mx-auto sm:mx-0 object-contain mb-3 drop-shadow-sm"
+              />
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                Welcome Back
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Enter your credentials below to access your account.
+              </p>
+            </div>
+
+            {/* Quick Demo Fill Buttons (1-Click) */}
+            <div className="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <FiShield className="text-amber-500" />
+                  Quick Demo Accounts
+                </span>
+                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">1-Click Auto Fill</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => fillDemo("admin@gmail.com", "admin123@#", "Admin")}
+                  className="py-2 px-3 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-amber-500/50 hover:text-amber-600 dark:hover:text-amber-400 transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
+                >
+                  <span>👑 Admin Demo</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fillDemo("user@gmail.com", "user123@#", "Customer")}
+                  className="py-2 px-3 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-amber-500/50 hover:text-amber-600 dark:hover:text-amber-400 transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
+                >
+                  <span>👤 Customer Demo</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Main Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Email Input */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <FiMail className="text-base" />
+                  </div>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="name@example.com"
+                    className="w-full pl-10 pr-4 py-3 text-sm rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Password Input */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    Password
+                  </label>
+                  <Link
+                    to="/forget-password"
+                    className="text-xs text-amber-600 dark:text-amber-400 hover:underline font-medium"
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <FiLock className="text-base" />
+                  </div>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full pl-10 pr-11 py-3 text-sm rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  >
+                    {showPassword ? <FiEyeOff className="text-base" /> : <FiEye className="text-base" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full mt-2 py-3.5 px-6 rounded-xl font-bold text-sm tracking-wide bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 text-slate-950 hover:shadow-lg hover:shadow-amber-500/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4 text-slate-950" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                    </svg>
+                    <span>Authenticating...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In to Atelier</span>
+                    <FiArrowRight />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Bottom Alternative Link */}
+            <div className="pt-2 text-center text-xs text-slate-500 dark:text-slate-400">
+              New to Trends Shop?{" "}
+              <Link
+                to="/register"
+                className="font-bold text-amber-600 dark:text-amber-400 hover:underline"
+              >
+                Create an account
+              </Link>
+            </div>
+          </div>
+        </div>
+
       </div>
-    </section>
+    </div>
   );
 };
 

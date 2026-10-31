@@ -12,31 +12,34 @@ import axios from "axios";
 const auth = getAuth(app);
 export const AuthContext = createContext(null);
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState("");
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   //   User Observer
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
         const apiBase = import.meta.env.VITE_LOCALHOST_KEY || "http://localhost:5000";
-        axios
-          .post(`${apiBase}/jwt`, {
-            email: currentUser?.email,
-          })
-          .then((data) => {
-            // console.log(data.data.token);
-            localStorage.setItem("access-token", data.data.token);
-            setLoading(false);
+        try {
+          const res = await axios.post(`${apiBase}/jwt`, {
+            email: currentUser.email,
           });
+          if (res?.data?.token) {
+            localStorage.setItem("access-token", res.data.token);
+          }
+        } catch (err) {
+          console.error("JWT fetch error:", err);
+        } finally {
+          setLoading(false);
+        }
       } else {
         localStorage.removeItem("access-token");
         setLoading(false);
       }
     });
     return () => {
-      return unsubscribe;
+      return unsubscribe();
     };
   }, []);
 
@@ -47,12 +50,29 @@ const AuthProvider = ({ children }) => {
   };
 
   // exiting user sing in
-  const SingInUser = (email, password) => {
+  const SingInUser = async (email, password) => {
     setLoading(true);
-    return signInWithEmailAndPassword(auth, email, password);
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    if (result?.user) {
+      setUser(result.user);
+      const apiBase = import.meta.env.VITE_LOCALHOST_KEY || "http://localhost:5000";
+      try {
+        const res = await axios.post(`${apiBase}/jwt`, {
+          email: result.user.email,
+        });
+        if (res?.data?.token) {
+          localStorage.setItem("access-token", res.data.token);
+        }
+      } catch (err) {
+        console.error("Error setting JWT on login:", err);
+      }
+    }
+    setLoading(false);
+    return result;
   };
   // User Logout
   const logOut = () => {
+    localStorage.removeItem("access-token");
     setLoading(true);
     return signOut(auth);
   };

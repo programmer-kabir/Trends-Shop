@@ -6,7 +6,7 @@ import { fetchCategories } from "../../Redux/Categories/categoriesSlice";
 import { useForm } from "react-hook-form";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import axios from "axios";
-import toast from "react-hot-toast";
+import toast from "../../../Components/Toast/LuxuryToast";
 const EditProduct = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -200,11 +200,16 @@ const EditProduct = () => {
     axios
       .patch(`${import.meta.env.VITE_LOCALHOST_KEY}/shoes`, mainData)
       .then((response) => {
-        toast.success("Item updated successfully");
+        toast.success("Product details and inventory updated successfully.", {
+          title: "Product Updated ✨",
+          badge: "Catalog",
+        });
         navigate("../show-product");
       })
       .catch((error) => {
-        toast.error("Error updating item");
+        toast.error("Failed to update footwear details.", {
+          title: "Update Failed ✕",
+        });
       });
   };
 

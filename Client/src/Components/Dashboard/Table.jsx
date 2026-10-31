@@ -1,7 +1,7 @@
 import { Empty } from "antd";
 import axios from "axios";
 import React from "react";
-import toast from "react-hot-toast";
+import toast from "../Toast/LuxuryToast";
 import { Link } from "react-router-dom";
 
 const Table = ({ name, matchData = [] }) => {
@@ -36,7 +36,9 @@ const Table = ({ name, matchData = [] }) => {
       .then((data) => {
         console.log(data.data);
         if(data.data.deletedCount==1){
-          toast.success('Your Cart Data delete')
+          toast.success("Item has been removed from your shopping cart.", {
+            title: "Cart Item Removed 🗑️",
+          });
         } // Server response after deletion
       })
       .catch((error) => {

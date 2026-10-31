@@ -8,7 +8,13 @@ const PrivateRoute = ({ children }) => {
     const location = useLocation();
 
     if (loading) {
-        return <LoadingSpinner progress={50} />;
+        return (
+          <LoadingSpinner
+            fullScreen={true}
+            message="Verifying Client Session..."
+            subMessage="Trends Shop • Atelier Concierge"
+          />
+        );
     }
 
     if (user) {

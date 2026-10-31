@@ -2,19 +2,24 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchShoes } from "../Redux/Shoes/shoesSlice";
+import { fetchBooked } from "../Redux/Booked/bookedSlice";
 import Content from "../../Components/Content/Content";
 import Rating from "react-rating";
 import { AiFillStar } from "react-icons/ai";
 import { MdOutlineShoppingBag, MdElectricBolt } from "react-icons/md";
 import { FiHeart, FiPhone, FiCheck, FiChevronRight, FiShield, FiTruck, FiRefreshCw, FiZoomIn } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa6";
-import toast from "react-hot-toast";
+import toast from "../../Components/Toast/LuxuryToast";
 import useAuth from "../../Components/Hooks/useAuth";
 import axios from "axios";
 import DeliveryOption from "../../Components/Design/DeliveryOption";
 import Faqs from "../Faqs/Faqs";
 import Reviews from "../Reviews/Reviews";
-import { FavoritesContext } from "../../Provider/FavoritesContext";
+import {
+  FavoritesContext,
+  getStoredFavorites,
+  setStoredFavorites,
+} from "../../Provider/FavoritesContext";
 import LoadingSpinner from "../../Components/Design/LoadingSpinner/LoadingSpinner";
 
 const ProductDetails = () => {
@@ -60,31 +65,36 @@ const ProductDetails = () => {
 
   useEffect(() => {
     if (currentShoe) {
-      const storedIdsString = localStorage.getItem("favoriteTShirt");
-      const storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
+      const storedIds = getStoredFavorites();
       setIsFavorite(storedIds.includes(currentShoe._id));
       if (Array.isArray(currentShoe.size) && currentShoe.size.length > 0 && !activeSize) {
         setActiveSize(currentShoe.size[0]);
       }
     }
-  }, [currentShoe]);
+  }, [currentShoe, activeSize]);
 
   const toggleFavorite = () => {
     if (!currentShoe) return;
-    const storedIdsString = localStorage.getItem("favoriteTShirt");
-    let storedIds = storedIdsString ? JSON.parse(storedIdsString) : [];
+    let storedIds = getStoredFavorites();
 
     if (storedIds.includes(currentShoe._id)) {
       storedIds = storedIds.filter((itemId) => itemId !== currentShoe._id);
       setIsFavorite(false);
-      toast.success("Removed from wishlist");
+      toast.success(`${currentShoe.name || "Item"} removed from your wishlist.`, {
+        title: "Wishlist Updated ✨",
+        badge: currentShoe.category || "Footwear",
+      });
     } else {
       storedIds.push(currentShoe._id);
       setIsFavorite(true);
-      toast.success("Added to wishlist ❤️");
+      toast.success(`${currentShoe.name || "Item"} saved to your personal collection.`, {
+        title: "Added to Wishlist ❤️",
+        badge: currentShoe.category || "Luxury Footwear",
+        amount: `৳ ${finalPrice.toLocaleString()}`,
+      });
     }
-    localStorage.setItem("favoriteTShirt", JSON.stringify(storedIds));
-    updateFavoriteCount(storedIds.length);
+    setStoredFavorites(storedIds);
+    updateFavoriteCount();
   };
 
   const handleImageChange = (imageKey) => {
@@ -101,14 +111,12 @@ const ProductDetails = () => {
     }
   };
 
-  if (isLoading) {
+  if (!currentShoe && isLoading) {
     return (
-      <div className="py-32 flex flex-col items-center justify-center bg-slate-50 dark:bg-[#0B0F19] min-h-[60vh]">
-        <LoadingSpinner />
-        <p className="text-xs text-slate-400 mt-4 font-semibold uppercase tracking-wider">
-          Loading Luxury Footwear Details...
-        </p>
-      </div>
+      <LoadingSpinner
+        message="Loading Footwear Details..."
+        subMessage="Retrieving leather specifications and artisan sizing"
+      />
     );
   }
 
@@ -137,11 +145,15 @@ const ProductDetails = () => {
 
   const handleAddToCart = () => {
     if (!user) {
-      toast.error("Please login to add items to your cart");
+      toast.warning("Please sign in to add items to your cart", {
+        title: "Sign In Required 🔒",
+      });
       return navigate("/login");
     }
     if (!activeSize) {
-      return toast.error("Please select a shoe size");
+      return toast.warning("Please select a shoe size before proceeding", {
+        title: "Size Required ⚠️",
+      });
     }
     const data = {
       productId: currentShoe._id,
@@ -155,10 +167,21 @@ const ProductDetails = () => {
     axios
       .post(`${import.meta.env.VITE_LOCALHOST_KEY}/booked`, data)
       .then((res) => {
+        if (user?.email) {
+          dispatch(fetchBooked(user.email));
+        }
         if (res.data?.updateResult?.acknowledged) {
-          toast.success(`${currentShoe.name} quantity updated in cart`);
+          toast.success(`${currentShoe.name} quantity updated in cart`, {
+            title: "Cart Updated 🛍️",
+            badge: `Size ${activeSize} • Qty ${quantity}`,
+            amount: `৳ ${(finalPrice * quantity).toLocaleString()}`,
+          });
         } else if (res.data?.insertedId) {
-          toast.success(`${currentShoe.name} added to cart`);
+          toast.success(`${currentShoe.name} added to your bag`, {
+            title: "Added to Cart 🛍️",
+            badge: `Size ${activeSize} • Qty ${quantity}`,
+            amount: `৳ ${(finalPrice * quantity).toLocaleString()}`,
+          });
         } else {
           toast.error("Failed to add to cart");
         }
@@ -166,11 +189,38 @@ const ProductDetails = () => {
       .catch(() => toast.error("Failed to add to cart"));
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!user) {
-      toast.error("Please login to proceed with instant checkout");
+      toast.warning("Please sign in to proceed with instant checkout", {
+        title: "Sign In Required 🔒",
+      });
       return navigate("/login");
     }
+    if (!activeSize) {
+      return toast.warning("Please select a shoe size before proceeding", {
+        title: "Size Required ⚠️",
+      });
+    }
+
+    const data = {
+      productId: currentShoe._id,
+      size: activeSize,
+      productName: currentShoe.name,
+      price: finalPrice,
+      discount: discount,
+      quantity: quantity,
+      email: user.email,
+    };
+
+    try {
+      await axios.post(`${import.meta.env.VITE_LOCALHOST_KEY}/booked`, data);
+      if (user?.email) {
+        await dispatch(fetchBooked(user.email));
+      }
+    } catch (_err) {
+      // Continue to checkout anyway
+    }
+
     navigate(`/CheckOut/${currentShoe._id}`);
   };
 
@@ -183,14 +233,19 @@ const ProductDetails = () => {
       email: user?.email || "customer@trendsshop.com",
     };
     if (!formData.rating) {
-      toast.error("Please select a star rating");
+      toast.warning("Please select a star rating before submitting", {
+        title: "Rating Required ⭐",
+      });
       return;
     }
     axios
       .post(`${import.meta.env.VITE_LOCALHOST_KEY}/reviews`, formData)
       .then((res) => {
         if (res.data.insertedId) {
-          toast.success("Thank you for your verified review!");
+          toast.success("Thank you for your verified product review!", {
+            title: "Feedback Received ⭐",
+            badge: "Verified Buyer",
+          });
         }
       });
   };

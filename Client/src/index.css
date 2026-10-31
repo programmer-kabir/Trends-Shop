@@ -91,7 +91,60 @@ background-color: #d33;
 color: white;
 }
 .btn-danger:hover{
-
-background-color: rgb(214, 21, 21);
-
+  background-color: rgb(214, 21, 21);
 }
+
+/* Luxury Toast Animation Keyframes */
+@keyframes luxuryToastIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes luxuryProgress {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+.animate-luxury-toast {
+  animation: luxuryToastIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Luxury Loader Animations */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
