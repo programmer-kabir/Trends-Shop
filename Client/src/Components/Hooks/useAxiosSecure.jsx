@@ -4,8 +4,9 @@ import axios from "axios";
 import { useEffect } from "react";
 
 // Singleton Axios instance created once at module level
+const rawBaseURL = import.meta.env.VITE_LOCALHOST_KEY || "http://localhost:5000";
 const axiosSecure = axios.create({
-  baseURL: import.meta.env.VITE_LOCALHOST_KEY || "http://localhost:5000",
+  baseURL: rawBaseURL.replace(/\/+$/, ""),
 });
 
 // Synchronous request interceptor to prevent race conditions on initial page load / query mount
